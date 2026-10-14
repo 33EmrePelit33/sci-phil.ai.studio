@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Cinzel", "Times New Roman", serif;
+  --font-sans: "Newsreader", Georgia, serif;
+  --color-bg: #0c0f14;
+  --color-surface: #141922;
+  --color-fg: #e8e4da;
+  --color-muted: #9a9386;
+  --color-gold: #c4a574;
+  --color-line: #2a303a;
+  --radius: 0.75rem;
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  html {
+    background: var(--color-bg);
+    color: var(--color-fg);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(1200px 500px at 10% -10%, color-mix(in oklab, var(--color-gold) 12%, transparent), transparent 60%),
+      var(--color-bg);
+    font-family: var(--font-sans);
+    font-optical-sizing: auto;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-gold) 35%, transparent);
+    color: var(--color-fg);
+  }
+}

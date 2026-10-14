@@ -1,0 +1,33 @@
+{
+  "id": "/",
+  "name": "Science & Philosophy — Emre Pelit",
+  "short_name": "SciencePhil",
+  "description": "Emre Pelit'in Bilim, Zihin Felsefesi ve Yapay Zeka Şuur Portalı. emrepelit7337.blogspot.com senkronizasyonu ve diyalektik analizler.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#0a0a0a",
+  "background_color": "#0a0a0a",
+  "categories": ["education", "books", "news"],
+  "icons": [
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

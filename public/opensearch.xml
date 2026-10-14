@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>Science &amp; Philosophy</ShortName>
+  <Description>Emre Pelit   Bilim ve Zihin Felsefesi Makalelerinde Ara</Description>
+  <Tags>bilim felsefe yapayzeka  uur beyin emrepelit</Tags>
+  <Contact>emrepelit7337@gmail.com</Contact>
+  <Url type="text/html" template="https://sci-phil.ai.studio/?q={searchTerms}" />
+  <Url type="application/x-suggestions+json" template="https://sci-phil.ai.studio/api/articles?q={searchTerms}" />
+  <Image height="16" width="16" type="image/x-icon">https://sci-phil.ai.studio/author.jpg</Image>
+  <Developer>Emre Pelit</Developer>
+  <Language>tr</Language>
+  <OutputEncoding>UTF-8</OutputEncoding>
+  <InputEncoding>UTF-8</InputEncoding>
+</OpenSearchDescription>

@@ -1,0 +1,92 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Science & Philosophy Public REST API",
+    "description": "High-performance REST API for Science & Philosophy (sci-phil.ai.studio) articles, topic clusters, AI search, and automated backups.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Emre Pelit",
+      "url": "https://sci-phil.ai.studio",
+      "email": "emrepelit39@gmail.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://sci-phil.ai.studio",
+      "description": "Primary Production Server"
+    }
+  ],
+  "paths": {
+    "/api/v1/articles": {
+      "get": {
+        "summary": "List articles with pagination, language and cluster filters",
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } },
+          { "name": "lang", "in": "query", "schema": { "type": "string" } },
+          { "name": "category", "in": "query", "schema": { "type": "string" } },
+          { "name": "cluster", "in": "query", "schema": { "type": "string" } },
+          { "name": "q", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Paginated article list" }
+        }
+      }
+    },
+    "/api/v1/articles/{slug}": {
+      "get": {
+        "summary": "Get full article detail, dialectical triad, and topic cluster",
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Article details with dialectical structure" },
+          "404": { "description": "Article not found" }
+        }
+      }
+    },
+    "/api/v1/clusters": {
+      "get": {
+        "summary": "List all 5 topic clusters and pillar pages",
+        "responses": {
+          "200": { "description": "List of topic clusters" }
+        }
+      }
+    },
+    "/api/v1/search": {
+      "get": {
+        "summary": "Fast full-text and semantic keyword search",
+        "parameters": [
+          { "name": "q", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Search results with relevance score" }
+        }
+      }
+    },
+    "/api/v1/export/backup": {
+      "get": {
+        "summary": "Download complete site and catalog backup as JSON",
+        "responses": {
+          "200": { "description": "Full archive backup JSON file" }
+        }
+      }
+    },
+    "/api/v1/ai/forecast": {
+      "get": {
+        "summary": "AI & Time-series forecast for traffic, indexing, and content recommendations",
+        "responses": {
+          "200": { "description": "Forecast metrics and recommendations" }
+        }
+      }
+    },
+    "/api/v1/automations/digest": {
+      "get": {
+        "summary": "Search Console & GA4 weekly automated summary digest",
+        "responses": {
+          "200": { "description": "Weekly automated digest" }
+        }
+      }
+    }
+  }
+}

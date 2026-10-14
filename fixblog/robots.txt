@@ -1,0 +1,6 @@
+# Science & Philosophy — primary domain: https://sci-phil.ai.studio/
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://sci-phil.ai.studio/sitemap.xml

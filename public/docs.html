@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>REST API &amp; Mobil Entegrasyon Dokümantasyonu · Science &amp; Philosophy</title>
+  <link rel="canonical" href="https://sci-phil.ai.studio/docs">
+  <style>
+    :root { color-scheme: dark; --bg: #0b1120; --panel: #111a2e; --line: #263652; --text: #f1f5f9; --muted: #94a3b8; --blue: #38bdf8; --amber: #f59e0b; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: ui-sans-serif, system-ui, sans-serif; line-height: 1.6; }
+    .wrap { width: min(1000px, calc(100% - 32px)); margin: 40px auto; }
+    header { border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 32px; }
+    h1 { font-size: 2.2rem; margin: 0 0 10px; color: #fff; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #0284c7; color: #fff; font-size: 0.78rem; font-weight: 700; margin-bottom: 12px; }
+    .endpoint { margin: 20px 0; padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    .method { display: inline-block; padding: 3px 8px; border-radius: 6px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; margin-right: 8px; }
+    .method.get { background: #065f46; color: #34d399; }
+    .method.post { background: #1e3a8a; color: #60a5fa; }
+    .path { font-family: ui-monospace, SFMono-Regular, monospace; font-size: 1.05rem; font-weight: 700; color: #f8fafc; }
+    .desc { color: var(--muted); font-size: 0.92rem; margin: 8px 0; }
+    pre { background: #060b14; padding: 12px; border-radius: 8px; border: 1px solid #1e293b; font-family: monospace; font-size: 0.85rem; overflow-x: auto; color: #38bdf8; }
+    a { color: var(--blue); }
+    .top-links { display: flex; gap: 14px; margin-top: 14px; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; background: #1e293b; color: #fff; text-decoration: none; font-size: 0.88rem; font-weight: 600; border: 1px solid #334155; }
+    .btn:hover { background: #334155; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <span class="badge">OpenAPI 3.0 / REST API</span>
+      <h1>Science &amp; Philosophy Public REST API</h1>
+      <p style="color:var(--muted);margin:0;font-size:1.05rem">
+        Mobil uygulamalar, veri araştırmaları ve otomasyonlar için salt okunur yüksek performanslı JSON API arayüzü.
+      </p>
+      <div class="top-links">
+        <a href="/" class="btn">← Ana Sayfa</a>
+        <a href="/analytics.html" class="btn">Analytics Paneli</a>
+        <a href="/openapi.json" class="btn" target="_blank">openapi.json Şeması ↗</a>
+        <a href="/api/v1/export/backup" class="btn" style="background:#0284c7;border-color:#38bdf8">📦 Külliyat Yedeği İndir (JSON)</a>
+      </div>
+    </header>
+
+    <main>
+      <div class="endpoint">
+        <span class="method get">GET</span> <span class="path">/api/v1/articles</span>
+        <div class="desc">Katalogdaki makaleleri sayfalı, dil ve kategori filtreli olarak döndürür. Parametreler: <code>page</code>, <code>limit</code>, <code>lang</code>, <code>category</code>, <code>cluster</code>, <code>q</code>.</div>
+        <pre>GET /api/v1/articles?lang=tr&limit=10</pre>
+      </div>
+
+      <div class="endpoint">
+        <span class="method get">GET</span> <span class="path">/api/v1/articles/{slug}</span>
+        <div class="desc">Belirtilen makalenin tam metnini, diyalektik üçlüsünü (iddia, karşı iddia, neyin kanıtı olmadığı) ve bağlı konu kümesini döndürür.</div>
+        <pre>GET /api/v1/articles/zamanin-simulasyon-yapisi-ve-noronal-zaman-algisi-3395198863934648239</pre>
+      </div>
+
+      <div class="endpoint">
+        <span class="method get">GET</span> <span class="path">/api/v1/clusters</span>
+        <div class="desc">Site bünyesindeki 5 ana SEO ve düşünsel Konu Kümesini (Topic Clusters), pillar makalelerini ve anahtar kelimelerini listeler.</div>
+        <pre>GET /api/v1/clusters</pre>
+      </div>
+
+      <div class="endpoint">
+        <span class="method get">GET</span> <span class="path">/api/v1/search</span>
+        <div class="desc">Başlık, özet ve kavramsal anahtar kelimelerde anlık arama yapar.</div>
+        <pre>GET /api/v1/search?q=bilinc</pre>
+      </div>
+
+      <div class="endpoint">
+        <span class="method get">GET</span> <span class="path">/api/v1/ai/forecast</span>
+        <div class="desc">Zaman serisi projeksiyon modeli ile indekslenme oranı, organik gösterim tahmini ve içerik derinleştirme önerilerini sunar.</div>
+        <pre>GET /api/v1/ai/forecast</pre>
+      </div>
+
+      <div class="endpoint">
+        <span class="method get">GET</span> <span class="path">/api/v1/automations/digest</span>
+        <div class="desc">Search Console ve Analytics verilerinin haftalık zamanlanmış otomatik özet raporu.</div>
+        <pre>GET /api/v1/automations/digest</pre>
+      </div>
+
+      <div class="endpoint">
+        <span class="method get">GET</span> <span class="path">/api/v1/export/backup</span>
+        <div class="desc">Tüm makale külliyatını, katalog yapısını ve site haritası metaverilerini tek tıkla indirilebilir JSON formatında dışa aktarır.</div>
+        <pre>GET /api/v1/export/backup</pre>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

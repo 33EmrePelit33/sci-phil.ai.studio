@@ -1,0 +1,64 @@
+{
+  "name": "Science & Philosophy | Emre Pelit",
+  "short_name": "S&P Pelit",
+  "description": "Fizik, kozmoloji, yapay zeka epistemolojisi ve varlık felsefesi akademik külliyatı.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "any",
+  "background_color": "#0b1120",
+  "theme_color": "#0b1120",
+  "lang": "tr",
+  "categories": ["education", "books", "news"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Külliyat Arşivi",
+      "short_name": "Külliyat",
+      "description": "289 bilim ve felsefe makalesi",
+      "url": "/#kulliyat",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Sokratik AI Diyaloğu",
+      "short_name": "Sokratik AI",
+      "description": "Felsefi akıl yürütme asistanı",
+      "url": "/#sokratik-diyalog",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Public Analytics",
+      "short_name": "Analytics",
+      "description": "Canlı küresel istatistik ve sıralama paneli",
+      "url": "/analytics.html",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

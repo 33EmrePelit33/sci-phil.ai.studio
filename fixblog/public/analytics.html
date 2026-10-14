@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1120">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="description" content="Science & Philosophy için herkese açık, salt okunur kullanım ve yayın istatistikleri paneli.">
+  <link rel="canonical" href="https://sci-phil.ai.studio/analytics">
+  <title>Public Analytics · Science &amp; Philosophy</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0b1120;--panel:#101a2d;--panel2:#17243b;--line:#263652;--text:#eef4ff;--muted:#a7b5ce;--blue:#75d5ff;--gold:#f5c76b;--green:#6de2ad;--warning:#f6cb74}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at top,#15243c 0,#0b1120 52%);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.6}
+    a{color:var(--blue)}a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}.wrap{width:min(1120px,calc(100% - 32px));margin:auto}
+    header{border-bottom:1px solid var(--line);background:#0b1120ed;position:sticky;top:0;backdrop-filter:blur(12px);z-index:2}.head{min-height:66px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-weight:800;letter-spacing:.02em;text-decoration:none;color:var(--text)}.nav{display:flex;gap:14px;flex-wrap:wrap;align-items:center}.nav a{font-size:.9rem;text-decoration:none}.nav a:hover{color:var(--gold)}
+    main{padding:42px 0 64px}.eyebrow{display:flex;align-items:center;gap:8px;color:var(--blue);text-transform:uppercase;letter-spacing:.12em;font-size:.76rem;font-weight:800}.readonly{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border:1px solid #28684e;border-radius:7px;background:#123326;color:#9df0c4;letter-spacing:.03em}.title{font-size:clamp(2rem,5vw,3.15rem);line-height:1.1;letter-spacing:-.04em;margin:.55rem 0 1rem}.intro{max-width:790px;color:var(--muted);margin:0 0 22px}
+    .notice{padding:14px 16px;border:1px solid #314663;border-radius:12px;background:#101d31;color:#cad6e9;font-size:.9rem;margin:20px 0}.toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:24px 0 14px}.status{font-size:.87rem;color:var(--muted)}.status.error{color:var(--warning)}button{background:#1a2b48;color:var(--text);border:1px solid #365070;border-radius:9px;padding:10px 14px;font:inherit;font-weight:750;cursor:pointer}button:hover{background:#243957}button:disabled{opacity:.6;cursor:wait}
+    .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.card{padding:18px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,#17243b,var(--panel));min-height:125px}.label{font-size:.84rem;color:var(--muted)}.value{font-size:clamp(1.55rem,3.2vw,2.25rem);font-weight:850;letter-spacing:-.04em;margin-top:5px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}.sub{font-size:.78rem;color:#91a4c1;margin-top:4px}
+    .section{padding:22px;margin-top:18px;border:1px solid var(--line);border-radius:15px;background:#101a2d}.section h2{margin:0 0 12px;font-size:1.15rem}.languages{display:grid;gap:12px}.language-row{display:grid;grid-template-columns:125px 1fr 60px;gap:12px;align-items:center;font-size:.9rem}.bar{height:10px;border-radius:99px;background:#23334e;overflow:hidden}.fill{height:100%;width:0;background:linear-gradient(90deg,#38bdf8,#a78bfa);border-radius:99px}.language-count{text-align:right;font-variant-numeric:tabular-nums}.definitions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0}.definition{padding:12px;border:1px solid #263652;border-radius:10px;background:#121e32}.definition dt{font-weight:750;margin-bottom:3px}.definition dd{margin:0;color:var(--muted);font-size:.88rem}.links{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px}.links a{padding:9px 12px;border:1px solid #365070;background:#182740;border-radius:9px;text-decoration:none;font-weight:700;font-size:.88rem}.small-note{color:var(--muted);font-size:.84rem;margin:14px 0 0}footer{border-top:1px solid var(--line);padding:20px 0 32px;color:var(--muted);font-size:.82rem}
+    @media(max-width:780px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.head{align-items:flex-start;padding:14px 0;flex-direction:column}.language-row{grid-template-columns:90px 1fr 48px}}@media(max-width:500px){.cards,.definitions{grid-template-columns:1fr}.card{min-height:auto}.language-row{grid-template-columns:78px 1fr 42px;font-size:.82rem}.wrap{width:min(100% - 22px,1120px)}.nav{gap:10px}}
+  </style>
+</head>
+<body>
+  <header><div class="wrap head"><a class="brand" href="/">Science &amp; Philosophy · Emre Pelit</a><nav class="nav" aria-label="Ana gezinme"><a href="/">← Ana sayfa</a><a href="https://emrepelit7337.blogspot.com/" target="_blank" rel="noopener noreferrer">Blogger ↗</a></nav></div></header>
+  <main class="wrap">
+    <div class="eyebrow">Herkese açık <span class="readonly">◉ READ ONLY · SALT OKUNUR</span></div>
+    <h1 class="title">Analytics Paneli</h1>
+    <p class="intro">Science &amp; Philosophy yayınlarının birleşik okunma ve görüntülenme sayaçlarını, ayrıca makale kataloğunun yapısal özetini gösterir. Bu sayfada sayaçları değiştiren veya site ayarlarına erişen bir yönetim aracı bulunmaz.</p>
+    <div class="notice"><strong>Veri doğruluğu hakkında:</strong> Toplamlar, <code>/stats/read-baseline.json</code> içindeki kayıtlı başlangıç değerleri ile erişilebilen canlı sayaçların toplamından hesaplanır. Bir canlı sayaç yanıt vermezse ilgili toplam “—” görünür; eksik veri sıfır kabul edilmez. Ziyaretçi ülkeleri, tekil kullanıcı sayısı ve ortalama okuma süresi mevcut sayaç kaynaklarından güvenilir biçimde alınmadığı için bu panelde gösterilmez.</div>
+    <div class="toolbar"><div id="analytics-status" class="status" role="status" aria-live="polite">İstatistikler yükleniyor…</div><button id="analytics-refresh" type="button">↻ Yenile</button></div>
+    <section class="cards" aria-label="Salt okunur istatistikler">
+      <article class="card"><div class="label">BİRLEŞİK NET OKUNMA</div><div id="total-net" class="value" aria-live="polite">—</div><div class="sub">Kayıtlı taban + erişilebilen canlı net okuma sayaçları</div></article>
+      <article class="card"><div class="label">TOPLAM GÖRÜNTÜLEME</div><div id="total-views" class="value">—</div><div class="sub">Blogger, web, GitHub Pages ve uygulama görüntülemeleri</div></article>
+      <article class="card"><div class="label">BU UYGULAMA NET OKUNMA</div><div id="app-net" class="value">—</div><div class="sub">sci-phil.ai.studio için kaydedilen net okumalar</div></article>
+      <article class="card"><div class="label">BU UYGULAMA GÖRÜNTÜLEME</div><div id="app-views" class="value">—</div><div class="sub">sci-phil.ai.studio görüntüleme sayacı</div></article>
+      <article class="card"><div class="label">BLOGGER NET OKUNMA</div><div id="blogger-net" class="value">—</div><div class="sub">Kayıtlı Blogger başlangıç tabanı + canlı sayaç</div></article>
+      <article class="card"><div class="label">DİĞER WEB OKUNMALARI</div><div id="source-net" class="value">—</div><div class="sub">science-philosophy.grok.me tabanı + canlı sayaç</div></article>
+      <article class="card"><div class="label">GITHUB PAGES NET OKUNMA</div><div id="pages-net" class="value">—</div><div class="sub">GitHub Pages canlı sayacı</div></article>
+      <article class="card"><div class="label">YAZI ALTI OKUMALARI</div><div id="bottom-net" class="value">—</div><div class="sub">Kayıtlı başlangıç dosyasındaki değer</div></article>
+      <article class="card"><div class="label">KATALOGDAKİ MAKALELER</div><div id="article-total" class="value">—</div><div class="sub">catalog.json dosyasındaki kayıt sayısı</div></article>
+      <article class="card"><div class="label">MAKALELERDEKİ KELİMELER</div><div id="total-words" class="value">—</div><div class="sub">Katalogdaki wordCount alanlarının toplamı</div></article>
+      <article class="card"><div class="label">KATEGORİ SAYISI</div><div id="total-categories" class="value">—</div><div class="sub">Katalogda yer alan benzersiz kategoriler</div></article>
+      <article class="card"><div class="label">KATALOG GÜNCELLEMESİ</div><div id="catalog-updated" class="value" style="font-size:1.15rem">—</div><div class="sub">catalog.json içindeki tarih</div></article>
+    </section>
+    <section class="section" aria-label="Makale dillerinin dağılımı"><h2>Dillere göre makale dağılımı</h2><div id="language-breakdown" class="languages"><p class="status">Katalog okunuyor…</p></div></section>
+    <section class="section"><h2>Metrik tanımları ve sınırlar</h2>
+      <dl class="definitions">
+        <div class="definition"><dt>Net okuma</dt><dd>Site sayaç mantığında görünür kalma eşiğini karşılayan okuma. Geçmiş başlangıç verileri, kaynak dosyada kayıtlı tutulan değerlerdir.</dd></div>
+        <div class="definition"><dt>Görüntüleme</dt><dd>Sayfanın açılışını sayan sayaçların toplamıdır; tekil ziyaretçi sayısı anlamına gelmez.</dd></div>
+        <div class="definition"><dt>Salt okunur arayüz</dt><dd>Bu sayfada sayaç artırma, kayıt silme veya yapılandırma değiştirme işlevi yoktur. Yenile düğmesi yalnızca verileri yeniden okur.</dd></div>
+        <div class="definition"><dt>Veri kaynağı sınırı</dt><dd>Mevcut dış sayaç servisi istemci tarafında çağrıldığı için bu arayüz kendi başına sayaç yazma işlemlerine karşı güvenlik sınırı oluşturmaz. Güçlü yazma koruması için sunucu tarafı kimlik doğrulamalı sayaç servisi gerekir.</dd></div>
+      </dl>
+      <div class="links"><a href="/">Ana site</a><a href="https://emrepelit7337.blogspot.com/" target="_blank" rel="noopener noreferrer">Blogger ana sayfası ↗</a></div>
+    </section>
+  </main>
+  <footer><div class="wrap">© 2026 Emre Pelit · Science &amp; Philosophy · Herkese açık Analytics</div></footer>
+  <script src="/analytics-dashboard.js" defer></script>
+</body>
+</html>
