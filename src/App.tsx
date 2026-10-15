@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Header, READING_LANGUAGES, ReadingLanguageOption } from './components/Header';
 import { SyncStatusBanner } from './components/SyncStatusBanner';
 import { ArticleCard } from './components/ArticleCard';
@@ -20,6 +20,8 @@ import { FEATURED_70TH_ARTICLE } from './data/featuredArticle';
 import { TOPIC_CLUSTERS } from './data/topicClusters';
 import { Article, SyncStatus } from './types/article';
 import { getTranslations, translateCategory } from './utils/i18n';
+import { translateSiteCatalog, type SiteArticleTranslation } from './utils/siteTranslationService';
+import { getTranslatedArticle } from './data/articleTranslations';
 import { 
   Compass, 
   FlaskConical, 
@@ -40,7 +42,7 @@ import {
   Terminal,
   Share2
 } from 'lucide-react';
-
+import SocraticPartner from './SocraticPartner';
 const ARTICLES_PER_PAGE = 24;
 
 export default function App() {
@@ -60,7 +62,20 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<string>('Tümü');
   
   // Global target reading language preference: default is Turkish (Original)
-  const [readingLanguage, setReadingLanguage] = useState<ReadingLanguageOption>(READING_LANGUAGES[0]);
+  const [readingLanguage, setReadingLanguage] = useState<ReadingLanguageOption>(() => {
+    try {
+      const savedCode = localStorage.getItem('sci-phil-reading-language');
+      return READING_LANGUAGES.find((item) => item.code === savedCode) || READING_LANGUAGES[0];
+    } catch {
+      return READING_LANGUAGES[0];
+    }
+  });
+  const [siteTranslations, setSiteTranslations] = useState<Record<string, SiteArticleTranslation>>({});
+  const [isChangingLanguage, setIsChangingLanguage] = useState(false);
+  const [languageNotice, setLanguageNotice] = useState('');
+  const [translationPercent, setTranslationPercent] = useState(0);
+  const languageRequestId = useRef(0);
+  const autoTranslationAttemptRef = useRef('');
   
   // UI Translations dictionary according to selected reading language
   const ui = useMemo(() => getTranslations(readingLanguage.code), [readingLanguage.code]);
@@ -73,6 +88,7 @@ export default function App() {
   const [isAuthorModalOpen, setIsAuthorModalOpen] = useState(false);
   const [isLabModalOpen, setIsLabModalOpen] = useState(false);
   const [isSocialModalOpen, setIsSocialModalOpen] = useState(false);
+  const [isSocraticOpen, setIsSocraticOpen] = useState(false);
   
   // Pagination & Display View: Page mode or View-All mode
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -96,8 +112,13 @@ export default function App() {
     }
   }, [isDark]);
 
-  // Fetch the bundled archive merged with the live Blogger feed. The server
-  // refreshes the feed every 10 minutes; this client also polls on that cadence.
+  useEffect(() => {
+    document.documentElement.lang = readingLanguage.code;
+    document.documentElement.dir = readingLanguage.code === 'ar' ? 'rtl' : 'ltr';
+  }, [readingLanguage.code]);
+
+  // Fetch the bundled archive merged with the live Blogger feed. The server and
+  // client refresh at one-minute intervals; focus/visibility events refresh promptly.
   useEffect(() => {
     let isMounted = true;
     let requestInFlight = false;
@@ -135,12 +156,54 @@ export default function App() {
     };
 
     void fetchArticles();
-    const refreshTimer = window.setInterval(() => { void fetchArticles(); }, 10 * 60 * 1000);
+    const refreshTimer = window.setInterval(() => { void fetchArticles(); }, 60 * 1000);
+    const refreshOnReturn = () => { if (document.visibilityState === 'visible') void fetchArticles(); };
+    window.addEventListener('focus', refreshOnReturn);
+    document.addEventListener('visibilitychange', refreshOnReturn);
     return () => {
       isMounted = false;
       window.clearInterval(refreshTimer);
+      window.removeEventListener('focus', refreshOnReturn);
+      document.removeEventListener('visibilitychange', refreshOnReturn);
     };
   }, []);
+
+  // When a one-minute Blogger refresh adds or updates posts while a non-Turkish
+  // language is active, translate the new catalogue before treating it as complete.
+  // The signature guard prevents retry storms when the external translation service fails.
+  useEffect(() => {
+    if (readingLanguage.code === 'tr' || syncStatus.status === 'idle' || syncStatus.status === 'syncing' || isChangingLanguage) return;
+    if (!articles.length) return;
+    const hasMissingTranslations = articles.some((article) => !siteTranslations[article.id] && !siteTranslations[article.slug]);
+    if (!hasMissingTranslations) return;
+
+    const catalogueKey = `${readingLanguage.code}:${articles.map((article) => JSON.stringify([article.id, article.updatedAt || article.publishedAt || '', article.title, article.summary, article.categories, article.dialecticalTriad])).join('|')}`;
+    if (autoTranslationAttemptRef.current === catalogueKey) return;
+    autoTranslationAttemptRef.current = catalogueKey;
+
+    let cancelled = false;
+    const requestId = ++languageRequestId.current;
+    setIsChangingLanguage(true);
+    setTranslationPercent(8);
+    setLanguageNotice(`Yeni veya güncellenen makaleler ${readingLanguage.native} diline çevriliyor…`);
+    void translateSiteCatalog(articles, readingLanguage, (percent) => {
+      if (!cancelled && requestId === languageRequestId.current) setTranslationPercent(percent);
+    }).then((translations) => {
+      if (cancelled || requestId !== languageRequestId.current) return;
+      setSiteTranslations(translations);
+      setLanguageNotice(`Site arayüzü ve ${Object.keys(translations).length} makalenin dizin metni ${readingLanguage.native} dilinde hazır.`);
+    }).catch((error) => {
+      if (cancelled || requestId !== languageRequestId.current) return;
+      const detail = error instanceof Error ? error.message : 'Çeviri servisine ulaşılamadı.';
+      setLanguageNotice(`Yeni makalelerin tam çevirisi tamamlanamadı: ${detail}`);
+    }).finally(() => {
+      if (!cancelled && requestId === languageRequestId.current) {
+        setIsChangingLanguage(false);
+        setTranslationPercent(100);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [articles, readingLanguage, siteTranslations, syncStatus.status]);
 
   // Trigger an immediate server-side Blogger feed refresh.
   const handleTriggerSync = async () => {
@@ -177,6 +240,70 @@ export default function App() {
     }
   };
 
+  // Translate the whole catalogue as one language transition. The UI dictionary
+  // switches at once; all article-card metadata is swapped in a single state update.
+  const handleReadingLanguageChange = async (lang: ReadingLanguageOption) => {
+    if (lang.code === readingLanguage.code && !isChangingLanguage && (lang.code === 'tr' || articles.every((article) => Boolean(siteTranslations[article.id] || siteTranslations[article.slug])))) return;
+    const requestId = ++languageRequestId.current;
+    setLanguageNotice('');
+    if (lang.code === 'tr') {
+      setReadingLanguage(lang);
+      if (selectedArticle) setSelectedArticleInitialLang({ code: lang.code, name: lang.name });
+      setSiteTranslations({});
+      setIsChangingLanguage(false);
+      setTranslationPercent(0);
+      try { localStorage.setItem('sci-phil-reading-language', 'tr'); } catch { /* storage may be disabled */ }
+      return;
+    }
+
+    setIsChangingLanguage(true);
+    setTranslationPercent(8);
+    setLanguageNotice(`Tüm makale dizini ${lang.native} diline hazırlanıyor…`);
+    try {
+      const translations = await translateSiteCatalog(articles, lang, (percent) => { if (requestId === languageRequestId.current) setTranslationPercent(percent); });
+      if (requestId !== languageRequestId.current) return;
+      if (translations && Object.keys(translations).length) {
+        setSiteTranslations(translations);
+        setReadingLanguage(lang);
+        if (selectedArticle) setSelectedArticleInitialLang({ code: lang.code, name: lang.name });
+        try { localStorage.setItem('sci-phil-reading-language', lang.code); } catch { /* storage may be disabled */ }
+        const translatedCount = Object.keys(translations).length;
+        setLanguageNotice(translatedCount < articles.length
+          ? `${translatedCount}/${articles.length} makalenin dizin metni çevrildi; çevrilemeyen kayıtlar özgün hâliyle korunuyor.`
+          : `Site arayüzü ve ${translatedCount} makalenin dizin metni ${lang.native} diline çevrildi.`);
+      } else {
+        throw new Error('Çeviri servisi hedef dilde tam makale dizini döndürmedi. Özgün dil korunuyor.');
+      }
+    } catch (error) {
+      if (requestId !== languageRequestId.current) return;
+      console.warn('[Site translation] Translation request failed:', error);
+      // Keep the previously selected language and its complete catalogue; never
+      // label untranslated source text as a successful language change.
+      const detail = error instanceof Error ? error.message : 'Çeviri servisine ulaşılamadı.';
+      setLanguageNotice(`${detail} Sunucu Secrets ayarında GEMINI_API_KEY değerini ve model erişimini kontrol edin.`);
+    } finally {
+      if (requestId === languageRequestId.current) {
+        setIsChangingLanguage(false);
+        setTranslationPercent(100);
+      }
+    }
+  };
+
+  const articleCatalogRevision = useMemo(
+    () => articles.map((article) => `${article.id}:${article.updatedAt || article.publishedAt || ''}:${article.title}`).join('|'),
+    [articles],
+  );
+
+  // Restore the saved reading language after the article list has loaded. The
+  // translation service uses a catalogue signature, so new Blogger posts refresh it.
+  useEffect(() => {
+    if (readingLanguage.code !== 'tr' && !isChangingLanguage && !articles.every((article) => Boolean(siteTranslations[article.id] || siteTranslations[article.slug]))) {
+      void handleReadingLanguageChange(readingLanguage);
+    }
+    // Catalogue revision changes only when post identity/content metadata changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [articleCatalogRevision, readingLanguage.code]);
+
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
@@ -194,6 +321,20 @@ export default function App() {
     return ['Tümü', ...sorted];
   }, [articles]);
 
+  // Keep original category IDs for filtering, but show the translated label
+  // in the category bar so category navigation changes with the selected language.
+  const translatedCategoryLabels = useMemo(() => {
+    const labels: Record<string, string> = {};
+    articles.forEach((article) => {
+      const translated = siteTranslations[article.id] || siteTranslations[article.slug];
+      article.categories.forEach((sourceCategory, index) => {
+        const translatedLabel = translated?.categories?.[index];
+        labels[sourceCategory] = translatedLabel || labels[sourceCategory] || translateCategory(sourceCategory, readingLanguage.code);
+      });
+    });
+    return labels;
+  }, [articles, siteTranslations, readingLanguage.code]);
+
   // Filter articles by search and category (All articles are pure Turkish originals)
   const filteredArticles = useMemo(() => {
     return articles.filter((article) => {
@@ -205,9 +346,12 @@ export default function App() {
       // Search query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        const inTitle = article.title.toLowerCase().includes(q);
-        const inSummary = article.summary.toLowerCase().includes(q);
-        const inCategories = article.categories.some((c) => c.toLowerCase().includes(q));
+        const translated = siteTranslations[article.id] || siteTranslations[article.slug];
+        const fallbackArticle = readingLanguage.code !== 'tr' ? getTranslatedArticle(article, readingLanguage.code) : article;
+        const inTitle = article.title.toLowerCase().includes(q) || String(translated?.title || fallbackArticle.title).toLowerCase().includes(q);
+        const inSummary = article.summary.toLowerCase().includes(q) || String(translated?.summary || fallbackArticle.summary).toLowerCase().includes(q);
+        const translatedCategories = translated?.categories || fallbackArticle.categories || [];
+        const inCategories = [...article.categories, ...translatedCategories].some((c) => c.toLowerCase().includes(q));
         if (!inTitle && !inSummary && !inCategories) {
           return false;
         }
@@ -215,7 +359,7 @@ export default function App() {
 
       return true;
     });
-  }, [articles, selectedCategory, searchQuery]);
+  }, [articles, selectedCategory, searchQuery, readingLanguage.code, siteTranslations]);
 
   // Total pages calculation
   const totalPages = Math.max(1, Math.ceil(filteredArticles.length / ARTICLES_PER_PAGE));
@@ -275,7 +419,7 @@ export default function App() {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         readingLanguage={readingLanguage}
-        onReadingLanguageChange={setReadingLanguage}
+        onReadingLanguageChange={(lang) => { void handleReadingLanguageChange(lang); }}
         onOpenSecurityModal={() => setIsSecurityModalOpen(true)}
         onOpenAuthorModal={() => setIsAuthorModalOpen(true)}
         onOpenInteractiveLab={() => setIsLabModalOpen(true)}
@@ -287,6 +431,16 @@ export default function App() {
 
       {/* Sync Status Info Banner */}
       <SyncStatusBanner syncStatus={syncStatus} onRefresh={handleTriggerSync} />
+      {(isChangingLanguage || languageNotice) && (
+        <div className={`mx-auto mt-3 w-[calc(100%-2rem)] max-w-7xl rounded-xl border px-4 py-3 text-xs ${isChangingLanguage ? 'border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200' : 'border-neutral-200 bg-white text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300'}`} role="status" aria-live="polite">
+          <div className="flex items-center gap-2">
+            {isChangingLanguage && <Globe className="h-4 w-4 animate-pulse shrink-0" />}
+            <span className="flex-1">{isChangingLanguage ? `${languageNotice} ${translationPercent}%` : languageNotice}</span>
+            {!isChangingLanguage && <button type="button" onClick={() => setLanguageNotice('')} className="text-xs underline">Kapat</button>}
+          </div>
+          {isChangingLanguage && <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-amber-200 dark:bg-amber-900"><div className="h-full rounded-full bg-amber-600 transition-all duration-300" style={{ width: `${translationPercent}%` }} /></div>}
+        </div>
+      )}
 
       {/* Preview Viewport Frame Indicator when in Tablet or Mobile Mode */}
       {previewMode !== 'desktop' && (
@@ -422,6 +576,7 @@ export default function App() {
             onSelectWithLanguage={(art, lang) => handleSelectArticleWithLanguage(art, lang.code, lang.name)}
             readingLanguage={readingLanguage}
             ui={ui}
+            siteTranslation={siteTranslations[featuredArticle.id] || siteTranslations[featuredArticle.slug]}
           />
 
           {/* Konu Kümeleri (Topic Clusters) ve Pillar Sayfa Kürsüsü */}
@@ -554,7 +709,7 @@ export default function App() {
                   {READING_LANGUAGES.slice(0, 5).map((lang) => (
                     <button
                       key={lang.code}
-                      onClick={() => setReadingLanguage(lang)}
+                      onClick={() => { void handleReadingLanguageChange(lang); }}
                       className={`px-2 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                         readingLanguage.code === lang.code
                           ? 'bg-amber-600 text-white font-bold shadow-sm'
@@ -581,7 +736,7 @@ export default function App() {
                       : 'bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 border border-neutral-200 dark:border-neutral-800'
                   }`}
                 >
-                  {cat === 'Tümü' ? ui.allCategory : translateCategory(cat, readingLanguage.code)}
+                  {cat === 'Tümü' ? ui.allCategory : (translatedCategoryLabels[cat] || translateCategory(cat, readingLanguage.code))}
                 </button>
               ))}
             </div>
@@ -618,6 +773,7 @@ export default function App() {
                     onSelectWithLanguage={handleSelectArticleWithLanguage}
                     readingLanguage={readingLanguage}
                     ui={ui}
+                    siteTranslation={siteTranslations[article.id] || siteTranslations[article.slug]}
                   />
                 ))}
               </div>
@@ -706,7 +862,20 @@ export default function App() {
       </div>
 
       {/* Floating Preview Konsolu launcher for rapid access in AI Studio */}
+            {/* Socratic Thought Partner launcher */}
       <button
+        onClick={() => setIsSocraticOpen(true)}
+        className="fixed bottom-6 left-6 z-40 p-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-sky-400 border border-sky-500/50 shadow-2xl hover:scale-105 transition-all flex items-center gap-2 cursor-pointer group"
+        title="Sokratik Düşünce Partneri"
+        aria-label="Sokratik Partneri Aç"
+      >
+        <Brain className="w-5 h-5 text-sky-400" />
+        <span className="text-xs font-bold font-title pr-1 hidden sm:inline text-white">
+          Sokratik Partner
+        </span>
+      </button>
+
+<button
         onClick={() => setIsPreviewConsoleOpen(true)}
         className="fixed bottom-6 right-6 z-40 p-3.5 rounded-2xl bg-neutral-900 hover:bg-neutral-800 text-amber-400 border border-amber-500/50 shadow-2xl hover:scale-105 transition-all flex items-center gap-2 cursor-pointer group"
         title="AI Studio Preview Konsolunu Aç"
@@ -724,7 +893,7 @@ export default function App() {
         isOpen={isPreviewConsoleOpen}
         onClose={() => setIsPreviewConsoleOpen(false)}
         currentLanguage={readingLanguage}
-        onLanguageChange={setReadingLanguage}
+        onLanguageChange={(lang) => { void handleReadingLanguageChange(lang); }}
         ui={ui}
         previewMode={previewMode}
         onPreviewModeChange={setPreviewMode}
@@ -765,7 +934,23 @@ export default function App() {
         />
       )}
 
-      {/* Portal Footer */}
+            {/* Socratic Thought Partner Modal */}
+      {isSocraticOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setIsSocraticOpen(false)}
+              className="absolute top-2 right-2 z-10 p-2 rounded-full bg-slate-800 text-white hover:bg-slate-700"
+              aria-label="Kapat"
+            >
+              ✕
+            </button>
+            <SocraticPartner lang={readingLanguage.code === 'en' ? 'en' : 'tr'} />
+          </div>
+        </div>
+      )}
+
+{/* Portal Footer */}
       <footer className="border-t border-neutral-200/80 dark:border-neutral-800/80 bg-white/50 dark:bg-neutral-900/50 backdrop-blur-sm mt-auto py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-neutral-500 dark:text-neutral-400">
           <div className="flex items-center gap-3">

@@ -6,8 +6,14 @@ import { TOPIC_CLUSTERS, findClusterForArticle } from './topic-clusters.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const SITE_URL = 'https://sci-phil.ai.studio';
+let runtimeCatalog = null;
+
+export function setRuntimeCatalog(catalog) {
+  if (catalog && Array.isArray(catalog.posts)) runtimeCatalog = catalog;
+}
 
 function readCatalog() {
+  if (runtimeCatalog && Array.isArray(runtimeCatalog.posts)) return runtimeCatalog;
   const candidates = [path.join(__dirname, 'catalog.json'), path.join(__dirname, 'public', 'catalog.json')];
   for (const file of candidates) {
     try {
@@ -211,7 +217,7 @@ function getBaseUrl(_req) {
   return SITE_URL;
 }
 
-function renderSitemap(catalog, baseUrl = SITE_URL) {
+export function renderSitemap(catalog, baseUrl = SITE_URL) {
   const posts = Array.isArray(catalog.posts) ? catalog.posts : [];
   const entries = [{ loc: `${baseUrl}/`, lastmod: isoDate(catalog.updatedAt), priority: '1.0', changefreq: 'daily', title: 'Science & Philosophy | Emre Pelit' }];
   for (const post of posts) {
@@ -251,7 +257,7 @@ export function injectSearchableArticleIndex(html, catalog) {
     return `          <li><a href="${href}">${title}</a> <span>(${lang})</span></li>`;
   }).join('\n');
   const section = `    <section class="seo-article-index" aria-label="Makale arşivi">\n` +
-    `      <details>\n        <summary>Makale Arşivi — ${posts.length} makale</summary>\n` +
+    `      <details open>\n        <summary style="cursor:pointer;user-select:none;font-weight:700;font-size:1.05rem;padding:0.4rem 0;color:#fbbf24">Makale Arşivi — ${posts.length} makale</summary>\n` +
     `        <p>Bilim, felsefe, kozmoloji, zihin, yapay zekâ bilinci ve epistemoloji alanlarındaki yazılara doğrudan erişin.</p>\n` +
     `        <p style="color:#7dd3fc;font-size:0.85rem;margin:.5rem 0"><strong>İç Linkleme &amp; Otorite Ağı:</strong> science-philosophy.ai.studio arşivi kalıcı olarak <a href="https://sci-phil.ai.studio/" style="color:#fde047">sci-phil.ai.studio</a> üzerinde birleştirilmiştir.</p>\n` +
     `        <ul>\n${items}\n        </ul>\n      </details>\n    </section>`;
@@ -393,9 +399,16 @@ function renderArticlePage(post, posts, baseUrl = SITE_URL) {
   const nextLink = next ? `<a rel="next" href="${escapeHtml(articlePath(next))}">${escapeHtml(next.title)} →</a>` : '';
   const sourceLink = post.originalUrl && /^https:\/\//i.test(post.originalUrl) ? `<a href="${escapeHtml(post.originalUrl)}" target="_blank" rel="noopener noreferrer">Orijinal Blogger yazısı ↗</a>` : '';
   const articleData = JSON.stringify({
-    title: originalTitle, content: String(post.content || ''), language: lang,
-    claim: String(post.claim || ''), counterClaim: String(post.counterClaim || ''),
-    notProof: String(post.notProof || ''), fromToEvolution: String(post.fromToEvolution || '')
+    id: String(post.id || post.slug || ''),
+    slug: String(post.slug || ''),
+    title: originalTitle,
+    summary: String(post.excerpt || post.summary || ''),
+    content: String(post.content || ''),
+    language: lang,
+    claim: String(post.claim || ''),
+    counterClaim: String(post.counterClaim || ''),
+    notProof: String(post.notProof || ''),
+    fromToEvolution: String(post.fromToEvolution || '')
   }).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026');
 
   return `<!doctype html>
@@ -416,13 +429,13 @@ function renderArticlePage(post, posts, baseUrl = SITE_URL) {
 <header class="top"><div class="wrap"><a class="brand" href="/">Science &amp; Philosophy · Emre Pelit</a><a class="analytics-nav" href="/analytics.html" aria-label="Canlı Analytics panelini aç">▥ Live Analytics ↗</a></div></header>
 <main class="wrap"><nav class="crumbs" aria-label="Ekmek kırıntısı"><a href="/">Ana sayfa</a> / <a href="/#kulliyat">Bilim ve Felsefe Makaleleri</a></nav>
 <article><header><h1 id="article-title">${escapeHtml(originalTitle)}</h1><div class="meta">Yazar: Emre Pelit · Dil: ${escapeHtml(post.languageName || lang)} · Yayın: ${escapeHtml(String(post.published || '').slice(0, 10) || 'Tarih belirtilmemiş')} · Okuma süresi: ${escapeHtml(post.readingTime || '3 dk')}</div></header>
-${epistemology}<div class="reader-tools" role="group" aria-label="Makale çeviri ve sesli okuma araçları"><label for="translate-language">Dil:</label><select id="translate-language"><option value="tr">Türkçe</option><option value="en">English</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option><option value="pt">Português</option></select><button id="translate-article" type="button">🌐 Dile çevir</button><button id="speak-article" type="button">🔊 Sesli oku</button><button id="pause-article" type="button">⏸ Duraklat / sürdür</button><button id="stop-article" type="button">⏹ Durdur</button><p id="reader-status" class="status" role="status" aria-live="polite">Sesli okuma tarayıcı/işletim sistemi seslerine bağlıdır. Çeviri için sunucuda GEMINI_API_KEY ayarlanmalıdır.</p></div>
+${epistemology}<div class="reader-tools" role="group" aria-label="Makale çeviri ve sesli okuma araçları"><label for="translate-language">Dil:</label><select id="translate-language"><option value="tr">Türkçe</option><option value="en">English</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option><option value="it">Italiano</option><option value="ru">Русский</option><option value="ar">العربية</option><option value="ja">日本語</option><option value="zh">中文</option><option value="pt">Português</option></select><button id="translate-article" type="button">🌐 Dile çevir</button><button id="speak-article" type="button">🔊 Sesli oku</button><button id="pause-article" type="button">⏸ Duraklat / sürdür</button><button id="stop-article" type="button">⏹ Durdur</button><p id="reader-status" class="status" role="status" aria-live="polite">Sesli okuma tarayıcı/işletim sistemi seslerine bağlıdır. Çeviri için sunucuda GEMINI_API_KEY ayarlanmalıdır.</p></div>
 <div id="article-body" class="article-body">${content}</div>${buildSectorEvaluationHtml(post)}${buildTopicClusterHtml(post, posts)}${buildDeepeningSection(post, baseUrl)}<p>${sourceLink}</p></article>
 <nav class="nav" aria-label="Diğer makaleler">${prevLink}${nextLink}</nav><p><a href="/">← Tüm makaleler arşivine dön</a> · <a href="/analytics.html">Salt okunur Analytics paneli</a></p></main><footer><div class="wrap">© 2026 Emre Pelit · Science &amp; Philosophy</div></footer>
 <script id="article-data" type="application/json">${articleData}</script><script>
 (function(){const data=JSON.parse(document.getElementById('article-data').textContent);const language=document.getElementById('translate-language');const status=document.getElementById('reader-status');const title=document.getElementById('article-title');const body=document.getElementById('article-body');const originalTitle=data.title;const originalContent=data.content;const badTags='script,style,iframe,object,embed,form,textarea,select,svg,math,template';
 function safeHTML(value){const doc=new DOMParser().parseFromString(String(value||''),'text/html');doc.querySelectorAll(badTags).forEach(el=>el.remove());doc.querySelectorAll('*').forEach(el=>Array.from(el.attributes).forEach(attr=>{const name=attr.name.toLowerCase(),val=attr.value.trim();if(name.startsWith('on')||name==='srcdoc'||name==='formaction')el.removeAttribute(attr.name);else if(['href','src','xlink:href'].includes(name)&&/^(javascript|vbscript|data):/i.test(val))el.removeAttribute(attr.name);}));return doc.body.innerHTML;}
-document.getElementById('translate-article').addEventListener('click',async function(){if(language.value===data.language){status.textContent='Makale zaten bu dilde. Başka bir dil seçebilirsiniz.';return;}this.disabled=true;status.textContent='Çeviri hazırlanıyor…';try{const response=await fetch('/api/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({targetLang:language.value,title:originalTitle,content:originalContent,claim:data.claim,counterClaim:data.counterClaim,notProof:data.notProof,fromToEvolution:data.fromToEvolution})});const result=await response.json();if(!response.ok)throw new Error(result.error||'Çeviri hizmeti yanıt vermedi.');title.textContent=result.translation.title;body.innerHTML=safeHTML(result.translation.content);document.documentElement.lang=language.value;status.textContent='Çeviri gösteriliyor. Sayfa yenilenirse orijinal metin geri gelir.';}catch(error){status.textContent=error.message||'Çeviri tamamlanamadı.';}finally{this.disabled=false;}});
+document.getElementById('translate-article').addEventListener('click',async function(){if(language.value===data.language){status.textContent='Makale zaten bu dilde. Başka bir dil seçebilirsiniz.';return;}this.disabled=true;status.textContent='Makalenin tam çevirisi hazırlanıyor…';try{const response=await fetch('/api/gemini/translate',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({articleId:data.id,slug:data.slug,title:originalTitle,summary:data.summary,content:originalContent,dialecticalTriad:{claim:data.claim,counterClaim:data.counterClaim,whatIsNotEvidence:data.notProof,methodologicalNote:data.fromToEvolution},sourceLanguageCode:data.language||'tr',targetLanguage:language.options[language.selectedIndex].textContent||language.value,targetLanguageCode:language.value})});const result=await response.json();if(!response.ok||result.success!==true||!result.data)throw new Error(result.error||'Tam çeviri yanıtı alınamadı.');const translated=result.data;if(originalContent&&!translated.translatedContent)throw new Error('Makale gövdesi çevrilmedi; özgün metin korundu.');title.textContent=translated.translatedTitle||originalTitle;body.innerHTML=safeHTML(translated.translatedContent||originalContent);document.documentElement.lang=language.value;status.textContent='Makale başlığı ve gövdesi çevrildi. Yeniden yüklenince özgün dil gösterilir.';}catch(error){status.textContent=(error&&error.message)||'Çeviri tamamlanamadı. Kaynak metin değiştirilmedi.';}finally{this.disabled=false;}});
 document.getElementById('speak-article').addEventListener('click',function(){if(!('speechSynthesis'in window)){status.textContent='Bu tarayıcı sesli okumayı desteklemiyor.';return;}window.speechSynthesis.cancel();const utterance=new SpeechSynthesisUtterance((title.textContent+' . '+body.innerText).slice(0,120000));utterance.lang=language.value||data.language||'tr';utterance.onstart=()=>status.textContent='Sesli okuma başladı.';utterance.onend=()=>status.textContent='Sesli okuma tamamlandı.';utterance.onerror=()=>status.textContent='Sesli okuma tamamlanamadı.';window.speechSynthesis.speak(utterance);});
 document.getElementById('pause-article').addEventListener('click',function(){if(!('speechSynthesis'in window))return;if(window.speechSynthesis.paused)window.speechSynthesis.resume();else if(window.speechSynthesis.speaking)window.speechSynthesis.pause();});document.getElementById('stop-article').addEventListener('click',function(){if('speechSynthesis'in window)window.speechSynthesis.cancel();status.textContent='Sesli okuma durduruldu.';});})();
 </script></body></html>`;
@@ -485,13 +498,14 @@ Sitemap: ${baseUrl}/sitemap.xml
     const requestedSlug = String(req.params.slug || '').toLowerCase();
     const post = posts.find(item =>
       String(item.slug || '').toLowerCase() === requestedSlug ||
-      String(item.id || '').toLowerCase() === requestedSlug
+      String(item.id || '').toLowerCase() === requestedSlug ||
+      (item.id && (requestedSlug.endsWith(String(item.id).toLowerCase()) || requestedSlug.includes(String(item.id).toLowerCase())))
     );
-    if (!post) return res.status(404).type('text/plain; charset=utf-8').send('404 - Makale bulunamadı');
+    if (!post) return res.status(404).set('Content-Type', 'text/plain; charset=utf-8').send('404 - Makale bulunamadı');
     // Older /makale/<id> links remain useful, but each one points to the canonical slug.
     const canonicalPath = articlePath(post);
     if (req.params.slug !== post.slug) return res.redirect(301, canonicalPath);
-    res.set('Cache-Control', 'public, max-age=300').type('html; charset=utf-8').send(renderArticlePage(post, posts, baseUrl));
+    res.set('Cache-Control', 'public, max-age=300').set('Content-Type', 'text/html; charset=utf-8').send(renderArticlePage(post, posts, baseUrl));
   });
 
   if (includeHome) {
@@ -502,9 +516,9 @@ Sitemap: ${baseUrl}/sitemap.xml
         let page = readFileSync(path.join(__dirname, 'index.html'), 'utf8');
         const cards = renderArchiveCards(posts);
         page = replaceArticleGrid(page, cards);
-        res.set('Cache-Control', 'public, max-age=300').type('html; charset=utf-8').send(page);
+        res.set('Cache-Control', 'public, max-age=300').set('Content-Type', 'text/html; charset=utf-8').send(page);
       } catch (err) {
-        res.status(500).type('text/plain; charset=utf-8').send('Site ana sayfası hazırlanamadı.');
+        res.status(500).set('Content-Type', 'text/plain; charset=utf-8').send('Site ana sayfası hazırlanamadı.');
       }
     });
   }

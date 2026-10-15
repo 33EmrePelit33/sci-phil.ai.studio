@@ -6,11 +6,11 @@
 - 301 ile taşınacak adres: `https://science-philosophy.ai.studio/`
 - Eski alternatif adres: `https://science-philosophy-emre-pelit.ai.studio/`
 
-Bu paket mevcut React/Vite arayüzünü korur. SEO katmanı `catalog.json` içindeki 289 makaleyi `/makale/<slug>` adreslerinde sunucu tarafında HTML olarak yayınlar; `robots.txt` ve 291 URL içeren `sitemap.xml` sunucu tarafından oluşturulur. Ana sayfanın altında açılabilir, kullanıcıya görünür 289-makale listesi de normal HTML bağlantıları olarak yer alır.
+Bu paket mevcut React/Vite arayüzünü korur. SEO katmanı `catalog.json` içindeki 294 makaleyi `/makale/<slug>` adreslerinde sunucu tarafında HTML olarak yayınlar; `robots.txt` ve 296 URL içeren `sitemap.xml` sunucu tarafından oluşturulur. Ana sayfanın altında açılabilir, kullanıcıya görünür 294-makale listesi de normal HTML bağlantıları olarak yer alır.
 
 ## Yerel test ve yayınlama
 
-1. Node.js 20+ kullanın.
+1. Node.js 20.19+ veya 22.12+ kullanın.
 2. `npm install`
 3. `npm test`
 4. `npm run build`
@@ -26,12 +26,12 @@ Sunucu kuralı eski host istekleri aynı uygulamaya ulaştığında HTTP 301 dö
 ## İndeksleme
 
 - `https://sci-phil.ai.studio/sitemap.xml` haritasını Google Search Console ve Bing Webmaster Tools'a gönderin.
-- IndexNow gönderimi için dağıtımdan sonra Node.js 20+ ortamında `npm run submit:indexnow` çalıştırın. Key dosyası `public/5d3436c931b6024c.txt` konumundadır.
+- IndexNow gönderimi için dağıtımdan sonra Node.js 20.19+ veya 22.12+ ortamında `npm run submit:indexnow` çalıştırın. Key dosyası `public/5d3436c931b6024c.txt` konumundadır.
 - IndexNow Google'a gönderim yapmaz. Search Console üzerinden ayrıca doğrulama ve URL denetimi gerekir. Bütün sayfaların indeksleneceği veya üst sıraların garanti edildiği iddia edilmez; arama motorları kendi kalite ve tarama değerlendirmelerini yapar.
 
 ## Dikkat
 
-`server.ts`, bu kaynak projede bulunmayan API uç noktaları uydurmamaktadır; uygulamadaki `/api` uç noktaları 404 JSON yanıtıyla açıkça raporlanır.
+`server.ts`, bu paketin tanımlı `/api` uç noktalarını sağlar; tanımsız yollar 404 JSON yanıtı döndürür. Site genelinde çeviri ve canlı analitik için gereken sağlayıcı anahtarları sunucunun gizli değişkenlerinde tanımlanmalıdır.
 
 Bu paketteki yeni SEO makale sayfaları sesli okumayı tarayıcının Speech Synthesis API'si ile sunar. Çeviri API'si için `GEMINI_API_KEY` içeren bir sunucu uç noktası ayrıca yapılandırılmalıdır.
 

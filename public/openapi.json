@@ -21,15 +21,55 @@
       "get": {
         "summary": "List articles with pagination, language and cluster filters",
         "parameters": [
-          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
-          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } },
-          { "name": "lang", "in": "query", "schema": { "type": "string" } },
-          { "name": "category", "in": "query", "schema": { "type": "string" } },
-          { "name": "cluster", "in": "query", "schema": { "type": "string" } },
-          { "name": "q", "in": "query", "schema": { "type": "string" } }
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cluster",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
-          "200": { "description": "Paginated article list" }
+          "200": {
+            "description": "Paginated article list"
+          }
         }
       }
     },
@@ -37,11 +77,22 @@
       "get": {
         "summary": "Get full article detail, dialectical triad, and topic cluster",
         "parameters": [
-          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
-          "200": { "description": "Article details with dialectical structure" },
-          "404": { "description": "Article not found" }
+          "200": {
+            "description": "Article details with dialectical structure"
+          },
+          "404": {
+            "description": "Article not found"
+          }
         }
       }
     },
@@ -49,7 +100,9 @@
       "get": {
         "summary": "List all 5 topic clusters and pillar pages",
         "responses": {
-          "200": { "description": "List of topic clusters" }
+          "200": {
+            "description": "List of topic clusters"
+          }
         }
       }
     },
@@ -57,10 +110,19 @@
       "get": {
         "summary": "Fast full-text and semantic keyword search",
         "parameters": [
-          { "name": "q", "in": "query", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
-          "200": { "description": "Search results with relevance score" }
+          "200": {
+            "description": "Search results with relevance score"
+          }
         }
       }
     },
@@ -68,23 +130,29 @@
       "get": {
         "summary": "Download complete site and catalog backup as JSON",
         "responses": {
-          "200": { "description": "Full archive backup JSON file" }
+          "200": {
+            "description": "Full archive backup JSON file"
+          }
         }
       }
     },
     "/api/v1/ai/forecast": {
       "get": {
-        "summary": "AI & Time-series forecast for traffic, indexing, and content recommendations",
+        "summary": "Archive size, measurement-source connectivity status, and recommended SEO validation checks. No traffic/indexing projection is returned without verified source data.",
         "responses": {
-          "200": { "description": "Forecast metrics and recommendations" }
+          "200": {
+            "description": "Archive size, measurement-source connectivity status, and recommended SEO validation checks. No traffic/indexing projection is returned without verified source data."
+          }
         }
       }
     },
     "/api/v1/automations/digest": {
       "get": {
-        "summary": "Search Console & GA4 weekly automated summary digest",
+        "summary": "Search Console and analytics connection status with recommended validation actions; not a live weekly report unless external data is actually connected.",
         "responses": {
-          "200": { "description": "Weekly automated digest" }
+          "200": {
+            "description": "Search Console and analytics connection status with recommended validation actions; not a live weekly report unless external data is actually connected."
+          }
         }
       }
     }

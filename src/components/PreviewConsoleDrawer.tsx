@@ -72,8 +72,12 @@ export const PreviewConsoleDrawer: React.FC<PreviewConsoleDrawerProps> = ({
   useEffect(() => {
     if (isOpen) {
       loadAnalytics();
+      if (activeTab === 'analytics') {
+        const intervalId = window.setInterval(loadAnalytics, 15 * 60 * 1000);
+        return () => window.clearInterval(intervalId);
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, activeTab]);
 
   useEffect(() => {
     try {
@@ -91,7 +95,7 @@ export const PreviewConsoleDrawer: React.FC<PreviewConsoleDrawerProps> = ({
 
   const priorityIndexingUrls = [
     { title: '1. Ana Sayfa (Felsefe ve Bilim Kürsüsü)', url: 'https://sci-phil.ai.studio/', priority: '1.0' },
-    { title: '2. 70. Vitrin Makalesi: Evren Her Zaman Tekil Bir Olguydu', url: 'https://sci-phil.ai.studio/makale/evren-her-zaman-tekil-bir-olguydu-ve-sonsuza-deg-8837081716175656566', priority: '0.9' },
+    { title: '2. 70. Vitrin Makalesi: Evren Her Zaman Tekil Bir Olguydu', url: 'https://sci-phil.ai.studio/makale/evren-her-zaman-tekil-bir-olguydu-ve-ilelebet-de-oyle-kalacak-8837081716175656566', priority: '0.9' },
     { title: '3. Pillar 1: LLM’lerin İnsan Davranışını Taklit Etmesi ve Şuur', url: 'https://sci-phil.ai.studio/makale/llmlerin-insan-davranisini-taklit-etmesi-onlarin-suur-sahibi-olduklarini-gosteri-3117827894793638348', priority: '0.9' },
     { title: '4. Pillar 2: Zamanın Simülasyon Yapısı ve Nöronal Zaman Algısı', url: 'https://sci-phil.ai.studio/makale/zamanin-simulasyon-yapisi-ve-noronal-zaman-algisi-3395198863934648239', priority: '0.9' },
     { title: '5. Yaratma Sanatı ve Yapılabilecekler (Higgs Alanı)', url: 'https://sci-phil.ai.studio/makale/yaratma-sanati-ve-yapilabilecekler-1885775824888267248', priority: '0.85' },
@@ -374,7 +378,40 @@ export const PreviewConsoleDrawer: React.FC<PreviewConsoleDrawerProps> = ({
                 </div>
               </div>
 
-              {/* Top 3 Summary Cards */}
+              {/* Synchronized Real Analytics Cards (Birleşik Net Okunma & Toplam Görüntüleme) */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-amber-500/10 to-orange-500/5 border border-amber-500/30">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] uppercase tracking-wider text-amber-400 font-bold block">Birleşik Net Okunma</span>
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-amber-500/20 text-amber-300">15 dk senkron</span>
+                  </div>
+                  <strong className="text-2xl font-black text-amber-300 mt-1.5 block font-mono">
+                    {analyticsData?.unifiedStats?.totalNetReads
+                      ? Number(analyticsData.unifiedStats.totalNetReads).toLocaleString('tr-TR')
+                      : '—'}
+                  </strong>
+                  <span className="text-[10px] text-neutral-400 mt-1 block">
+                    Kayıtlı taban + canlı okuma telemetrisi
+                  </span>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-sky-500/10 to-blue-500/5 border border-sky-500/30">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] uppercase tracking-wider text-sky-400 font-bold block">Toplam Görüntüleme</span>
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-sky-500/20 text-sky-300">15 dk senkron</span>
+                  </div>
+                  <strong className="text-2xl font-black text-sky-300 mt-1.5 block font-mono">
+                    {analyticsData?.unifiedStats?.totalViews
+                      ? Number(analyticsData.unifiedStats.totalViews).toLocaleString('tr-TR')
+                      : '—'}
+                  </strong>
+                  <span className="text-[10px] text-neutral-400 mt-1 block">
+                    Blogger + grok.me + uygulama toplamı
+                  </span>
+                </div>
+              </div>
+
+              {/* Telemetry Metrics */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="p-3 rounded-2xl bg-neutral-950/70 border border-neutral-800">
                   <span className="text-[11px] text-neutral-400 font-medium block">Benzersiz Ziyaretçi</span>
@@ -383,7 +420,7 @@ export const PreviewConsoleDrawer: React.FC<PreviewConsoleDrawerProps> = ({
                   </strong>
                 </div>
                 <div className="p-3 rounded-2xl bg-neutral-950/70 border border-neutral-800">
-                  <span className="text-[11px] text-neutral-400 font-medium block">Görüntüleme</span>
+                  <span className="text-[11px] text-neutral-400 font-medium block">Bu Uygulama Görüntüleme</span>
                   <strong className="text-xl font-black text-white mt-1 block">
                     {analyticsData?.pageviews ? Number(analyticsData.pageviews).toLocaleString('tr-TR') : '—'}
                   </strong>

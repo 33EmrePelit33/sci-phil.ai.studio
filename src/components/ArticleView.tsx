@@ -57,6 +57,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
   // Dynamic live translated content state
   const [displayArticle, setDisplayArticle] = useState<Article>(article);
   const [isTranslating, setIsTranslating] = useState(false);
+  const [translationError, setTranslationError] = useState('');
   const [translatedLang, setTranslatedLang] = useState<string>(article.language || 'tr');
   const [translatedLangName, setTranslatedLangName] = useState<string>('Türkçe');
 
@@ -109,10 +110,12 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
     }
 
     setIsTranslating(true);
+    setTranslationError('');
     try {
       const translated = await translateArticleContent({
         articleId: article.id,
         slug: article.slug,
+        sourceLanguageCode: article.language || 'tr',
         title: article.title,
         summary: article.summary,
         content: article.content,
@@ -137,8 +140,10 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
       });
       setTranslatedLang(targetLangCode);
       setTranslatedLangName(targetLangName);
+      setTranslationError('');
     } catch (err) {
       console.warn('Translation failed:', err);
+      setTranslationError(err instanceof Error ? err.message : 'Çeviri tamamlanamadı. Özgün makale gösterilmeye devam ediyor.');
     } finally {
       setIsTranslating(false);
     }
@@ -146,6 +151,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
 
   // Reset to original Turkish article text
   const handleResetOriginal = () => {
+    setTranslationError('');
     setDisplayArticle(article);
     setTranslatedLang('tr');
     setTranslatedLangName('Türkçe (Orijinal)');
@@ -225,6 +231,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
               isTranslating={isTranslating}
               onResetOriginal={handleResetOriginal}
             />
+            {translationError && <p className="basis-full text-xs text-rose-700 dark:text-rose-300" role="status" aria-live="polite">{translationError}</p>}
 
             {/* Typography Controls */}
             <div className="hidden sm:flex items-center rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-800 p-0.5 text-xs">

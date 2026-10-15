@@ -1,0 +1,11 @@
+node_modules
+dist
+.git
+.gitignore
+*.md
+fixblog
+sci-phil-deploy
+*.zip
+.env
+.env.local
+.DS_Store

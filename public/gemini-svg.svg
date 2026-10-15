@@ -1,0 +1,188 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- Derin Uzay Kozmik Arka Plan Geçişleri -->
+    <radialGradient id="deepSpace" cx="50%" cy="45%" r="75%">
+      <stop offset="0%" stop-color="#0d1b3e" />
+      <stop offset="45%" stop-color="#080d21" />
+      <stop offset="100%" stop-color="#040711" />
+    </radialGradient>
+
+    <radialGradient id="nebulaPurple" cx="24%" cy="34%" r="46%">
+      <stop offset="0%" stop-color="#7e22ce" stop-opacity="0.42" />
+      <stop offset="50%" stop-color="#3b0764" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="#040711" stop-opacity="0" />
+    </radialGradient>
+
+    <radialGradient id="nebulaCyan" cx="78%" cy="40%" r="44%">
+      <stop offset="0%" stop-color="#00f2fe" stop-opacity="0.35" />
+      <stop offset="55%" stop-color="#0369a1" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#040711" stop-opacity="0" />
+    </radialGradient>
+
+    <radialGradient id="galaxyCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fef08a" stop-opacity="0.95" />
+      <stop offset="28%" stop-color="#f59e0b" stop-opacity="0.6" />
+      <stop offset="65%" stop-color="#9333ea" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="#040711" stop-opacity="0" />
+    </radialGradient>
+
+    <radialGradient id="atomCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="38%" stop-color="#00f2fe" />
+      <stop offset="100%" stop-color="#0284c7" stop-opacity="0" />
+    </radialGradient>
+
+    <linearGradient id="circuitGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f2fe" stop-opacity="0.85" />
+      <stop offset="50%" stop-color="#f59e0b" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#fef08a" stop-opacity="1" />
+    </linearGradient>
+
+    <linearGradient id="cyanGlowLine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe" stop-opacity="0.92" />
+      <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.55" />
+      <stop offset="100%" stop-color="#a855f7" stop-opacity="0.85" />
+    </linearGradient>
+
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="14" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- 1. Ana Kozmik Uzay Tabanı -->
+  <rect width="1920" height="1080" fill="url(#deepSpace)" />
+  <rect width="1920" height="1080" fill="url(#nebulaPurple)" />
+  <rect width="1920" height="1080" fill="url(#nebulaCyan)" />
+
+  <!-- 2. Uzay-Zaman Kütleçekim Eğriliği Izgarası (Genel Görelilik Katmanı) -->
+  <g stroke="#38bdf8" stroke-opacity="0.12" stroke-width="1.1" fill="none">
+    <path d="M 0 800 Q 480 650 960 770 T 1920 730" />
+    <path d="M 0 860 Q 480 700 960 830 T 1920 800" />
+    <path d="M 0 920 Q 480 750 960 890 T 1920 870" />
+    <path d="M 0 980 Q 480 810 960 950 T 1920 940" />
+    <path d="M 100 0 Q 250 540 140 1080" />
+    <path d="M 260 0 Q 400 540 290 1080" />
+    <path d="M 420 0 Q 530 540 440 1080" />
+    <path d="M 580 0 Q 660 540 590 1080" />
+  </g>
+
+  <!-- 3. Sol Üst: Spiral Galaksi ve Astrofiziksel Yörünge -->
+  <g transform="translate(270, 230)">
+    <circle cx="0" cy="0" r="165" fill="url(#galaxyCore)" />
+    <g fill="none" stroke="url(#circuitGold)" stroke-opacity="0.48" stroke-width="2" filter="url(#glow)">
+      <path d="M 0 0 C 30 -10, 60 20, 40 55 C 15 95, -55 90, -85 45 C -125 -15, -90 -105, -20 -135 C 70 -170, 175 -110, 195 -10" />
+      <path d="M 0 0 C -30 10, -60 -20, -40 -55 C -15 -95, 55 -90, 85 -45 C 125 15, 90 105, 20 135 C -70 170, -175 110, -195 10" />
+    </g>
+  </g>
+
+  <!-- 4. Sol Alt & Orta: KUANTUM ATOM YÖRÜNGELERİ, PARÇACIK ÇARPIŞMA İZLERİ VE DALGA FONKSİYONU -->
+  <g transform="translate(310, 640)" filter="url(#glow)">
+    <!-- Kuantum Olasılık Bulutu ve Dalga Halkaları -->
+    <circle cx="0" cy="0" r="215" fill="none" stroke="#00f2fe" stroke-opacity="0.22" stroke-width="1.5" stroke-dasharray="10 7" />
+    <circle cx="0" cy="0" r="168" fill="none" stroke="#38bdf8" stroke-opacity="0.28" stroke-width="1.2" stroke-dasharray="4 8" />
+
+    <!-- Elektron Orbital Eliptik Yörüngeleri (4 Eksenli Bilimsel Atom Modeli) -->
+    <ellipse cx="0" cy="0" rx="198" ry="64" fill="none" stroke="url(#cyanGlowLine)" stroke-width="2.3" transform="rotate(0)" />
+    <ellipse cx="0" cy="0" rx="198" ry="64" fill="none" stroke="url(#cyanGlowLine)" stroke-width="2.3" transform="rotate(45)" />
+    <ellipse cx="0" cy="0" rx="198" ry="64" fill="none" stroke="url(#cyanGlowLine)" stroke-width="2.3" transform="rotate(90)" />
+    <ellipse cx="0" cy="0" rx="198" ry="64" fill="none" stroke="url(#cyanGlowLine)" stroke-width="2.3" transform="rotate(135)" />
+
+    <!-- Yüksek Enerjili Parçacık Hızlandırıcı (CERN/Higgs) Çarpışma Spiral İzleri -->
+    <path d="M 0 0 Q 90 -40 130 -120 C 155 -170 110 -210 75 -180 C 45 -155 70 -115 95 -135" fill="none" stroke="#fef08a" stroke-width="1.6" stroke-opacity="0.75" />
+    <path d="M 0 0 Q -85 55 -140 125 C -175 170 -130 215 -90 185 C -60 160 -85 120 -110 140" fill="none" stroke="#00f2fe" stroke-width="1.6" stroke-opacity="0.75" />
+
+    <!-- Atom Çekirdeği (Proton / Nötron / Kuark Kümesi) -->
+    <circle cx="0" cy="0" r="36" fill="url(#atomCore)" filter="url(#softGlow)" />
+    <circle cx="-8" cy="-5" r="8" fill="#00f2fe" />
+    <circle cx="8" cy="-4" r="7.5" fill="#f59e0b" />
+    <circle cx="0" cy="8" r="8" fill="#a855f7" />
+    <circle cx="-5" cy="5" r="6" fill="#ffffff" />
+
+    <!-- Yörüngedeki Elektron Parçacıkları -->
+    <circle cx="198" cy="0" r="6.5" fill="#00f2fe" />
+    <circle cx="-198" cy="0" r="6.5" fill="#00f2fe" />
+    <circle cx="140" cy="140" r="6.5" fill="#fef08a" />
+    <circle cx="-140" cy="-140" r="6.5" fill="#fef08a" />
+    <circle cx="0" cy="-198" r="6.5" fill="#38bdf8" />
+    <circle cx="-140" cy="140" r="6.5" fill="#c084fc" />
+
+    <!-- Sinüzoidal Kuantum Dalga Paketi (Ψ) -->
+    <path d="M -240 235 Q -210 198, -180 235 T -120 235 T -60 235 T 0 235 T 60 235 T 120 235 T 180 235" fill="none" stroke="#00f2fe" stroke-width="2.2" stroke-opacity="0.7" />
+    <path d="M -240 235 Q -210 272, -180 235 T -120 235 T -60 235 T 0 235 T 60 235 T 120 235 T 180 235" fill="none" stroke="#f59e0b" stroke-width="1.6" stroke-opacity="0.55" />
+  </g>
+
+  <!-- 5. Sağ Taraf: YAPAY ZEKÂ NÖRAL AĞ BEYİN MİMARİSİ VE DEVRE HATLARI -->
+  <g transform="translate(1470, 390)" filter="url(#glow)">
+    <g stroke="#00f2fe" stroke-opacity="0.72" fill="none">
+      <!-- Beyin Yarımküre Silüeti Çokgen Ağı -->
+      <path d="M -180 -40 C -195 -130, -110 -210, -10 -215 C 95 -220, 195 -160, 210 -55 C 225 35, 165 115, 85 135 C 45 145, 20 175, -5 195 C -30 165, -45 120, -95 105 C -160 85, -195 20, -180 -40 Z" stroke-width="2.5" fill="#0284c7" fill-opacity="0.12" />
+      <!-- Sinaptik Ağ Katmanları -->
+      <path d="M -130 -90 L -50 -160 L 40 -150 L 125 -95 L 155 -10 L 95 65 L 0 75 L -95 45 L -145 -25 Z" stroke-width="1.3" stroke-opacity="0.55" />
+      <path d="M -50 -160 L -20 -65 L 40 -150 M -20 -65 L 70 -50 L 125 -95 M -20 -65 L -95 45 M -20 -65 L 0 75 L 70 -50 L 95 65" stroke-width="1.1" stroke-opacity="0.45" />
+      <path d="M -130 -90 L -20 -65 L -145 -25 M 155 -10 L 70 -50" stroke-width="1.1" stroke-opacity="0.45" />
+    </g>
+
+    <!-- Nöron Düğümleri -->
+    <g fill="#e0f2fe">
+      <circle cx="-130" cy="-90" r="5" />
+      <circle cx="-50" cy="-160" r="6" />
+      <circle cx="40" cy="-150" r="6" />
+      <circle cx="125" cy="-95" r="5" />
+      <circle cx="155" cy="-10" r="6" />
+      <circle cx="95" cy="65" r="5" />
+      <circle cx="0" cy="75" r="6" />
+      <circle cx="-95" cy="45" r="5" />
+      <circle cx="-145" cy="-25" r="5" />
+      <circle cx="-20" cy="-65" r="8" fill="#00f2fe" />
+      <circle cx="70" cy="-50" r="7" fill="#fef08a" />
+    </g>
+
+    <!-- Beyin Sapından Uzanan Altın/Cyan Mikroişlemci Devre Hatları -->
+    <g fill="none" stroke="url(#circuitGold)" stroke-width="2.2" stroke-opacity="0.85">
+      <path d="M -15 185 L -15 580" />
+      <path d="M 0 190 L 0 620" />
+      <path d="M 15 185 L 15 440 L 160 440 L 195 475 L 420 475" />
+      <path d="M 30 165 L 30 340 L 190 340 L 230 300 L 450 300" />
+      <path d="M 55 145 L 55 240 L 240 240 L 280 200 L 450 200" />
+      <path d="M 180 -120 L 260 -120 L 300 -160 L 450 -160" />
+      <path d="M 208 -50 L 310 -50 L 350 -85 L 450 -85" />
+      <path d="M 195 30 L 290 30 L 330 70 L 450 70" />
+    </g>
+
+    <!-- Devre Uç Noktaları -->
+    <g fill="#fef08a">
+      <circle cx="160" cy="440" r="5" />
+      <circle cx="190" cy="340" r="5" />
+      <circle cx="240" cy="240" r="5" />
+      <circle cx="260" cy="-120" r="5" />
+      <circle cx="310" cy="-50" r="5" />
+      <circle cx="290" cy="30" r="5" />
+    </g>
+  </g>
+
+  <!-- 6. Sağ Alt: Astrofiziksel Galaksi Diski -->
+  <g transform="translate(1210, 740) rotate(-28)">
+    <ellipse cx="0" cy="0" rx="145" ry="42" fill="url(#galaxyCore)" opacity="0.82" />
+    <ellipse cx="0" cy="0" rx="185" ry="52" fill="none" stroke="#f59e0b" stroke-opacity="0.35" stroke-width="1.5" />
+  </g>
+
+  <!-- 7. Kozmik Yıldız Tozu Parçacıkları -->
+  <g fill="#ffffff" opacity="0.78">
+    <circle cx="140" cy="90" r="1.5" />
+    <circle cx="480" cy="130" r="2" />
+    <circle cx="620" cy="240" r="1.2" />
+    <circle cx="820" cy="110" r="1.8" />
+    <circle cx="1080" cy="160" r="1.4" />
+    <circle cx="1290" cy="95" r="2.2" />
+    <circle cx="1690" cy="120" r="1.5" />
+    <circle cx="710" cy="690" r="1.6" />
+    <circle cx="940" cy="820" r="2" />
+    <circle cx="540" cy="920" r="1.5" />
+  </g>
+</svg>

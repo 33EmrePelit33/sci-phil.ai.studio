@@ -74,7 +74,7 @@ test('every direct article route renders a sector definition and assessment in a
     assert.doesNotMatch(res.body, /professional-review|Sektörel ve Profesyonel Tez Değerlendirmesi/);
   }
   // Check coverage, not merely the five language examples above: each of the
-  // 289 direct catalogue routes must receive the same sector-analysis section.
+  // 294 direct catalogue routes must receive the same sector-analysis section.
   for (const post of catalog.posts) {
     const lang = Object.hasOwn(expected, String(post.language || '').toLowerCase())
       ? String(post.language).toLowerCase() : 'tr';
@@ -93,7 +93,7 @@ test('every direct article route renders a sector definition and assessment in a
   }
 });
 
-test('catalog still retains all 289 articles for sector coverage', () => {
-  assert.equal(catalog.posts.length, 289);
+test('catalog still retains all 294 articles for sector coverage', () => {
+  assert.equal(catalog.posts.length, 294);
   assert.ok(catalog.posts.every((post) => post.slug && post.title));
 });

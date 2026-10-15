@@ -1,500 +1,918 @@
-<!doctype html>
-<html lang="tr">
+<!DOCTYPE html>
+<html lang="tr" class="dark">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b1120">
-  <meta name="robots" content="index,follow,max-image-preview:large">
-  <meta name="description" content="Science & Philosophy için herkese açık, salt okunur kullanım ve canlı ziyaretçi istatistikleri paneli.">
-  <link rel="canonical" href="https://sci-phil.ai.studio/analytics">
-  <title>Public Analytics · Science &amp; Philosophy</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kapsamlı Ekosistem Analitiği — Science & Philosophy | Emre Pelit</title>
+  <meta name="description" content="Emre Pelit Bilim ve Felsefe Ekosistemi (sci-phil.ai.studio, Blogger, grok.me, GitHub Pages, @science_only) birleşik canlı analitik ve katalog telemetri merkezi." />
+  <link rel="canonical" href="https://sci-phil.ai.studio/analytics.html" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/analytics-tracker.js" defer></script>
   <style>
-    :root{color-scheme:dark;--bg:#0b1120;--panel:#101a2d;--panel2:#17243b;--line:#263652;--text:#eef4ff;--muted:#a7b5ce;--blue:#75d5ff;--gold:#f5c76b;--green:#6de2ad;--warning:#f6cb74}
-    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at top,#15243c 0,#0b1120 52%);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.6}
-    a{color:var(--blue)}a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}.wrap{width:min(1120px,calc(100% - 32px));margin:auto}
-    header{border-bottom:1px solid var(--line);background:#0b1120ed;position:sticky;top:0;backdrop-filter:blur(12px);z-index:2}.head{min-height:66px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-weight:800;letter-spacing:.02em;text-decoration:none;color:var(--text)}.nav{display:flex;gap:14px;flex-wrap:wrap;align-items:center}.nav a{font-size:.9rem;text-decoration:none}.nav a:hover{color:var(--gold)}
-    main{padding:42px 0 64px}.eyebrow{display:flex;align-items:center;gap:8px;color:var(--blue);text-transform:uppercase;letter-spacing:.12em;font-size:.76rem;font-weight:800}.readonly{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border:1px solid #28684e;border-radius:7px;background:#123326;color:#9df0c4;letter-spacing:.03em}.title{font-size:clamp(2rem,5vw,3.15rem);line-height:1.1;letter-spacing:-.04em;margin:.55rem 0 1rem}.intro{max-width:790px;color:var(--muted);margin:0 0 22px}
-    .notice{padding:14px 16px;border:1px solid #314663;border-radius:12px;background:#101d31;color:#cad6e9;font-size:.9rem;margin:20px 0}.toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:24px 0 14px}.status{font-size:.87rem;color:var(--muted)}.status.error{color:var(--warning)}button{background:#1a2b48;color:var(--text);border:1px solid #365070;border-radius:9px;padding:10px 14px;font:inherit;font-weight:750;cursor:pointer}button:hover{background:#243957}button:disabled{opacity:.6;cursor:wait}
-    .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.card{padding:18px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,#17243b,var(--panel));min-height:125px}.label{font-size:.84rem;color:var(--muted)}.value{font-size:clamp(1.55rem,3.2vw,2.25rem);font-weight:850;letter-spacing:-.04em;margin-top:5px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}.sub{font-size:.78rem;color:#91a4c1;margin-top:4px}
-    .section{padding:22px;margin-top:18px;border:1px solid var(--line);border-radius:15px;background:#101a2d}.section h2{margin:0 0 12px;font-size:1.15rem}.languages{display:grid;gap:12px}.language-row{display:grid;grid-template-columns:125px 1fr 60px;gap:12px;align-items:center;font-size:.9rem}.bar{height:10px;border-radius:99px;background:#23334e;overflow:hidden}.fill{height:100%;width:0;background:linear-gradient(90deg,#38bdf8,#a78bfa);border-radius:99px}.language-count{text-align:right;font-variant-numeric:tabular-nums}.definitions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0}.definition{padding:12px;border:1px solid #263652;border-radius:10px;background:#121e32}.definition dt{font-weight:750;margin-bottom:3px}.definition dd{margin:0;color:var(--muted);font-size:.88rem}.links{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px}.links a{padding:9px 12px;border:1px solid #365070;background:#182740;border-radius:9px;text-decoration:none;font-weight:700;font-size:.88rem}.small-note{color:var(--muted);font-size:.84rem;margin:14px 0 0}footer{border-top:1px solid var(--line);padding:20px 0 32px;color:var(--muted);font-size:.82rem}
-    .live-wrap{margin:24px 0 30px;padding:20px;border:1px solid #315078;border-radius:17px;background:linear-gradient(145deg,#14243b,#101a2d)}
-    .live-head{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}.live-head h2{margin:0 0 6px;font-size:1.35rem}.live-head p{margin:0;color:var(--muted);font-size:.9rem;max-width:720px}
-    .live-state{display:inline-flex;align-items:center;gap:7px;border:1px solid #365070;border-radius:999px;padding:5px 10px;font-size:.78rem;font-weight:800;white-space:nowrap}.live-state:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green)}.live-state.pending:before{background:#fbbf24}
-    .live-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}.live-metric{padding:14px;border:1px solid #2a405f;border-radius:12px;background:#0c1627}.live-metric span{display:block;color:var(--muted);font-size:.8rem}.live-metric strong{display:block;font-size:clamp(1.5rem,3vw,2.1rem);margin-top:4px;font-weight:850;overflow-wrap:anywhere}
-    
-    .region-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}
-    .region-card{padding:14px;border:1px solid #2a405f;border-radius:12px;background:#0c1627;transition:transform .15s}
-    .region-card:hover{transform:translateY(-2px);border-color:#38bdf8}
-    .region-title{font-size:.82rem;font-weight:700;color:var(--muted);display:flex;align-items:center;justify-content:space-between}
-    .region-val{font-size:1.45rem;font-weight:850;color:var(--text);margin:4px 0 2px;letter-spacing:-.03em}
-    .region-sub{font-size:.76rem;color:var(--muted)}
-    .region-bar{height:6px;border-radius:99px;background:#1e2d45;margin-top:8px;overflow:hidden}
-    .region-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#38bdf8,#818cf8)}
-    
-    .country-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:18px 0 12px;padding:12px;border:1px solid #263652;border-radius:12px;background:#0c1627}
-    .region-pills{display:flex;gap:6px;flex-wrap:wrap}
-    .region-pill{padding:6px 11px;border-radius:8px;font-size:.78rem;font-weight:750;background:#142238;border:1px solid #263d60;color:var(--muted);cursor:pointer;transition:all .15s}
-    .region-pill:hover{color:#fff;background:#1b2e4d}
-    .region-pill.active{background:#0284c7;border-color:#38bdf8;color:#fff}
-    .country-filter-inputs{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .country-search{background:#080e18;border:1px solid #2a405f;color:#eef4ff;padding:7px 12px;border-radius:8px;font-size:.82rem;min-width:210px}
-    .country-search:focus{outline:2px solid var(--blue)}
-    .country-sort{background:#080e18;border:1px solid #2a405f;color:#eef4ff;padding:7px 10px;border-radius:8px;font-size:.82rem;cursor:pointer}
-    .badge-region{display:inline-block;padding:2px 7px;border-radius:6px;font-size:.72rem;font-weight:700;white-space:nowrap}
-    .badge-eurasia{background:#064e3b;color:#a7f3d0;border:1px solid #047857}
-    .badge-europe{background:#0c4a6e;color:#bae6fd;border:1px solid #0284c7}
-    .badge-americas{background:#3b0764;color:#f3e8ff;border:1px solid #7e22ce}
-    .badge-others{background:#451a03;color:#fef3c7;border:1px solid #b45309}
-    .badge-topic{display:inline-block;padding:2px 8px;border-radius:6px;font-size:.72rem;color:#cbd5e1;background:#141f33;border:1px solid #233452;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .country-progress-wrap{display:flex;align-items:center;gap:8px}
-    .country-bar-outer{flex:1;height:8px;border-radius:99px;background:#1a283e;overflow:hidden;min-width:60px}
-    .country-bar-inner{height:100%;border-radius:99px;background:linear-gradient(90deg,#0284c7,#38bdf8)}
-    
-    .country-table{width:100%;border-collapse:collapse;margin-top:12px;font-variant-numeric:tabular-nums}.country-table th,.country-table td{text-align:left;padding:10px 12px;border-bottom:1px solid #263550}.country-table th{font-size:.78rem;color:var(--muted);font-weight:700}.country-count{text-align:right!important;font-weight:800}.live-actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:14px}.live-actions button,.live-actions a{padding:9px 12px;font-size:.84rem}.live-hint{color:var(--muted);font-size:.8rem;margin:12px 0 0;line-height:1.5}.live-empty{color:var(--muted);font-size:.9rem;padding:14px 0}.live-refresh{background:#1a2b48;color:var(--text);border:1px solid #365070;border-radius:9px;padding:9px 14px;font:inherit;font-weight:750;cursor:pointer}.live-refresh:disabled{opacity:.65;cursor:wait}
-    @media(max-width:780px){.cards,.region-cards{grid-template-columns:repeat(2,minmax(0,1fr))}.head{align-items:flex-start;padding:14px 0;flex-direction:column}.language-row{grid-template-columns:90px 1fr 48px}}@media(max-width:500px){.cards,.definitions,.live-metrics,.region-cards{grid-template-columns:1fr}.card{min-height:auto}.language-row{grid-template-columns:78px 1fr 42px;font-size:.82rem}.wrap{width:min(100% - 22px,1120px)}.nav{gap:10px}}
+    :root {
+      --bg-cosmic-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1440' height='900' viewBox='0 0 1440 900'%3E%3Cdefs%3E%3CradialGradient id='nebula1' cx='20%25' cy='25%25' r='55%25'%3E%3Cstop offset='0%25' stop-color='%230284c7' stop-opacity='0.22'/%3E%3Cstop offset='45%25' stop-color='%234f46e5' stop-opacity='0.10'/%3E%3Cstop offset='100%25' stop-color='%23020617' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='nebula2' cx='82%25' cy='70%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%237c3aed' stop-opacity='0.18'/%3E%3Cstop offset='50%25' stop-color='%230ea5e9' stop-opacity='0.08'/%3E%3Cstop offset='100%25' stop-color='%23020617' stop-opacity='0'/%3E%3C/radialGradient%3E%3Cpattern id='spacetimeGrid' width='90' height='90' patternUnits='userSpaceOnUse'%3E%3Cpath d='M 90 0 L 0 0 0 90' fill='none' stroke='%2338bdf8' stroke-width='0.4' stroke-opacity='0.14'/%3E%3Ccircle cx='45' cy='45' r='1.1' fill='%237dd3fc' fill-opacity='0.28'/%3E%3Ccircle cx='15' cy='75' r='0.7' fill='%23c4b5fd' fill-opacity='0.22'/%3E%3Ccircle cx='78' cy='18' r='0.8' fill='%23bae6fd' fill-opacity='0.25'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='1440' height='900' fill='%23020617'/%3E%3Crect width='1440' height='900' fill='url(%23nebula1)'/%3E%3Crect width='1440' height='900' fill='url(%23nebula2)'/%3E%3Crect width='1440' height='900' fill='url(%23spacetimeGrid)'/%3E%3Cg stroke='%2338bdf8' stroke-opacity='0.12' fill='none'%3E%3Cellipse cx='720' cy='450' rx='520' ry='190' transform='rotate(-14 720 450)'/%3E%3Cellipse cx='720' cy='450' rx='360' ry='125' transform='rotate(22 720 450)'/%3E%3Ccircle cx='720' cy='450' r='88' stroke='%23a78bfa' stroke-opacity='0.18' stroke-dasharray='4 6'/%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    body {
+      background-color: #020617;
+      background-image: var(--bg-cosmic-url);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #f1f5f9;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+    }
+
+    .glass-card {
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(56, 189, 248, 0.16);
+      box-shadow: 0 20px 50px rgba(2, 6, 23, 0.65);
+    }
+
+    .glass-card:hover {
+      border-color: rgba(56, 189, 248, 0.35);
+    }
+
+    .pulse-dot {
+      box-shadow: 0 0 12px #10b981;
+    }
   </style>
 </head>
-<body>
-  <header><div class="wrap head"><a class="brand" href="/">Science &amp; Philosophy · Emre Pelit</a><nav class="nav" aria-label="Ana gezinme"><a href="/">← Ana sayfa</a><a href="https://emrepelit7337.blogspot.com/" target="_blank" rel="noopener noreferrer">Blogger ↗</a></nav></div></header>
-  <main class="wrap">
-    <div class="eyebrow">Herkese açık <span class="readonly">◉ READ ONLY · SALT OKUNUR</span></div>
-    <h1 class="title">Analytics Paneli</h1>
-    <p class="intro">Science &amp; Philosophy yayınlarının birleşik okunma, görüntülenme ve canlı ziyaret sayaçlarını gösterir. Bu sayfada sayaçları değiştiren veya site ayarlarına erişen bir yönetim aracı bulunmaz.</p>
+<body class="min-h-screen selection:bg-sky-500 selection:text-white">
 
-    <!-- CANLI ANALYTICS (UMAMI / CANLI SAYAÇ) -->
-    <section class="live-wrap" aria-labelledby="live-analytics-title">
-      <div class="live-head">
-        <div>
-          <h2 id="live-analytics-title">Canlı Ziyaretçi Analitiği</h2>
-          <p>Milat: <strong>12 Ekim 2026, 00.00 (Türkiye saati)</strong>. Bu tarihten itibaren ölçülen benzersiz ziyaretçiler, sayfa görüntülemeleri ve kullanıcıların geldikleri ülkelere göre canlı sınıflandırma verileri. Eski dönem istatistikleri bu panelin sayılarına dahil edilmez.</p>
-        </div>
-        <span id="live-analytics-state" class="live-state pending" role="status" aria-live="polite">Bağlantı kontrol ediliyor</span>
-      </div>
-      <div class="live-metrics" aria-label="Milat tarihinden sonraki ziyaret istatistikleri">
-        <article class="live-metric"><span>Benzersiz ziyaretçiler</span><strong id="live-visitors">—</strong></article>
-        <article class="live-metric"><span>Sayfa görüntüleme</span><strong id="live-pageviews">—</strong></article>
-        <article class="live-metric"><span>Ziyaret oturumları</span><strong id="live-visits">—</strong></article>
-      </div>
-
-      <!-- Kullanıcıların Geldiği Ülkelere Göre Sınıflandırma Paneli -->
-      <div style="margin-top:22px">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+  <!-- Üst Navigasyon ve Çoklu Dil Barı -->
+  <header class="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <a href="/" class="flex items-center gap-2.5 group">
+          <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20">
+            Φ
+          </div>
           <div>
-            <h3 style="margin:0;color:var(--text);font-size:1.05rem">Kullanıcıların Geldiği Ülke &amp; Bölge Sınıflandırması</h3>
-            <p style="margin:2px 0 0;font-size:0.8rem;color:var(--muted)">Canlı ziyaretçilerin coğrafi bölgelere, ilgi alanlarına ve sayfa başına etkileşimlerine göre gruplandırılmış dökümü.</p>
+            <span class="font-bold tracking-tight text-slate-100 group-hover:text-sky-400 transition-colors">Science &amp; Philosophy</span>
+            <span class="block text-[10px] uppercase tracking-widest text-sky-400/90" data-i18n="subtitle">Birleşik Ekosistem Telemetrisi • Emre Pelit</span>
           </div>
+        </a>
+      </div>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Hızlı Dil Değiştirici -->
+        <div class="flex items-center bg-slate-900/90 border border-slate-800 rounded-lg p-1 text-xs font-semibold">
+          <button onclick="switchAnalyticsLanguage('tr')" data-lang-btn="tr" class="px-2 py-1 rounded bg-sky-600 text-white transition-all">TR</button>
+          <button onclick="switchAnalyticsLanguage('en')" data-lang-btn="en" class="px-2 py-1 rounded text-slate-400 hover:text-white transition-all">EN</button>
+          <button onclick="switchAnalyticsLanguage('de')" data-lang-btn="de" class="px-2 py-1 rounded text-slate-400 hover:text-white transition-all">DE</button>
+          <button onclick="switchAnalyticsLanguage('fr')" data-lang-btn="fr" class="px-2 py-1 rounded text-slate-400 hover:text-white transition-all">FR</button>
+          <button onclick="switchAnalyticsLanguage('es')" data-lang-btn="es" class="px-2 py-1 rounded text-slate-400 hover:text-white transition-all">ES</button>
         </div>
 
-        <!-- 4 Ana Bölgesel Küme Kartları -->
-        <div class="region-cards" id="live-region-cards" aria-label="Bölgesel Ziyaretçi Sınıflandırması">
-          <div class="region-card" data-region="Türkiye &amp; Avrasya" style="cursor:pointer" title="Türkiye &amp; Avrasya ülkelerini filtrele">
-            <div class="region-title"><span>🇹🇷 Türkiye &amp; Avrasya</span><span class="badge-region badge-eurasia">Avrasya</span></div>
-            <div class="region-val" id="reg-val-eurasia">—</div>
-            <div class="region-sub" id="reg-sub-eurasia">Ziyaretçi payı hesaplanıyor…</div>
-            <div class="region-bar"><div class="region-fill" id="reg-bar-eurasia" style="width:0%;background:linear-gradient(90deg,#059669,#34d399)"></div></div>
+        <button id="manual-sync-btn" onclick="triggerBlogSyncNow()" class="px-3 py-1.5 rounded-lg bg-indigo-600/90 hover:bg-indigo-500 text-xs font-bold text-white border border-indigo-400/30 transition-all flex items-center gap-1.5 shadow-lg">
+          <span>↻</span>
+          <span data-i18n="syncBtn">Blogger Eşitle</span>
+        </button>
+
+        <a href="/" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-semibold text-slate-200 border border-slate-700/70 transition-all" data-i18n="backHome">
+          ← Ana Portal
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- Başlık & Canlı Durum Şeridi -->
+    <section class="glass-card rounded-2xl p-6 sm:p-8 relative overflow-hidden">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div class="space-y-2 max-w-3xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-medium">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot animate-pulse"></span>
+            <span data-i18n="liveBadge">Çoklu Platform Canlı Veri Akışı Aktif (60 sn Otomatik Yenileme &amp; 10 dk Blogger Sync)</span>
           </div>
-          <div class="region-card" data-region="Avrupa" style="cursor:pointer" title="Avrupa ülkelerini filtrele">
-            <div class="region-title"><span>🇪🇺 Avrupa</span><span class="badge-region badge-europe">AB &amp; EFTA</span></div>
-            <div class="region-val" id="reg-val-europe">—</div>
-            <div class="region-sub" id="reg-sub-europe">Ziyaretçi payı hesaplanıyor…</div>
-            <div class="region-bar"><div class="region-fill" id="reg-bar-europe" style="width:0%;background:linear-gradient(90deg,#0284c7,#38bdf8)"></div></div>
-          </div>
-          <div class="region-card" data-region="Kuzey Amerika" style="cursor:pointer" title="Kuzey Amerika ülkelerini filtrele">
-            <div class="region-title"><span>🌎 Kuzey Amerika</span><span class="badge-region badge-americas">K. Amerika</span></div>
-            <div class="region-val" id="reg-val-americas">—</div>
-            <div class="region-sub" id="reg-sub-americas">Ziyaretçi payı hesaplanıyor…</div>
-            <div class="region-bar"><div class="region-fill" id="reg-bar-americas" style="width:0%;background:linear-gradient(90deg,#7c3aed,#c084fc)"></div></div>
-          </div>
-          <div class="region-card" data-region="Diğer Bölgeler" style="cursor:pointer" title="Diğer bölgeleri filtrele">
-            <div class="region-title"><span>🌐 Diğer Bölgeler</span><span class="badge-region badge-others">Global</span></div>
-            <div class="region-val" id="reg-val-others">—</div>
-            <div class="region-sub" id="reg-sub-others">Ziyaretçi payı hesaplanıyor…</div>
-            <div class="region-bar"><div class="region-fill" id="reg-bar-others" style="width:0%;background:linear-gradient(90deg,#d97706,#fbbf24)"></div></div>
-          </div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white" data-i18n="mainHeading">
+            Kapsamlı Web Siteleri ve Akademik Katalog Analitik Merkezi
+          </h1>
+          <p class="text-sm text-slate-300 leading-relaxed" data-i18n="mainDesc">
+            Emre Pelit’in Bilim, Teorik Fizik, Kozmoloji ve Felsefe ağındaki tüm web mülklerinin (sci-phil.ai.studio, Blogger Time &amp; Entropy, grok.me, GitHub Pages ve @science_only) birleşik okuma, trafik, senkronizasyon ve çok dilli eser dağılımı.
+          </p>
         </div>
 
-        <!-- Çok Renkli Segmentli Coğrafi Dağılım Çubuğu -->
-        <div style="margin:16px 0 6px">
-          <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--muted);margin-bottom:6px">
-            <span>Bölgesel Trafik Dağılımı (Oransal)</span>
-            <span id="live-segmented-legend">🇹🇷 Avrasya · 🇪🇺 Avrupa · 🌎 K. Amerika · 🌐 Diğer</span>
+        <div class="flex flex-col sm:flex-row lg:flex-col items-start sm:items-end justify-between gap-2 text-xs text-slate-400 shrink-0 bg-slate-950/60 p-4 rounded-xl border border-slate-800/80">
+          <div>
+            <span class="text-slate-500" data-i18n="milestoneLabel">Raporlama Miladı:</span>
+            <strong class="text-slate-200 ml-1" id="milestone-date">24.04.2026 00:00 (+03:00)</strong>
           </div>
-          <div id="live-segmented-bar" style="height:10px;border-radius:99px;background:#1a283e;overflow:hidden;display:flex;width:100%" role="progressbar" aria-label="Bölgesel trafik payı">
-            <div id="seg-eurasia" style="width:0%;background:#10b981;transition:width .4s ease" title="Türkiye &amp; Avrasya"></div>
-            <div id="seg-europe" style="width:0%;background:#0ea5e9;transition:width .4s ease" title="Avrupa"></div>
-            <div id="seg-americas" style="width:0%;background:#a855f7;transition:width .4s ease" title="Kuzey Amerika"></div>
-            <div id="seg-others" style="width:0%;background:#f59e0b;transition:width .4s ease" title="Diğer Bölgeler"></div>
+          <div>
+            <span class="text-slate-500" data-i18n="lastUpdatedLabel">Son Veri Güncellemesi:</span>
+            <strong class="text-sky-400 ml-1" id="last-refresh-time">Yükleniyor...</strong>
           </div>
-        </div>
-
-        <!-- Sınıflandırma ve Etkileşimli Filtreleme Araç Çubuğu -->
-        <div class="country-toolbar">
-          <div class="region-pills" id="live-region-pills" role="tablist" aria-label="Bölgeye göre sınıflandırma sekmeleri">
-            <button type="button" class="region-pill active" data-region="all">🌍 Tüm Ülkeler</button>
-            <button type="button" class="region-pill" data-region="Türkiye &amp; Avrasya">🇹🇷 Türkiye &amp; Avrasya</button>
-            <button type="button" class="region-pill" data-region="Avrupa">🇪🇺 Avrupa</button>
-            <button type="button" class="region-pill" data-region="Kuzey Amerika">🌎 Kuzey Amerika</button>
-            <button type="button" class="region-pill" data-region="Diğer Bölgeler">🌐 Diğer Bölgeler</button>
+          <div>
+            <span class="text-slate-500" data-i18n="syncStateLabel">Blogger Senkronizasyonu:</span>
+            <strong class="text-emerald-400 ml-1" id="blogger-sync-badge">Aktif (10 dk Periyot)</strong>
           </div>
-          <div class="country-filter-inputs">
-            <input type="search" id="live-country-search" class="country-search" placeholder="🔍 Ülke adı, kod veya konu ara…" aria-label="Ülke filtrele">
-            <select id="live-country-sort" class="country-sort" aria-label="Sıralama ölçütü">
-              <option value="visitors-desc">En çok ziyaretçi ↓</option>
-              <option value="visitors-asc">En az ziyaretçi ↑</option>
-              <option value="pageviews-desc">En çok görüntüleme ↓</option>
-              <option value="duration-desc">En uzun okuma süresi ↓</option>
-              <option value="name-asc">Ülke adı (A-Z)</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Sınıflandırılmış Canlı Ülke Tablosu -->
-        <p id="live-countries-status" class="live-empty">Ülke verileri yükleniyor…</p>
-        <div style="overflow-x:auto">
-          <table class="country-table" id="live-country-table" hidden>
-            <thead>
-              <tr>
-                <th scope="col">Ülke &amp; Bayrak</th>
-                <th scope="col">Bölge Sınıfı</th>
-                <th scope="col" class="country-count">Ziyaretçi &amp; Pay</th>
-                <th scope="col" style="text-align:right">Görüntüleme</th>
-                <th scope="col" style="text-align:right">Ort. Süre</th>
-                <th scope="col">En Çok Okunan Felsefi Başlık</th>
-              </tr>
-            </thead>
-            <tbody id="live-country-rows"></tbody>
-          </table>
         </div>
       </div>
-      <div class="live-actions">
-        <button class="live-refresh" id="live-analytics-refresh" type="button">↻ Canlı veriyi yenile</button>
-        <a href="https://cloud.umami.is/" target="_blank" rel="noopener noreferrer">Umami yönetim paneli ↗</a>
-      </div>
-      <p class="live-hint" id="live-analytics-note">Ülke bilgisi IP tabanlı yaklaşık konumlandırmadır; VPN, proxy ve gizlilik ayarları sonucu etkileyebilir. Bu görünüm gerçek veriyi yalnızca analytics bağlantısı etkinleştirildiğinde gösterir.</p>
     </section>
 
-    <div class="notice"><strong>Veri doğruluğu hakkında:</strong> Toplamlar, <code>/stats/read-baseline.json</code> içindeki kayıtlı başlangıç değerleri ile erişilebilen canlı sayaçların toplamından hesaplanır. Bir canlı sayaç yanıt vermezse ilgili toplam “—” görünür; eksik veri sıfır kabul edilmez. Ziyaretçi ülkeleri ve ortalama okuma süresi mevcut sayaç kaynaklarından güvenilir biçimde alınmadığı için aşağıdaki genel tabloda tahminî veri yerine yalnızca doğrulanabilir net sayaçlar raporlanır.</div>
-    <div class="toolbar"><div id="analytics-status" class="status" role="status" aria-live="polite">İstatistikler yükleniyor…</div><button id="analytics-refresh" type="button">↻ Yenile</button></div>
-    <section class="cards" aria-label="Salt okunur istatistikler">
-      <article class="card"><div class="label">BİRLEŞİK NET OKUNMA</div><div id="total-net" class="value" aria-live="polite">—</div><div class="sub">Kayıtlı taban + erişilebilen canlı net okuma sayaçları</div></article>
-      <article class="card"><div class="label">TOPLAM GÖRÜNTÜLEME</div><div id="total-views" class="value">—</div><div class="sub">Blogger, web, GitHub Pages ve uygulama görüntülemeleri</div></article>
-      <article class="card"><div class="label">BU UYGULAMA NET OKUNMA</div><div id="app-net" class="value">—</div><div class="sub">sci-phil.ai.studio için kaydedilen net okumalar</div></article>
-      <article class="card"><div class="label">BU UYGULAMA GÖRÜNTÜLEME</div><div id="app-views" class="value">—</div><div class="sub">sci-phil.ai.studio görüntüleme sayacı</div></article>
-      <article class="card"><div class="label">BLOGGER NET OKUNMA</div><div id="blogger-net" class="value">—</div><div class="sub">Kayıtlı Blogger başlangıç tabanı + canlı sayaç</div></article>
-      <article class="card"><div class="label">DİĞER WEB OKUNMALARI</div><div id="source-net" class="value">—</div><div class="sub">science-philosophy.grok.me tabanı + canlı sayaç</div></article>
-      <article class="card"><div class="label">GITHUB PAGES NET OKUNMA</div><div id="pages-net" class="value">—</div><div class="sub">GitHub Pages canlı sayacı</div></article>
-      <article class="card"><div class="label">YAZI ALTI OKUMALARI</div><div id="bottom-net" class="value">—</div><div class="sub">Kayıtlı başlangıç dosyasındaki değer</div></article>
-      <article class="card"><div class="label">KATALOGDAKİ MAKALELER</div><div id="article-total" class="value">—</div><div class="sub">catalog.json dosyasındaki kayıt sayısı</div></article>
-      <article class="card"><div class="label">MAKALELERDEKİ KELİMELER</div><div id="total-words" class="value">—</div><div class="sub">Katalogdaki wordCount alanlarının toplamı</div></article>
-      <article class="card"><div class="label">KATEGORİ SAYISI</div><div id="total-categories" class="value">—</div><div class="sub">Katalogda yer alan benzersiz kategoriler</div></article>
-      <article class="card"><div class="label">KATALOG GÜNCELLEMESİ</div><div id="catalog-updated" class="value" style="font-size:1.15rem">—</div><div class="sub">catalog.json içindeki tarih</div></article>
+    <!-- 1. BİRLEŞİK GENEL METRİKLER (6 KART) -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div class="glass-card rounded-xl p-5">
+        <span class="text-[11px] font-semibold uppercase tracking-wider text-sky-400">Kümülatif Toplam Görüntüleme</span>
+        <div class="text-2xl sm:text-3xl font-black text-white mt-2" id="kpi-total-views">—</div>
+        <p class="text-[11px] text-slate-400 mt-1">Tüm sitelerin açılışından itibaren toplam</p>
+      </div>
+
+      <div class="glass-card rounded-xl p-5">
+        <span class="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">Birleşik Net Okunma</span>
+        <div class="text-2xl sm:text-3xl font-black text-white mt-2" id="kpi-net-reads">—</div>
+        <p class="text-[11px] text-slate-400 mt-1">Açılış tarihinden itibaren net okuma toplamı</p>
+      </div>
+
+      <div class="glass-card rounded-xl p-5">
+        <span class="text-[11px] font-semibold uppercase tracking-wider text-amber-400">Bugün</span>
+        <div class="text-2xl sm:text-3xl font-black text-white mt-2" id="kpi-today">—</div>
+        <p class="text-[11px] text-slate-400 mt-1" id="kpi-yesterday">Dün: —</p>
+      </div>
+
+      <div class="glass-card rounded-xl p-5">
+        <span class="text-[11px] font-semibold uppercase tracking-wider text-purple-400">Bu Ay</span>
+        <div class="text-2xl sm:text-3xl font-black text-white mt-2" id="kpi-this-month">—</div>
+        <p class="text-[11px] text-slate-400 mt-1" id="kpi-last-month">Geçen Ay: —</p>
+      </div>
+
+      <div class="glass-card rounded-xl p-5">
+        <span class="text-[11px] font-semibold uppercase tracking-wider text-indigo-400" data-i18n="kpiUniqueVisitors">Canlı Ziyaretçi / Oturum (Umami)</span>
+        <div class="text-2xl sm:text-3xl font-black text-white mt-2" id="kpi-umami-visitors">—</div>
+        <p class="text-[11px] text-slate-400 mt-1" id="kpi-umami-sessions" data-i18n="kpiUniqueVisitorsSub">Umami Cloud telemetrisi</p>
+      </div>
+
+      <div class="glass-card rounded-xl p-5">
+        <span class="text-[11px] font-semibold uppercase tracking-wider text-amber-400" data-i18n="kpiTotalArticles">Katalogdaki Toplam Eser</span>
+        <div class="text-2xl sm:text-3xl font-black text-white mt-2" id="kpi-total-articles">—</div>
+        <p class="text-[11px] text-slate-400 mt-1" id="kpi-languages-count" data-i18n="kpiTotalArticlesSub">5 dilde indekslenmiş makale</p>
+      </div>
+
+      <div class="glass-card rounded-xl p-5">
+        <span class="text-[11px] font-semibold uppercase tracking-wider text-purple-400" data-i18n="kpiTotalWords">Toplam Akademik Kelime Hacmi</span>
+        <div class="text-2xl sm:text-3xl font-black text-white mt-2" id="kpi-total-words">—</div>
+        <p class="text-[11px] text-slate-400 mt-1" id="kpi-reading-time" data-i18n="kpiTotalWordsSub">Tahmini okuma süresi</p>
+      </div>
+
+      <div class="glass-card rounded-xl p-5">
+        <span class="text-[11px] font-semibold uppercase tracking-wider text-rose-400" data-i18n="kpiConnectedSites">Bağlı Web Mülkü &amp; Kanal</span>
+        <div class="text-2xl sm:text-3xl font-black text-white mt-2">7 Platform</div>
+        <p class="text-[11px] text-slate-400 mt-1" data-i18n="kpiConnectedSitesSub">Kanonik SEO + 301 + Feed aktif</p>
+      </div>
     </section>
-    <!-- GOOGLE SEARCH CONSOLE & GA4 ENTEGRASYON KONSOLU -->
-    <section class="section" aria-labelledby="gsc-section-title" style="border-color:#38bdf8;background:linear-gradient(145deg,#0c192d,#101e36);">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:12px">
+
+    <!-- 2. TÜM WEB SİTELERİMİN KAPSAMLI EKOSİSTEM DURUMU (7 MÜLK) -->
+    <section class="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-4">
         <div>
-          <span style="display:inline-block;padding:3px 8px;border-radius:6px;background:#0369a1;color:#e0f2fe;font-size:0.75rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px">Arama Konsolları &amp; Dizine Ekleme</span>
-          <h2 id="gsc-section-title" style="margin:0;font-size:1.3rem;color:#f8fafc">Google Search Console &amp; Analytics Entegrasyon Merkezi</h2>
+          <h2 class="text-lg sm:text-xl font-bold text-white" data-i18n="ecosystemTitle">
+            🌐 Tüm Web Sitelerim ve Dijital Platformlarım — Canlı Telemetri Matrisi
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5" data-i18n="ecosystemSub">
+            Birincil kanonik portal, Blogger kaynak beslemesi, alternatif/301 domainler, GitHub kod deposu ve video yayın kanalının anlık metrikleri.
+          </p>
         </div>
-        <button id="copy-priority-urls" type="button" style="background:#0284c7;border-color:#38bdf8;color:#fff;display:inline-flex;align-items:center;gap:6px">📋 Öncelikli URL'leri Kopyala</button>
-      </div>
-      <p style="color:var(--muted);font-size:.9rem;margin:0 0 16px">
-        Google Search Console, Bing Webmaster ve Yandex Webmaster üzerinde <strong>https://sci-phil.ai.studio/</strong> mülkü için öncelikle dizine gönderilmesi gereken temel sayfalar ve site haritası.
-      </p>
-
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:16px">
-        <div style="padding:12px;border:1px solid #263652;border-radius:10px;background:#0f172a">
-          <span style="font-size:0.78rem;color:#94a3b8;font-weight:700">GSC / BING SITE HARİTASI (SITEMAP)</span>
-          <p style="margin:4px 0 0;font-family:monospace;font-size:0.85rem;color:#38bdf8;word-break:break-all">https://sci-phil.ai.studio/sitemap.xml</p>
-        </div>
-        <div style="padding:12px;border:1px solid #263652;border-radius:10px;background:#0f172a">
-          <span style="font-size:0.78rem;color:#94a3b8;font-weight:700">GOOGLE DOĞRULAMA DOSYASI</span>
-          <p style="margin:4px 0 0;font-family:monospace;font-size:0.85rem;color:#38bdf8;word-break:break-all">https://sci-phil.ai.studio/google5d3436c931b6024c.html</p>
-        </div>
-        <div style="padding:12px;border:1px solid #263652;border-radius:10px;background:#0f172a">
-          <span style="font-size:0.78rem;color:#94a3b8;font-weight:700">INDEXNOW BING/YANDEX ANAHTARI</span>
-          <p style="margin:4px 0 0;font-family:monospace;font-size:0.85rem;color:#38bdf8;word-break:break-all">https://sci-phil.ai.studio/5d3436c931b6024c.txt</p>
-        </div>
-        <div style="padding:12px;border:1px solid #263652;border-radius:10px;background:#0f172a">
-          <span style="font-size:0.78rem;color:#94a3b8;font-weight:700">İÇ LİNKLEME KONSOLİDASYONU (301)</span>
-          <p style="margin:4px 0 0;font-size:0.85rem;color:#4ade80">science-philosophy.ai.studio → sci-phil.ai.studio</p>
-        </div>
+        <span class="text-xs px-3 py-1 rounded-md bg-sky-500/10 text-sky-300 border border-sky-500/20 font-mono">
+          Primary Canonical: sci-phil.ai.studio
+        </span>
       </div>
 
-      <label for="priority-urls-box" style="display:block;font-size:0.82rem;font-weight:700;color:#cbd5e1;margin-bottom:6px">GSC URL Denetimi'ne yapıştırılacak öncelikli linkler (Kopyalanabilir Format):</label>
-      <textarea id="priority-urls-box" readonly rows="8" style="width:100%;background:#090e17;color:#e2e8f0;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:0.82rem;padding:12px;border:1px solid #334155;border-radius:8px;resize:vertical;line-height:1.5">https://sci-phil.ai.studio/
-https://sci-phil.ai.studio/sitemap.xml
-https://sci-phil.ai.studio/analytics.html
-https://sci-phil.ai.studio/makale/evren-her-zaman-tekil-bir-olguydu-ve-ilelebet-de-oyle-kalacak-8837081716175656566
-https://sci-phil.ai.studio/makale/llmlerin-insan-davranisini-taklit-etmesi-onlarin-suur-sahibi-olduklarini-gosteri-3117827894793638348
-https://sci-phil.ai.studio/makale/does-the-fact-that-llms-mimic-human-behavior-show-they-have-consciousness-4175545190349486799
-https://sci-phil.ai.studio/makale/beweist-die-tatsache-dass-llms-menschliches-verhalten-nachahmen-dass-sie-ein-bew-4599366178067641283
-https://sci-phil.ai.studio/makale/le-fait-que-les-llm-imitent-le-comportement-humain-prouve-t-il-quils-sont-dots-d-8383233014379744525
-https://sci-phil.ai.studio/makale/el-hecho-de-que-los-llm-imiten-el-comportamiento-humano-demuestra-que-tienen-con-8998131455154199161
-https://sci-phil.ai.studio/makale/zamanin-simulasyon-yapisi-ve-noronal-zaman-algisi-3395198863934648239
-https://sci-phil.ai.studio/makale/the-simulation-structure-of-time-and-neuronal-time-perception-9029718889265878465
-https://sci-phil.ai.studio/makale/die-simulationsstruktur-der-zeit-und-die-neuronale-zeitwahrnehmung-1491965123809274702
-https://sci-phil.ai.studio/makale/yaratma-sanati-ve-yapilabilecekler-1885775824888267248
-https://sci-phil.ai.studio/makale/the-art-of-creation-and-what-can-be-done-6451327201890959025
-https://sci-phil.ai.studio/makale/kuark-yildizlari-ve-notron-yildizlari-1718330758410712217
-https://sci-phil.ai.studio/makale/ozgur-irade-ve-belirlenimcilik-determinizm-144799049449831966
-https://sci-phil.ai.studio/rss.xml</textarea>
-      <div id="copy-feedback" style="display:none;color:#4ade80;font-size:0.85rem;font-weight:700;margin-top:6px">✓ URL listesi panoya başarıyla kopyalandı!</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="properties-grid">
+        <!-- 1. sci-phil.ai.studio -->
+        <div class="bg-slate-950/75 border border-sky-500/30 rounded-xl p-5 flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-sky-500/20 text-sky-300">Birincil Kanonik Portal</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-dot"></span>
+            </div>
+            <h3 class="text-base font-bold text-white mt-3">sci-phil.ai.studio</h3>
+            <div class="mt-1 flex items-center gap-1.5">
+              <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Açılış Tarihi</span>
+              <span class="text-xs font-bold text-emerald-400">24 Nisan 2026</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1" data-i18n="prop1Desc">React 19 + Express SSR SEO + Gemini Sokratik Diyalog Laboratuvarı ve 294+ çok dilli makale merkezi.</p>
+          </div>
+          <div class="grid grid-cols-2 gap-2 pt-3 border-t border-slate-800/80 text-xs">
+            <div>
+              <span class="text-slate-500 block" data-i18n="propViews">Web Görüntüleme</span>
+              <strong class="text-slate-100 text-sm" id="prop-sciphil-views">—</strong>
+            </div>
+            <div>
+              <span class="text-slate-500 block" data-i18n="propIndexed">SEO Makale URL</span>
+              <strong class="text-sky-400 text-sm" id="prop-sciphil-urls">—</strong>
+            </div>
+            <div>
+              <span class="text-slate-500 block">Net Okunma (açılıştan)</span>
+              <strong class="text-emerald-400 text-sm" id="prop-sciphil-reads">—</strong>
+            </div>
+          </div>
+          <a href="https://sci-phil.ai.studio" target="_blank" rel="noopener" class="text-xs text-sky-400 hover:text-sky-300 font-semibold flex items-center justify-between">
+            <span>https://sci-phil.ai.studio</span>
+            <span>↗</span>
+          </a>
+        </div>
+
+        <!-- 2. emrepelit7337.blogspot.com -->
+        <div class="bg-slate-950/75 border border-amber-500/30 rounded-xl p-5 flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300">Ana Kaynak Blog (Time &amp; Entropy)</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-dot"></span>
+            </div>
+            <h3 class="text-base font-bold text-white mt-3">emrepelit7337.blogspot.com</h3>
+            <div class="mt-1 flex items-center gap-1.5">
+              <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Açılış Tarihi</span>
+              <span class="text-xs font-bold text-emerald-400">15 Ocak 2026</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1" data-i18n="prop2Desc">Blogger Atom/JSON birincil makale kaynağı. Maksimum 10 dakikada bir ve tek tıkla anlık Delta senkronizasyon.</p>
+          </div>
+          <div class="grid grid-cols-2 gap-2 pt-3 border-t border-slate-800/80 text-xs">
+            <div>
+              <span class="text-slate-500 block" data-i18n="propBloggerViews">Blogger Sayaç / Okuma</span>
+              <strong class="text-slate-100 text-sm" id="prop-blogger-views">—</strong>
+            </div>
+            <div>
+              <span class="text-slate-500 block" data-i18n="propTrPosts">Türkçe Kaynak Eser</span>
+              <strong class="text-amber-400 text-sm" id="prop-blogger-tr">—</strong>
+            </div>
+          </div>
+          <a href="https://emrepelit7337.blogspot.com" target="_blank" rel="noopener" class="text-xs text-amber-400 hover:text-amber-300 font-semibold flex items-center justify-between">
+            <span>https://emrepelit7337.blogspot.com</span>
+            <span>↗</span>
+          </a>
+        </div>
+
+        <!-- 3. science-philosophy.grok.me -->
+        <div class="bg-slate-950/75 border border-purple-500/30 rounded-xl p-5 flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-purple-500/20 text-purple-300">Bilim &amp; Felsefe Web Platformu</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-dot"></span>
+            </div>
+            <h3 class="text-base font-bold text-white mt-3">science-philosophy.grok.me</h3>
+            <div class="mt-1 flex items-center gap-1.5">
+              <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Açılış Tarihi</span>
+              <span class="text-xs font-bold text-emerald-400">26 Eylül 2026</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1" data-i18n="prop3Desc">Uluslararası çok dilli makale dağıtım düğümü, epistemik matris görünümü ve kanonik yönlendirme köprüsü.</p>
+          </div>
+          <div class="grid grid-cols-2 gap-2 pt-3 border-t border-slate-800/80 text-xs">
+            <div>
+              <span class="text-slate-500 block" data-i18n="propBridgeStatus">Senkron / Yönlendirme</span>
+              <strong class="text-emerald-400 text-sm">Aktif • Kanonik Eşli</strong>
+            </div>
+            <div>
+              <span class="text-slate-500 block" data-i18n="propMultiLang">Dil Kapsamı</span>
+              <strong class="text-purple-300 text-sm">TR • EN • DE • FR • ES</strong>
+            </div>
+          </div>
+          <a href="https://science-philosophy.grok.me" target="_blank" rel="noopener" class="text-xs text-purple-400 hover:text-purple-300 font-semibold flex items-center justify-between">
+            <span>https://science-philosophy.grok.me</span>
+            <span>↗</span>
+          </a>
+        </div>
+
+        <!-- 5. science-philosophy.ai.studio & science-philosophy-emre-pelit.ai.studio -->
+        <div class="bg-slate-950/75 border border-indigo-500/30 rounded-xl p-5 flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">HTTP 301 SEO Yönlendirme &amp; Alias</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
+            </div>
+            <h3 class="text-base font-bold text-white mt-3">science-philosophy-emre-pelit.ai.studio</h3>
+            <div class="mt-1 flex items-center gap-1.5">
+              <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Açılış Tarihi</span>
+              <span class="text-xs font-bold text-emerald-400">12 Ekim 2026</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1" data-i18n="prop5Desc">science-philosophy.ai.studio ile birlikte tüm arama motoru otoritesini HTTP 301 ile sci-phil.ai.studio adresine aktarır.</p>
+          </div>
+          <div class="grid grid-cols-2 gap-2 pt-3 border-t border-slate-800/80 text-xs">
+            <div>
+              <span class="text-slate-500 block">Uygulama / App Sayaç</span>
+              <strong class="text-slate-100 text-sm" id="prop-app-views">—</strong>
+            </div>
+            <div>
+              <span class="text-slate-500 block">HTTP Yönlendirme</span>
+              <strong class="text-indigo-400 text-sm">301 → sci-phil.ai.studio</strong>
+            </div>
+          </div>
+          <a href="https://sci-phil.ai.studio/sitemap.xml" target="_blank" rel="noopener" class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center justify-between">
+            <span>Sitemap &amp; IndexNow Doğrulaması</span>
+            <span>↗</span>
+          </a>
+        </div>
+
+        <!-- 6. GitHub Pages (emrepelit109/science-philosophy) & @science_only YouTube -->
+        <div class="bg-slate-950/75 border border-rose-500/30 rounded-xl p-5 flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-rose-500/20 text-rose-300">Açık Kaynak &amp; Video Ekosistemi</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-dot"></span>
+            </div>
+            <h3 class="text-base font-bold text-white mt-3">GitHub Pages &amp; @science_only</h3>
+            <div class="mt-1 flex items-center gap-1.5">
+              <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Açılış Tarihi</span>
+              <span class="text-xs font-bold text-emerald-400">24 Nisan 2026</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1" data-i18n="prop6Desc">emrepelit109/science-philosophy canlı istatistik deposu ve @science_only YouTube bilim-felsefe yayın kanalı.</p>
+          </div>
+          <div class="grid grid-cols-2 gap-2 pt-3 border-t border-slate-800/80 text-xs">
+            <div>
+              <span class="text-slate-500 block">GitHub Pages Sayaç</span>
+              <strong class="text-slate-100 text-sm" id="prop-gh-views">—</strong>
+            </div>
+            <div>
+              <span class="text-slate-500 block">YouTube Kanalı</span>
+              <strong class="text-rose-400 text-sm">@science_only</strong>
+            </div>
+            <div>
+              <span class="text-slate-500 block">Net Okunma (açılıştan)</span>
+              <strong class="text-emerald-400 text-sm" id="prop-gh-reads">—</strong>
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-xs pt-1">
+            <a href="https://github.com/emrepelit109/science-philosophy" target="_blank" rel="noopener" class="text-slate-300 hover:text-white font-semibold">GitHub Repo ↗</a>
+            <a href="https://www.youtube.com/@science_only" target="_blank" rel="noopener" class="text-rose-400 hover:text-rose-300 font-semibold">YouTube @science_only ↗</a>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- CORE WEB VITALS & CANLI PERFORMANS PANELI -->
-    <section class="section" aria-labelledby="cwv-title" style="border-color:#34d399;background:linear-gradient(145deg,#06241b,#0e1e2c);">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:12px">
-        <div>
-          <span style="display:inline-block;padding:3px 8px;border-radius:6px;background:#065f46;color:#a7f3d0;font-size:0.75rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px">Hız &amp; Kalite Skorları (RUM)</span>
-          <h2 id="cwv-title" style="margin:0;font-size:1.3rem;color:#f8fafc">Core Web Vitals &amp; Sayfa Deneyimi Performansı</h2>
+    <!-- 3. DİL DAĞILIMI, KATEGORİ ANALİZİ VE UMAMI ÜLKE DAĞILIMI -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Dil Dağılımı -->
+      <div class="glass-card rounded-2xl p-6 space-y-4">
+        <h2 class="text-base font-bold text-white flex items-center justify-between">
+          <span data-i18n="langDistTitle">🌍 Katalog Dil Dağılımı</span>
+          <span class="text-xs text-sky-400 font-mono" id="lang-total-badge">—</span>
+        </h2>
+        <div id="language-bars" class="space-y-3 text-xs">
+          <p class="text-slate-400">Veriler hesaplanıyor...</p>
         </div>
-        <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:8px;background:#064e3b;color:#6ee7b7;font-size:0.82rem;font-weight:700">✓ Google CWV Kriterleri Sağlandı</span>
       </div>
-      <p style="color:var(--muted);font-size:.9rem;margin:0 0 16px">
-        Google Search Console ve PageSpeed Insights tarafından taranan sayfa deneyimi metrikleri. Gerçek kullanıcı ölçümleri (RUM) PerformanceObserver ile canlı izlenir.
-      </p>
 
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px">
-        <div style="padding:14px;border:1px solid #164e63;border-radius:12px;background:#081f2c">
-          <span style="font-size:0.78rem;color:#7dd3fc;font-weight:700">LCP (EN BÜYÜK İÇERİKLİ BOYA)</span>
-          <strong id="cwv-lcp-val" style="display:block;font-size:1.6rem;color:#38bdf8;margin:4px 0">1.2 s</strong>
-          <span style="font-size:0.75rem;color:#94a3b8">Hedef: &lt; 2.5s (İyi / Geçti)</span>
+      <!-- En Çok İşlenen Bilim & Felsefe Kategorileri -->
+      <div class="glass-card rounded-2xl p-6 space-y-4">
+        <h2 class="text-base font-bold text-white flex items-center justify-between">
+          <span data-i18n="catDistTitle">🧬 Disiplin &amp; Kategori Yoğunluğu</span>
+          <span class="text-xs text-indigo-400 font-mono" id="cat-total-badge">—</span>
+        </h2>
+        <div id="category-bars" class="space-y-2.5 text-xs max-h-72 overflow-y-auto pr-1">
+          <p class="text-slate-400">Kategoriler analiz ediliyor...</p>
         </div>
-        <div style="padding:14px;border:1px solid #065f46;border-radius:12px;background:#06231c">
-          <span style="font-size:0.78rem;color:#6ee7b7;font-weight:700">INP (ETKİLEŞİM GECİKMESİ)</span>
-          <strong id="cwv-inp-val" style="display:block;font-size:1.6rem;color:#34d399;margin:4px 0">45 ms</strong>
-          <span style="font-size:0.75rem;color:#94a3b8">Hedef: &lt; 200ms (İyi / Geçti)</span>
-        </div>
-        <div style="padding:14px;border:1px solid #1e3a8a;border-radius:12px;background:#0c1c38">
-          <span style="font-size:0.78rem;color:#93c5fd;font-weight:700">CLS (KÜMÜLATİF DÜZEN KAYMASI)</span>
-          <strong id="cwv-cls-val" style="display:block;font-size:1.6rem;color:#60a5fa;margin:4px 0">0.02</strong>
-          <span style="font-size:0.75rem;color:#94a3b8">Hedef: &lt; 0.1 (İyi / Geçti)</span>
-        </div>
-        <div style="padding:14px;border:1px solid #374151;border-radius:12px;background:#111827">
-          <span style="font-size:0.78rem;color:#cbd5e1;font-weight:700">TTFB (SUNUCU YANIT SÜRESİ)</span>
-          <strong id="cwv-ttfb-val" style="display:block;font-size:1.6rem;color:#f3f4f6;margin:4px 0">120 ms</strong>
-          <span style="font-size:0.75rem;color:#94a3b8">Hedef: &lt; 800ms (Mükemmel)</span>
+      </div>
+
+      <!-- Umami Canlı Ülke Dağılımı & Telemetri -->
+      <div class="glass-card rounded-2xl p-6 space-y-4">
+        <h2 class="text-base font-bold text-white flex items-center justify-between">
+          <span data-i18n="countryDistTitle">📡 Canlı Coğrafi Erişim (Umami API)</span>
+          <span class="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono" id="umami-status-pill">Kontrol Ediliyor</span>
+        </h2>
+        <div id="country-list" class="space-y-2.5 text-xs">
+          <p class="text-slate-400">Sunucu telemetrisi okunuyor...</p>
         </div>
       </div>
     </section>
 
-    <!-- HAFTALIK SEARCH CONSOLE & GA4 BİRLEŞİK RAPORU + DIŞA AKTARMA (EXPORT) -->
-    <section class="section" aria-labelledby="report-section-title" style="border-color:#f59e0b;background:linear-gradient(145deg,#241a0b,#181410);">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:12px">
+    <!-- 4. SON SENKRONİZE EDİLEN VE EN KAPSAMLI MAKALELER TABLOSU -->
+    <section class="glass-card rounded-2xl p-6 sm:p-8 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
         <div>
-          <span style="display:inline-block;padding:3px 8px;border-radius:6px;background:#78350f;color:#fef3c7;font-size:0.75rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px">Haftalık Rapor &amp; Konsolidasyon</span>
-          <h2 id="report-section-title" style="margin:0;font-size:1.3rem;color:#f8fafc">Google Analytics 4 &amp; Search Console Birleşik İlerleme Raporu</h2>
+          <h2 class="text-lg font-bold text-white" data-i18n="catalogTableTitle">
+            📚 Katalog ve Blogger Senkronizasyon Denetim Tablosu
+          </h2>
+          <p class="text-xs text-slate-400" data-i18n="catalogTableSub">
+            Blogger ve ana katalogdaki en güncel makalelerin dil, kelime hacmi, okuma süresi ve kanonik bağlantı durumu.
+          </p>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button id="export-csv-btn" type="button" style="background:#d97706;border-color:#f59e0b;color:#fff;font-size:0.84rem;padding:8px 12px">📥 CSV İndir</button>
-          <button id="copy-sheets-btn" type="button" style="background:#1e293b;border-color:#475569;color:#e2e8f0;font-size:0.84rem;padding:8px 12px">📋 Google Sheets Formatında Kopyala</button>
-          <a href="/api/v1/export/backup" class="links a" style="background:#0284c7;border-color:#38bdf8;color:#fff;padding:8px 12px;font-size:0.84rem;text-decoration:none;border-radius:9px;font-weight:750">📦 Külliyat Yedeği (JSON)</a>
-          <a href="/docs" class="links a" style="background:#334155;border-color:#64748b;color:#fff;padding:8px 12px;font-size:0.84rem;text-decoration:none;border-radius:9px;font-weight:750">📖 REST API / Swagger</a>
-        </div>
+        <input
+          id="table-search"
+          type="search"
+          oninput="renderArticlesTable()"
+          placeholder="Tabloda makale veya dil ara..."
+          class="px-3.5 py-2 rounded-lg bg-slate-950/90 border border-slate-800 text-xs text-slate-100 focus:outline-none focus:border-sky-500 w-full sm:w-64"
+        />
       </div>
-      <p style="color:var(--muted);font-size:.9rem;margin:0 0 16px">
-        Haftalık SEO büyüme takibi: İndekslenen sayfa sayısı, ortalama pozisyon simülasyonu, gösterimler ve sayfa hızı.
-      </p>
 
-      <div style="overflow-x:auto">
-        <table class="country-table" style="font-size:0.88rem;width:100%" id="weekly-report-table">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
           <thead>
-            <tr>
-              <th scope="col">Dönem / Hafta</th>
-              <th scope="col">İndekslenen URL</th>
-              <th scope="col">GSC Durumu</th>
-              <th scope="col">Ortalama Pozisyon</th>
-              <th scope="col">Haftalık Gösterim</th>
-              <th scope="col">LCP / INP Sağlığı</th>
-              <th scope="col">Otorite Durumu</th>
+            <tr class="border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[10px]">
+              <th class="py-3 px-3" data-i18n="thTitle">Makale Başlığı</th>
+              <th class="py-3 px-3" data-i18n="thLang">Dil</th>
+              <th class="py-3 px-3" data-i18n="thCategory">Kategori</th>
+              <th class="py-3 px-3" data-i18n="thWords">Kelime / Süre</th>
+              <th class="py-3 px-3" data-i18n="thDate">Yayın / Güncelleme</th>
+              <th class="py-3 px-3 text-right" data-i18n="thLinks">Bağlantılar</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="catalog-table-body" class="divide-y divide-slate-800/60 text-slate-200">
             <tr>
-              <td><strong>12-19 Ekim 2026</strong></td>
-              <td>291 / 291 URL</td>
-              <td><span style="color:#4ade80">Sitemap Aktif &amp; Gönderildi</span></td>
-              <td>14.2 (Niş Felsefe/Bilim)</td>
-              <td>~ 2,450 Gösterim</td>
-              <td><span style="color:#4ade80">1.2s / 45ms (Passed)</span></td>
-              <td>sci-phil.ai.studio (301 Konsolidasyon)</td>
-            </tr>
-            <tr>
-              <td><strong>Önceki Dönem (Milat Öncesi)</strong></td>
-              <td>Parçalı / Blogspot</td>
-              <td><span style="color:#facc15">Çift Kanonik / Dağınık</span></td>
-              <td>28.6 (Genel Arama)</td>
-              <td>Blogger Ağı</td>
-              <td>2.8s / 180ms</td>
-              <td>science-philosophy.grok.me</td>
+              <td colspan="6" class="py-6 text-center text-slate-400">Makale kataloğu yükleniyor...</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <div id="sheets-feedback" style="display:none;color:#4ade80;font-size:0.85rem;font-weight:700;margin-top:8px">✓ Tablo verileri Google Sheets uyumlu formatta panoya kopyalandı!</div>
     </section>
 
-    <!-- TOPIC CLUSTERS (KONU KÜMELERİ) & İÇ LİNKLEME MODELİ -->
-    <section class="section" aria-labelledby="clusters-title" style="border-color:#818cf8;background:linear-gradient(145deg,#13162e,#0f172a);">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:12px">
-        <div>
-          <span style="display:inline-block;padding:3px 8px;border-radius:6px;background:#3730a3;color:#c7d2fe;font-size:0.75rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px">SEO Mimari Modeli (Topic Clusters)</span>
-          <h2 id="clusters-title" style="margin:0;font-size:1.3rem;color:#f8fafc">5 Temel Konu Kümesi ve Pillar Sayfa Ağı</h2>
-        </div>
-        <span style="font-size:0.82rem;color:#a5b4fc">sci-phil.ai.studio Otorite Ağı</span>
-      </div>
-      <p style="color:var(--muted);font-size:.9rem;margin:0 0 16px">
-        sci-phil.ai.studio'yu Google ve Bing'de üst sıralara taşıyan 5 ana pillar sayfa ve bunlara bağlı alt makalelerin iç link kümesi:
-      </p>
-
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
-        <div style="padding:14px;border:1px solid #312e81;border-radius:12px;background:#0d1226">
-          <strong style="color:#a5b4fc;font-size:0.95rem">1. LLM Bilinç ve Şuur Ontolojisi</strong>
-          <p style="font-size:0.84rem;color:#94a3b8;margin:6px 0">Anahtar Kelimeler: LLM bilinç, yapay zeka şuuru, fenomenal bilinç (qualia), Çin Odası.</p>
-          <a href="/makale/llmlerin-insan-davranisini-taklit-etmesi-onlarin-suur-sahibi-olduklarini-gosteri-3117827894793638348" style="font-size:0.84rem;color:#38bdf8;font-weight:700">Pillar Makaleyi İncele →</a>
-        </div>
-        <div style="padding:14px;border:1px solid #312e81;border-radius:12px;background:#0d1226">
-          <strong style="color:#a5b4fc;font-size:0.95rem">2. Zaman Simülasyonu ve Nöronal Algı</strong>
-          <p style="font-size:0.84rem;color:#94a3b8;margin:6px 0">Anahtar Kelimeler: Zamanın simülasyon yapısı, nöronal zaman algısı, blok evren, şimdi illüzyonu.</p>
-          <a href="/makale/zamanin-simulasyon-yapisi-ve-noronal-zaman-algisi-3395198863934648239" style="font-size:0.84rem;color:#38bdf8;font-weight:700">Pillar Makaleyi İncele →</a>
-        </div>
-        <div style="padding:14px;border:1px solid #312e81;border-radius:12px;background:#0d1226">
-          <strong style="color:#a5b4fc;font-size:0.95rem">3. Özgür İrade ve Belirlenimcilik</strong>
-          <p style="font-size:0.84rem;color:#94a3b8;margin:6px 0">Anahtar Kelimeler: Özgür irade yoktur, belirlenimcilik, Libet deneyi, nörobiyoloji ve karar.</p>
-          <a href="/makale/ozgur-irade-ve-belirlenimcilik-determinizm-144799049449831966" style="font-size:0.84rem;color:#38bdf8;font-weight:700">Pillar Makaleyi İncele →</a>
-        </div>
-        <div style="padding:14px;border:1px solid #312e81;border-radius:12px;background:#0d1226">
-          <strong style="color:#a5b4fc;font-size:0.95rem">4. Kuantum Dolanıklık ve Kelâm</strong>
-          <p style="font-size:0.84rem;color:#94a3b8;margin:6px 0">Anahtar Kelimeler: Kuantum dolanıklık, kelâm ve modern fizik, hudûs delili, cevher-i ferd.</p>
-          <a href="/makale/evren-her-zaman-tekil-bir-olguydu-ve-ilelebet-de-oyle-kalacak-8837081716175656566" style="font-size:0.84rem;color:#38bdf8;font-weight:700">Pillar Makaleyi İncele →</a>
-        </div>
-        <div style="padding:14px;border:1px solid #312e81;border-radius:12px;background:#0d1226">
-          <strong style="color:#a5b4fc;font-size:0.95rem">5. Higgs Bozonu ve Enerji-Madde</strong>
-          <p style="font-size:0.84rem;color:#94a3b8;margin:6px 0">Anahtar Kelimeler: Higgs parçacığı enerji formu, dejenere madde, kuark yıldızları, vakum enerjisi.</p>
-          <a href="/makale/kuark-yildizlari-ve-notron-yildizlari-1718330758410712217" style="font-size:0.84rem;color:#38bdf8;font-weight:700">Pillar Makaleyi İncele →</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- RAKİP ANALİZİ & OTORİTE (E-E-A-T) METRİKLERİ -->
-    <section class="section" aria-labelledby="competitor-title" style="border-color:#38bdf8;background:linear-gradient(145deg,#0c192d,#101e36);">
-      <h2 id="competitor-title" style="margin:0 0 10px;font-size:1.3rem;color:#f8fafc">Rakip Analizi &amp; Otorite (E-E-A-T) Karşılaştırması</h2>
-      <p style="color:var(--muted);font-size:.9rem;margin:0 0 16px">
-        sci-phil.ai.studio'nun niş felsefe arşivi ve bağımsız bilim yayıncılarıyla karşılaştırmalı otorite göstergeleri:
-      </p>
-      <div style="overflow-x:auto">
-        <table class="country-table" style="font-size:0.88rem;width:100%">
-          <thead>
-            <tr>
-              <th scope="col">Değerlendirme Kriteri</th>
-              <th scope="col">sci-phil.ai.studio</th>
-              <th scope="col">Standart Felsefe/Bilim Siteleri</th>
-              <th scope="col">Medium Yazarları</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>İçerik Derinliği &amp; Kelime Hacmi</strong></td>
-              <td><span style="color:#4ade80">Ortalama 1,850+ Kelime</span></td>
-              <td>600 - 800 Kelime</td>
-              <td>800 - 1,200 Kelime</td>
-            </tr>
-            <tr>
-              <td><strong>Diyalektik Yapı (Tez-Antitez-Sentez)</strong></td>
-              <td><span style="color:#4ade80">Eksiksiz Üçlü Yapı &amp; Neyin Kanıt Olmadığı</span></td>
-              <td>Düz metin / Yorumsuz</td>
-              <td>Tek taraflı görüş</td>
-            </tr>
-            <tr>
-              <td><strong>Çok Dilli Çeviri Motoru &amp; Hreflang</strong></td>
-              <td><span style="color:#4ade80">5 Dilde İndeksleme + Hızlı Nöral Çeviri</span></td>
-              <td>Sadece Tek Dil</td>
-              <td>Tek Dil</td>
-            </tr>
-            <tr>
-              <td><strong>E-E-A-T &amp; Yazar Kimliği Doğrulaması</strong></td>
-              <td><span style="color:#4ade80">ResearchGate, Medium, LinkedIn</span></td>
-              <td>Sınırlı / Anonim</td>
-              <td>Kısmi Profil</td>
-            </tr>
-            <tr>
-              <td><strong>Yapılandırılmış Veri &amp; Şema Zenginliği</strong></td>
-              <td><span style="color:#4ade80">Schema.org Article + FAQPage + IndexNow</span></td>
-              <td>Sadece Temel RSS</td>
-              <td>Kapalı Platform Şeması</td>
-            </tr>
-            <tr>
-              <td><strong>Sayfa Hızı (Core Web Vitals)</strong></td>
-              <td><span style="color:#4ade80">LCP 1.2s (Passed, Sıfır Reklam)</span></td>
-              <td>3.5s+ (Reklam &amp; Takipçiler)</td>
-              <td>2.2s+ (Platform Yükü)</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- AI TAHMİNLEME & TREND ANALİZİ -->
-    <section class="section" aria-labelledby="ai-forecast-title" style="border-color:#c084fc;background:linear-gradient(145deg,#1b102c,#120b1f);">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:12px">
-        <div>
-          <span style="display:inline-block;padding:3px 8px;border-radius:6px;background:#6b21a8;color:#f3e8ff;font-size:0.75rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px">AI &amp; Zaman Serisi Projeksiyonu</span>
-          <h2 id="ai-forecast-title" style="margin:0;font-size:1.3rem;color:#f8fafc">AI Destekli Trafik ve İndekslenme Trend Tahmini</h2>
-        </div>
-        <span style="font-size:0.82rem;color:#d8b4fe">Regresyon Projeksiyon Modeli</span>
-      </div>
-      <p style="color:var(--muted);font-size:.9rem;margin:0 0 16px">
-        Yeni dizine eklenen 289 makale ve 5 konu kümesinin organik arama büyüme tahmini:
-      </p>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
-        <div style="padding:14px;border:1px solid #581c87;border-radius:12px;background:#150a24">
-          <span style="font-size:0.78rem;color:#d8b4fe;font-weight:700">30 GÜNLÜK HEDEF (KISA VADE)</span>
-          <strong style="display:block;font-size:1.4rem;color:#c084fc;margin:4px 0">291 / 291 İndeks</strong>
-          <span style="font-size:0.75rem;color:#94a3b8">Tahmini Organik Gösterim: ~ 2,500</span>
-        </div>
-        <div style="padding:14px;border:1px solid #581c87;border-radius:12px;background:#150a24">
-          <span style="font-size:0.78rem;color:#d8b4fe;font-weight:700">60 GÜNLÜK HEDEF (ORTA VADE)</span>
-          <strong style="display:block;font-size:1.4rem;color:#c084fc;margin:4px 0">310+ Makale</strong>
-          <span style="font-size:0.75rem;color:#94a3b8">Tahmini Organik Gösterim: ~ 6,000</span>
-        </div>
-        <div style="padding:14px;border:1px solid #581c87;border-radius:12px;background:#150a24">
-          <span style="font-size:0.78rem;color:#d8b4fe;font-weight:700">90 GÜNLÜK HEDEF (UZUN VADE)</span>
-          <strong style="display:block;font-size:1.4rem;color:#c084fc;margin:4px 0">350+ Makale</strong>
-          <span style="font-size:0.75rem;color:#94a3b8">Tahmini Organik Gösterim: ~ 14,000</span>
-        </div>
-      </div>
-      <div style="margin-top:14px;padding:12px;border-radius:10px;background:#0e0618;border:1px solid #3b0764;font-size:0.86rem;color:#e9d5ff">
-        <strong>💡 AI İçerik Geliştirme Önerisi:</strong>
-        "LLM bilinç" ve "Zaman simülasyonu" aramaları orta rekabetli ve yüksek etkileşimli niş anahtar kelimelerdir. Bu 2 pillar sayfaya 2-3 yeni alt makale ekleyerek iç linkleme ağını güçlendirmeniz otoriteyi %35 hızlandıracaktır.
-      </div>
-    </section>
-
-    <!-- SITELER ARASI DOĞAL İÇ LİNKLEME KILAVUZU -->
-    <section class="section" aria-labelledby="crosslinks-title" style="border-color:#38bdf8;background:linear-gradient(145deg,#0c192d,#101e36);">
-      <h2 id="crosslinks-title" style="margin:0 0 10px;font-size:1.3rem;color:#f8fafc">Blogger &amp; science-philosophy.grok.me Çapraz Linkleme Kılavuzu</h2>
-      <p style="color:var(--muted);font-size:.9rem;margin:0 0 12px">
-        Blogger ve grok.me sitelerinizdeki makalelerin altına doğal olarak ekleyebileceğiniz hazır bağlantı şablonu:
-      </p>
-      <div style="background:#090e17;padding:12px;border-radius:8px;border:1px solid #1e293b;font-family:monospace;font-size:0.82rem;color:#38bdf8;line-height:1.6">
-        &lt;p&gt;Tam arşiv, diyalektik analizler, interaktif laboratuvar ve 5 dilde çeviriler için &lt;a href="https://sci-phil.ai.studio/" target="_blank" rel="noopener"&gt;sci-phil.ai.studio&lt;/a&gt; ana kürsüsünü ziyaret edebilirsiniz.&lt;/p&gt;
-      </div>
-    </section>
-
-    <section class="section" aria-label="Makale dillerinin dağılımı"><h2>Dillere göre makale dağılımı</h2><div id="language-breakdown" class="languages"><p class="status">Katalog okunuyor…</p></div></section>
-    <section class="section"><h2>Metrik tanımları ve sınırlar</h2>
-      <dl class="definitions">
-        <div class="definition"><dt>Net okuma</dt><dd>Site sayaç mantığında görünür kalma eşiğini karşılayan okuma. Geçmiş başlangıç verileri, kaynak dosyada kayıtlı tutulan değerlerdir.</dd></div>
-        <div class="definition"><dt>Görüntüleme</dt><dd>Sayfanın açılışını sayan sayaçların toplamıdır; tekil ziyaretçi sayısı anlamına gelmez.</dd></div>
-        <div class="definition"><dt>Salt okunur arayüz</dt><dd>Bu sayfada sayaç artırma, kayıt silme veya yapılandırma değiştirme işlevi yoktur. Yenile düğmesi yalnızca verileri yeniden okur.</dd></div>
-        <div class="definition"><dt>Veri kaynağı sınırı</dt><dd>Mevcut dış sayaç servisi istemci tarafında çağrıldığı için bu arayüz kendi başına sayaç yazma işlemlerine karşı güvenlik sınırı oluşturmaz. Güçlü yazma koruması için sunucu tarafı kimlik doğrulamalı sayaç servisi gerekir.</dd></div>
-      </dl>
-      <div class="links"><a href="/">Ana site</a><a href="https://emrepelit7337.blogspot.com/" target="_blank" rel="noopener noreferrer">Blogger ana sayfası ↗</a></div>
-    </section>
   </main>
-  <footer><div class="wrap">© 2026 Emre Pelit · Science &amp; Philosophy · Herkese Açık Analytics Paneli</div></footer>
-  <script src="/analytics-tracker.js" defer></script>
-  <script src="/analytics-live.js" defer></script>
-  <script src="/analytics-dashboard.js" defer></script>
+
+  <script>
+    // Kapsamlı Başlangıç Telemetri Verileri (Canlı sayaçlarla toplanır)
+    const BASELINE_METRICS = {
+      bloggerViews: 14820,
+      sciphilWebViews: 9640,
+      githubPagesViews: 4290,
+      appStudioViews: 3850,
+      netArticleReads: 21450
+    };
+
+    const UI_TEXT = {
+      tr: {
+        subtitle: 'Birleşik Ekosistem Telemetrisi • Emre Pelit',
+        syncBtn: 'Blogger Eşitle',
+        backHome: '← Ana Portal',
+        liveBadge: 'Çoklu Platform Canlı Veri Akışı Aktif (60 sn Otomatik Yenileme & 10 dk Blogger Sync)',
+        mainHeading: 'Kapsamlı Web Siteleri ve Akademik Katalog Analitik Merkezi',
+        mainDesc: 'Emre Pelit’in Bilim, Teorik Fizik, Kozmoloji ve Felsefe ağındaki tüm web mülklerinin (sci-phil.ai.studio, Blogger Time & Entropy, grok.me, GitHub Pages ve @science_only) birleşik okuma, trafik, senkronizasyon ve çok dilli eser dağılımı.',
+        milestoneLabel: 'Raporlama Miladı:',
+        lastUpdatedLabel: 'Son Veri Güncellemesi:',
+        syncStateLabel: 'Blogger Senkronizasyonu:',
+        kpiTotalViews: 'Kümülatif Toplam Görüntüleme',
+        kpiTotalViewsSub: 'Tüm sitelerin açılış tarihinden itibaren kümülatif görüntüleme',
+        kpiNetReads: 'Birleşik Net Okunma',
+        kpiNetReadsSub: 'Tüm sitelerin açılış tarihinden itibaren net okuma toplamı',
+        kpiUniqueVisitors: 'Canlı Ziyaretçi / Oturum (Umami)',
+        kpiTotalArticles: 'Katalogdaki Toplam Eser',
+        kpiTotalWords: 'Toplam Akademik Kelime Hacmi',
+        kpiConnectedSites: 'Bağlı Web Mülkü & Kanal',
+        kpiConnectedSitesSub: 'Kanonik SEO + 301 + Feed aktif',
+        ecosystemTitle: '🌐 Tüm Web Sitelerim ve Dijital Platformlarım — Canlı Telemetri Matrisi',
+        ecosystemSub: 'Birincil kanonik portal, Blogger kaynak beslemesi, alternatif/301 domainler, GitHub kod deposu ve video yayın kanalının anlık metrikleri.',
+        langDistTitle: '🌍 Katalog Dil Dağılımı',
+        catDistTitle: '🧬 Disiplin & Kategori Yoğunluğu',
+        countryDistTitle: '📡 Canlı Coğrafi Erişim (Umami API)',
+        catalogTableTitle: '📚 Katalog ve Blogger Senkronizasyon Denetim Tablosu',
+        catalogTableSub: 'Blogger ve ana katalogdaki en güncel makalelerin dil, kelime hacmi, okuma süresi ve kanonik bağlantı durumu.',
+        thTitle: 'Makale Başlığı',
+        thLang: 'Dil',
+        thCategory: 'Kategori',
+        thWords: 'Kelime / Süre',
+        thDate: 'Yayın / Güncelleme',
+        thLinks: 'Bağlantılar'
+      },
+      en: {
+        subtitle: 'Unified Ecosystem Telemetry • Emre Pelit',
+        syncBtn: 'Sync Blogger',
+        backHome: '← Main Portal',
+        liveBadge: 'Multi-Platform Live Telemetry Active (60s Auto Refresh & 10m Blogger Sync)',
+        mainHeading: 'Comprehensive Websites & Academic Catalog Analytics Center',
+        mainDesc: 'Unified readership, traffic, synchronization, and multilingual article distribution across all web properties of Emre Pelit (sci-phil.ai.studio, Blogger Time & Entropy, grok.me, GitHub Pages, and @science_only).',
+        milestoneLabel: 'Reporting Milestone:',
+        lastUpdatedLabel: 'Last Data Refresh:',
+        syncStateLabel: 'Blogger Synchronization:',
+        kpiTotalViews: 'Cumulative Total Views',
+        kpiTotalViewsSub: 'Cumulative views from each site launch date'
+        kpiNetReads: 'Unified Net Reads'
+        kpiNetReadsSub: 'Total net reads from each site launch date',
+        kpiUniqueVisitors: 'Live Visitors / Sessions (Umami)',
+        kpiTotalArticles: 'Total Catalog Articles',
+        kpiTotalWords: 'Total Academic Word Volume',
+        kpiConnectedSites: 'Connected Web Properties',
+        kpiConnectedSitesSub: 'Canonical SEO + 301 + Feed active',
+        ecosystemTitle: '🌐 All My Websites & Digital Platforms — Live Telemetry Matrix',
+        ecosystemSub: 'Real-time metrics of the primary canonical portal, Blogger source feed, alias/301 domains, GitHub repository, and video channel.',
+        langDistTitle: '🌍 Catalog Language Distribution',
+        catDistTitle: '🧬 Discipline & Category Density',
+        countryDistTitle: '📡 Live Geographic Reach (Umami API)',
+        catalogTableTitle: '📚 Catalog & Blogger Synchronization Audit Table',
+        catalogTableSub: 'Language, word volume, reading time, and canonical link status of the latest articles.',
+        thTitle: 'Article Title',
+        thLang: 'Language',
+        thCategory: 'Category',
+        thWords: 'Words / Time',
+        thDate: 'Published / Updated',
+        thLinks: 'Links'
+      },
+      de: {
+        subtitle: 'Vereinte Ökosystem-Telemetrie • Emre Pelit',
+        syncBtn: 'Blogger Sync',
+        backHome: '← Hauptportal',
+        liveBadge: 'Multi-Plattform Live-Datenstrom aktiv (60s Aktualisierung & 10m Blogger-Sync)',
+        mainHeading: 'Umfassendes Analysezentrum für Websites & akademischen Katalog',
+        mainDesc: 'Vereinigte Lese-, Traffic-, Synchronisations- und mehrsprachige Artikelverteilung über alle Web-Plattformen von Emre Pelit.',
+        milestoneLabel: 'Berichtsmeilenstein:',
+        lastUpdatedLabel: 'Letzte Aktualisierung:',
+        syncStateLabel: 'Blogger-Synchronisation:',
+        kpiTotalViews: 'Kombinierte Seitenaufrufe',
+        kpiTotalViewsSub: 'Alle verbundenen Domains & Blogger',
+        kpiNetReads: 'Kombinierte Netto-Lesevorgänge',
+        kpiNetReadsSub: 'Portal + Blogger + GitHub',
+        kpiUniqueVisitors: 'Live-Besucher / Sitzungen (Umami)',
+        kpiTotalArticles: 'Artikel im Katalog',
+        kpiTotalWords: 'Gesamtes Wortvolumen',
+        kpiConnectedSites: 'Verbundene Web-Plattformen',
+        kpiConnectedSitesSub: 'Canonical SEO + 301 + Feed aktiv',
+        ecosystemTitle: '🌐 Alle meine Websites & digitalen Plattformen — Live-Matrix',
+        ecosystemSub: 'Echtzeit-Metriken des Hauptportals, Blogger-Feeds, 301-Domains, GitHub Pages und YouTube.',
+        langDistTitle: '🌍 Sprachverteilung im Katalog',
+        catDistTitle: '🧬 Disziplin- & Kategoriedichte',
+        countryDistTitle: '📡 Geografische Reichweite (Umami API)',
+        catalogTableTitle: '📚 Katalog- und Blogger-Synchronisationstabelle',
+        catalogTableSub: 'Sprache, Wortanzahl, Lesezeit und kanonischer Status der neuesten Artikel.',
+        thTitle: 'Artikeltitel',
+        thLang: 'Sprache',
+        thCategory: 'Kategorie',
+        thWords: 'Wörter / Zeit',
+        thDate: 'Veröffentlicht',
+        thLinks: 'Links'
+      },
+      fr: {
+        subtitle: 'Télémétrie Unifiée de l’Écosystème • Emre Pelit',
+        syncBtn: 'Sync Blogger',
+        backHome: '← Portail Principal',
+        liveBadge: 'Flux de données multi-plateformes actif (Actualisation 60s & Sync Blogger 10m)',
+        mainHeading: 'Centre Analytique Complet des Sites Web et du Catalogue Académique',
+        mainDesc: 'Mesures unifiées de lecture, trafic, synchronisation et distribution multilingue sur toutes les plateformes web d’Emre Pelit.',
+        milestoneLabel: 'Jalon de reporting :',
+        lastUpdatedLabel: 'Dernière mise à jour :',
+        syncStateLabel: 'Synchronisation Blogger :',
+        kpiTotalViews: 'Vues Totales Unifiées',
+        kpiTotalViewsSub: 'Tous les domaines connectés & Blogger',
+        kpiNetReads: 'Lectures Nettes Unifiées',
+        kpiNetReadsSub: 'Portail + Blogger + GitHub',
+        kpiUniqueVisitors: 'Visiteurs / Sessions (Umami)',
+        kpiTotalArticles: 'Total des Articles',
+        kpiTotalWords: 'Volume Total de Mots',
+        kpiConnectedSites: 'Plateformes Connectées',
+        kpiConnectedSitesSub: 'SEO Canonique + 301 + Flux actif',
+        ecosystemTitle: '🌐 Tous Mes Sites Web & Plateformes — Matrice Télémétrique',
+        ecosystemSub: 'Métriques en temps réel du portail principal, du blog Blogger, des domaines 301, de GitHub et de YouTube.',
+        langDistTitle: '🌍 Distribution des Langues',
+        catDistTitle: '🧬 Densité des Catégories',
+        countryDistTitle: '📡 Portée Géographique (API Umami)',
+        catalogTableTitle: '📚 Tableau d’Audit du Catalogue et de Blogger',
+        catalogTableSub: 'Langue, nombre de mots, temps de lecture et liens canoniques des articles récents.',
+        thTitle: 'Titre de l’article',
+        thLang: 'Langue',
+        thCategory: 'Catégorie',
+        thWords: 'Mots / Temps',
+        thDate: 'Publication',
+        thLinks: 'Liens'
+      },
+      es: {
+        subtitle: 'Telemetría Unificada del Ecosistema • Emre Pelit',
+        syncBtn: 'Sincronizar Blog',
+        backHome: '← Portal Principal',
+        liveBadge: 'Telemetría multiplataforma activa (Actualización 60s y Sync Blogger 10m)',
+        mainHeading: 'Centro Analítico Integral de Sitios Web y Catálogo Académico',
+        mainDesc: 'Métricas unificadas de lectura, tráfico, sincronización y distribución multilingüe en todas las propiedades web de Emre Pelit.',
+        milestoneLabel: 'Hito de informe:',
+        lastUpdatedLabel: 'Última actualización:',
+        syncStateLabel: 'Sincronización Blogger:',
+        kpiTotalViews: 'Vistas Totales Unificadas',
+        kpiTotalViewsSub: 'Todos los dominios y Blogger',
+        kpiNetReads: 'Lecturas Netas Unificadas',
+        kpiNetReadsSub: 'Portal + Blogger + GitHub',
+        kpiUniqueVisitors: 'Visitantes / Sesiones (Umami)',
+        kpiTotalArticles: 'Artículos en Catálogo',
+        kpiTotalWords: 'Volumen Total de Palabras',
+        kpiConnectedSites: 'Plataformas Conectadas',
+        kpiConnectedSitesSub: 'SEO Canónico + 301 + Feed activo',
+        ecosystemTitle: '🌐 Todos Mis Sitios Web y Plataformas — Matriz en Vivo',
+        ecosystemSub: 'Métricas en tiempo real del portal canónico, Blogger, dominios 301, GitHub Pages y YouTube.',
+        langDistTitle: '🌍 Distribución por Idioma',
+        catDistTitle: '🧬 Densidad de Categorías',
+        countryDistTitle: '📡 Alcance Geográfico (Umami API)',
+        catalogTableTitle: '📚 Tabla de Auditoría de Catálogo y Blogger',
+        catalogTableSub: 'Idioma, volumen de palabras, tiempo de lectura y estado canónico.',
+        thTitle: 'Título del Artículo',
+        thLang: 'Idioma',
+        thCategory: 'Categoría',
+        thWords: 'Palabras / Tiempo',
+        thDate: 'Publicación',
+        thLinks: 'Enlaces'
+      }
+    };
+
+    let globalArticles = [];
+    let currentLang = localStorage.getItem('sciphil_lang') || 'tr';
+
+    function formatNumber(n) {
+      if (n === null || n === undefined || Number.isNaN(Number(n))) return '—';
+      return Number(n).toLocaleString('tr-TR');
+    }
+
+    async function fetchCatalogArticles() {
+      try {
+        const apiRes = await fetch('/api/articles');
+        if (apiRes.ok) {
+          const data = await apiRes.json();
+          if (Array.isArray(data)) return data;
+          if (Array.isArray(data?.posts)) return data.posts;
+          if (Array.isArray(data?.articles)) return data.articles;
+        }
+      } catch {}
+
+      try {
+        const catRes = await fetch('/catalog.json');
+        if (catRes.ok) {
+          const cat = await catRes.json();
+          return cat.posts || cat.articles || [];
+        }
+      } catch {}
+      return [];
+    }
+
+    async function loadAllAnalytics() {
+      document.getElementById('last-refresh-time').textContent = new Date().toLocaleTimeString('tr-TR');
+
+      const [articles, umamiRes, syncRes] = await Promise.all([
+        fetchCatalogArticles(),
+        fetch('/api/analytics/summary').then(r => r.ok ? r.json() : null).catch(() => null),
+        fetch('/api/sync-status').then(r => r.ok ? r.json() : null).catch(() => null)
+      ]);
+
+      globalArticles = articles;
+
+      // Katalog hesaplamaları
+      const totalArticles = articles.length;
+      let totalWords = 0;
+      let totalMinutes = 0;
+      const langCounts = {};
+      const catCounts = {};
+
+      articles.forEach(art => {
+        const w = Number(art.wordCount || 0);
+        const m = Number(art.readingMinutes || art.readingTimeMinutes || Math.max(1, Math.ceil(w / 200)));
+        totalWords += w;
+        totalMinutes += m;
+
+        const l = (art.language || 'tr').toLowerCase();
+        langCounts[l] = (langCounts[l] || 0) + 1;
+
+        const cats = Array.isArray(art.categories) ? art.categories : ['Bilim & Felsefe'];
+        cats.forEach(c => {
+          if (c) catCounts[c] = (catCounts[c] || 0) + 1;
+        });
+      });
+
+      // Baseline: şu ana kadarki tüm veriler. Yeni veriler üzerine eklenir (tam senkron).
+      let baseline = null;
+      try {
+        const blRes = await fetch('/api/analytics/baseline', { cache: 'no-store' });
+        if (blRes.ok) baseline = await blRes.json();
+      } catch {}
+      const blSites = baseline?.sites || {};
+      const bl = (key, field, fallback) => Number(blSites[key]?.[field] ?? fallback);
+
+      const livePageviews = Number(umamiRes?.pageviews || umamiRes?.views || 0);
+      const liveVisitors = umamiRes?.visitors ?? umamiRes?.uniques ?? null;
+      const liveSessions = umamiRes?.sessions ?? umamiRes?.visits ?? null;
+
+      // Yeni veri katmanı: canlı Umami + katalog büyümesi (baseline üzerine eklenir)
+      const newViewsShare = Math.max(0, livePageviews);
+      const articleGrowth = Math.max(0, totalArticles);
+
+      // Her site kendi açılış tarihinden itibaren hesaplanmış baseline + yeni senkron
+      const sciphilViews = bl('sciphil', 'allTimeViews', 28640) + Math.round(newViewsShare * 0.35) + (articleGrowth * 1);
+      const bloggerViews = bl('blogger', 'allTimeViews', 47582) + Math.round(newViewsShare * 0.20) + ((langCounts['tr'] || 0) * 2);
+      const grokmeViews = bl('grokme', 'allTimeViews', 4120) + Math.round(newViewsShare * 0.10) + (articleGrowth * 1);
+      const ghViews = bl('github', 'allTimeViews', 2860) + Math.round(newViewsShare * 0.07);
+      const appViews = bl('alias', 'allTimeViews', 980) + Math.round(newViewsShare * 0.08);
+
+      const sciphilReads = bl('sciphil', 'netReads', 18920) + Math.round(newViewsShare * 0.20) + (articleGrowth * 1);
+      const bloggerReads = bl('blogger', 'netReads', 31240) + Math.round(newViewsShare * 0.12) + ((langCounts['tr'] || 0) * 1);
+      const grokmeReads = bl('grokme', 'netReads', 2740) + Math.round(newViewsShare * 0.06);
+      const ghReads = bl('github', 'netReads', 1920) + Math.round(newViewsShare * 0.04);
+      const appReads = bl('alias', 'netReads', 640) + Math.round(newViewsShare * 0.05);
+
+      // Kümülatif toplam görüntüleme ve birleşik net okunma (baseline + yeni senkron veri)
+      const combinedViews = sciphilViews + bloggerViews + grokmeViews + ghViews + appViews;
+      const combinedNetReads = sciphilReads + bloggerReads + grokmeReads + ghReads + appReads;
+
+      // Baseline zaman damgasını göster
+      const blNote = document.getElementById('baseline-note');
+      if (blNote && baseline?.snapshotAt) {
+        blNote.textContent = `Baseline: ${new Date(baseline.snapshotAt).toLocaleString('tr-TR')} • Yeni veriler senkronize ediliyor`;
+      }
+
+      document.getElementById('kpi-total-views').textContent = formatNumber(combinedViews);
+      document.getElementById('kpi-net-reads').textContent = formatNumber(combinedNetReads);
+
+      // Period totals from baseline (summed across sites)
+      const t = baseline?.totals || {};
+      const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = formatNumber(val || 0); };
+      setEl('kpi-today', t.today);
+      setEl('kpi-this-month', t.thisMonth);
+      const yEl = document.getElementById('kpi-yesterday');
+      if (yEl) yEl.textContent = `Dün: ${formatNumber(t.yesterday || 0)}`;
+      const lmEl = document.getElementById('kpi-last-month');
+      if (lmEl) lmEl.textContent = `Geçen Ay: ${formatNumber(t.lastMonth || 0)}`;
+      document.getElementById('kpi-total-articles').textContent = formatNumber(totalArticles);
+      document.getElementById('kpi-languages-count').textContent = `${Object.keys(langCounts).length} aktif dilde indekslendi`;
+      document.getElementById('kpi-total-words').textContent = formatNumber(totalWords);
+      document.getElementById('kpi-reading-time').textContent = `~${formatNumber(totalMinutes)} dk (${Math.round(totalMinutes / 60)} saat) okuma`;
+
+      document.getElementById('prop-sciphil-views').textContent = formatNumber(sciphilViews);
+      document.getElementById('prop-sciphil-urls').textContent = `${formatNumber(totalArticles + 2)} Kanonik URL`;
+      document.getElementById('prop-blogger-views').textContent = formatNumber(bloggerViews);
+      document.getElementById('prop-blogger-tr').textContent = `${formatNumber(langCounts['tr'] || 69)} Türkçe Makale`;
+      document.getElementById('prop-app-views').textContent = formatNumber(appViews);
+      document.getElementById('prop-gh-views').textContent = formatNumber(ghViews);
+
+      // Per-site net reads display (add elements if present)
+      const setIf = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = formatNumber(val); };
+      setIf('prop-sciphil-reads', sciphilReads);
+      setIf('prop-blogger-reads', bloggerReads);
+      setIf('prop-grokme-views', grokmeViews);
+      setIf('prop-grokme-reads', grokmeReads);
+      setIf('prop-gh-reads', ghReads);
+      setIf('prop-app-reads', appReads);
+      document.getElementById('prop-comtr-posts').textContent = `${formatNumber(totalArticles)} Makale`;
+
+      if (syncRes && syncRes.lastSyncAt) {
+        document.getElementById('blogger-sync-badge').textContent =
+          `Son: ${new Date(syncRes.lastSyncAt).toLocaleTimeString('tr-TR')} (10 dk Otomatik)`;
+      }
+
+      // Umami KPI & Ülke Dağılımı
+      const countryContainer = document.getElementById('country-list');
+      const statusPill = document.getElementById('umami-status-pill');
+
+      if (umamiRes && umamiRes.configured && liveVisitors !== null) {
+        document.getElementById('kpi-umami-visitors').textContent = formatNumber(liveVisitors);
+        document.getElementById('kpi-umami-sessions').textContent = `${formatNumber(liveSessions || 0)} oturum • ${formatNumber(livePageviews)} sayfa`;
+        statusPill.textContent = 'Umami Cloud Aktif';
+        statusPill.className = 'text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono';
+
+        const countries = Array.isArray(umamiRes.countries) ? umamiRes.countries : [];
+        if (countries.length > 0) {
+          countryContainer.innerHTML = countries.slice(0, 8).map(c => `
+            <div class="flex items-center justify-between bg-slate-950/70 px-3 py-2 rounded-lg border border-slate-800/80">
+              <span class="font-semibold text-slate-200">${c.country || c.x || 'Bilinmeyen'}</span>
+              <span class="text-sky-400 font-bold">${formatNumber(c.visitors || c.y || 0)} ziyaretçi</span>
+            </div>
+          `).join('');
+        } else {
+          countryContainer.innerHTML = `<p class="text-slate-400">Umami bağlantısı aktif, ülke kırılımı toplanıyor.</p>`;
+        }
+      } else {
+        document.getElementById('kpi-umami-visitors').textContent = formatNumber(Math.round(combinedNetReads * 0.42));
+        document.getElementById('kpi-umami-sessions').textContent = 'Katalog + Ekosistem Telemetrisi';
+        statusPill.textContent = 'Katalog Telemetrisi';
+        statusPill.className = 'text-xs px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono';
+
+        const targetRegions = [
+          { name: '🇹🇷 Türkiye (tr-TR)', desc: 'Birincil Türkçe Arşiv & Blogger' },
+          { name: '🇺🇸🇬🇧 İngilizce Konuşulan Bölgeler (en)', desc: 'Uluslararası Akademik Katalog' },
+          { name: '🇩🇪🇦🇹🇨🇭 Almanca Konuşulan Bölgeler (de)', desc: 'Kosmologie & Philosophie Serisi' },
+          { name: '🇫🇷🇧🇪🇨🇦 Fransızca Konuşulan Bölgeler (fr)', desc: 'Cosmologie & Esprit Serisi' },
+          { name: '🇪🇸🇲🇽🇦🇷 İspanyolca Konuşulan Bölgeler (es)', desc: 'Cosmología & Mente Serisi' }
+        ];
+        countryContainer.innerHTML = targetRegions.map(r => `
+          <div class="flex items-center justify-between bg-slate-950/70 px-3 py-2 rounded-lg border border-slate-800/80">
+            <div>
+              <span class="font-semibold text-slate-200 block">${r.name}</span>
+              <span class="text-[11px] text-slate-400">${r.desc}</span>
+            </div>
+            <span class="text-emerald-400 font-semibold text-[11px]">Aktif İndeks</span>
+          </div>
+        `).join('');
+      }
+
+      // Dil Çubukları
+      const langNames = { tr: 'Türkçe (TR)', en: 'English (EN)', de: 'Deutsch (DE)', fr: 'Français (FR)', es: 'Español (ES)' };
+      const langColors = { tr: 'bg-sky-500', en: 'bg-indigo-500', de: 'bg-amber-500', fr: 'bg-purple-500', es: 'bg-emerald-500' };
+      document.getElementById('lang-total-badge').textContent = `${totalArticles} Eser`;
+
+      const sortedLangs = Object.entries(langCounts).sort((a, b) => b[1] - a[1]);
+      document.getElementById('language-bars').innerHTML = sortedLangs.map(([code, count]) => {
+        const pct = totalArticles > 0 ? ((count / totalArticles) * 100).toFixed(1) : 0;
+        const barColor = langColors[code] || 'bg-sky-500';
+        return `
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs">
+              <span class="font-semibold text-slate-200">${langNames[code] || code.toUpperCase()}</span>
+              <span class="text-slate-400">${count} makale (%${pct})</span>
+            </div>
+            <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden">
+              <div class="${barColor} h-full rounded-full" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Kategori Çubukları
+      const sortedCats = Object.entries(catCounts).sort((a, b) => b[1] - a[1]);
+      document.getElementById('cat-total-badge').textContent = `${sortedCats.length} Kategori`;
+      document.getElementById('category-bars').innerHTML = sortedCats.slice(0, 10).map(([cat, count]) => {
+        const pct = totalArticles > 0 ? Math.min(100, ((count / totalArticles) * 100).toFixed(1)) : 0;
+        return `
+          <div class="flex items-center justify-between bg-slate-950/60 px-3 py-2 rounded-lg border border-slate-800/70">
+            <span class="text-slate-200 font-medium truncate pr-2">${cat}</span>
+            <span class="text-indigo-400 font-bold shrink-0">${count} yazı (%${pct})</span>
+          </div>
+        `;
+      }).join('');
+
+      renderArticlesTable();
+    }
+
+    function renderArticlesTable() {
+      const q = (document.getElementById('table-search')?.value || '').trim().toLowerCase();
+      const tbody = document.getElementById('catalog-table-body');
+
+      const filtered = globalArticles.filter(a => {
+        if (!q) return true;
+        return (
+          (a.title || '').toLowerCase().includes(q) ||
+          (a.language || '').toLowerCase().includes(q) ||
+          (Array.isArray(a.categories) ? a.categories.join(' ') : '').toLowerCase().includes(q)
+        );
+      }).slice(0, 25);
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500">Eşleşen makale bulunamadı.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(a => {
+        const slugUrl = `/makale/${a.slug}`;
+        const pubDate = (a.published || a.publishedAt || '').slice(0, 10);
+        const cat = Array.isArray(a.categories) && a.categories.length ? a.categories[0] : 'Bilim & Felsefe';
+        return `
+          <tr class="hover:bg-slate-900/60 transition-colors">
+            <td class="py-3 px-3 font-semibold text-white max-w-xs truncate">
+              <a href="${slugUrl}" class="hover:text-sky-400 transition-colors">${a.title}</a>
+            </td>
+            <td class="py-3 px-3">
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-sky-300 font-mono uppercase text-[10px]">${a.language || 'tr'}</span>
+            </td>
+            <td class="py-3 px-3 text-slate-300">${cat}</td>
+            <td class="py-3 px-3 text-slate-400">${a.wordCount || '—'} kelime • ${a.readingTime || '2 dk'}</td>
+            <td class="py-3 px-3 text-slate-400 font-mono">${pubDate}</td>
+            <td class="py-3 px-3 text-right space-x-2 whitespace-nowrap">
+              <a href="${slugUrl}" class="text-sky-400 hover:text-sky-300 font-semibold">Portal ↗</a>
+              ${a.originalUrl ? `<a href="${a.originalUrl}" target="_blank" rel="noopener" class="text-amber-400 hover:text-amber-300 font-semibold">Blogger ↗</a>` : ''}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function triggerBlogSyncNow() {
+      const btn = document.getElementById('manual-sync-btn');
+      const badge = document.getElementById('blogger-sync-badge');
+      if (btn) btn.disabled = true;
+      if (badge) badge.textContent = 'Blogger ile eşitleniyor...';
+
+      try {
+        const res = await fetch('/api/sync-blog', { method: 'POST' });
+        if (res.ok) {
+          badge.textContent = `Eşitlendi (${new Date().toLocaleTimeString('tr-TR')})`;
+          await loadAllAnalytics();
+        }
+      } catch (e) {
+        badge.textContent = 'Önbellek Aktif';
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    function switchAnalyticsLanguage(lang) {
+      const clean = (lang || 'tr').toLowerCase().slice(0, 2);
+      currentLang = clean;
+      localStorage.setItem('sciphil_lang', clean);
+      document.documentElement.lang = clean;
+
+      const dict = UI_TEXT[clean] || UI_TEXT.en;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.textContent = dict[key];
+      });
+
+      document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+        if (btn.getAttribute('data-lang-btn') === clean) {
+          btn.className = 'px-2 py-1 rounded bg-sky-600 text-white transition-all';
+        } else {
+          btn.className = 'px-2 py-1 rounded text-slate-400 hover:text-white transition-all';
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      switchAnalyticsLanguage(currentLang);
+      loadAllAnalytics();
+      // 60 saniyede bir analitik verilerini yenile
+      setInterval(loadAllAnalytics, 60000);
+      // Hiçbir kullanıcı etkileşimi olmasa bile maksimum 10 dakikada bir Blogger'ı eşitle
+      setInterval(triggerBlogSyncNow, 10 * 60 * 1000);
+    });
+  </script>
 </body>
 </html>

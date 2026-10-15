@@ -40,12 +40,12 @@
       Büyük Patlama'dan kuantum mekaniğine, bilinç felsefesinden düşünce deneylerine
     </text>
     <text x="80" y="415" font-size="22" fill="#94a3b8" font-weight="400">
-      289+ akademik inceleme, interaktif Sokratik AI ve felsefi ikilemler.
+      294+ akademik inceleme, interaktif Sokratik AI ve felsefi ikilemler.
     </text>
 
     <!-- Alt İstatistik Kartı -->
     <rect x="80" y="480" width="1040" height="80" rx="16" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
-    <text x="120" y="528" font-size="26" font-weight="800" fill="#38bdf8">289+</text>
+    <text x="120" y="528" font-size="26" font-weight="800" fill="#38bdf8">294+</text>
     <text x="185" y="528" font-size="16" font-weight="500" fill="#94a3b8">Canlı Makale</text>
 
     <text x="360" y="528" font-size="26" font-weight="800" fill="#a78bfa">5</text>

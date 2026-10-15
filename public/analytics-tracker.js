@@ -4,7 +4,17 @@
   if (window.__SCI_PHIL_ANALYTICS_LOADER__) return;
   window.__SCI_PHIL_ANALYTICS_LOADER__ = true;
 
-  fetch('/api/analytics/config', { cache: 'no-store', credentials: 'same-origin' })
+  let configBase = window.location.origin;
+  let siteKey = 'sci-phil';
+  try {
+    const loaderUrl = new URL(document.currentScript && document.currentScript.src || '/analytics-tracker.js', window.location.href);
+    configBase = loaderUrl.origin;
+    siteKey = loaderUrl.searchParams.get('site') || 'sci-phil';
+  } catch (_) { /* Keep the same-origin primary-site defaults. */ }
+  const configUrl = new URL('/api/analytics/config', configBase);
+  configUrl.searchParams.set('site', siteKey);
+
+  fetch(configUrl.toString(), { cache: 'no-store', mode: configBase === window.location.origin ? 'same-origin' : 'cors' })
     .then((response) => {
       if (!response.ok) throw new Error('Analytics config unavailable');
       return response.json();

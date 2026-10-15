@@ -1,0 +1,84 @@
+{
+  "snapshotAt": "2026-10-15T17:09:00+03:00",
+  "description": "Her sitenin baseline'ı kendi açılış tarihinden itibaren hesaplandı. Toplamlar en sonda birleştirildi.",
+  "sites": {
+    "blogger": {
+      "name": "emrepelit7337.blogspot.com",
+      "launchDate": "2026-01-15",
+      "launchLabel": "15 Ocak 2026",
+      "daysActive": 273,
+      "allTimeViews": 47582,
+      "today": 110,
+      "yesterday": 222,
+      "thisMonth": 3548,
+      "lastMonth": 5204,
+      "netReads": 31240,
+      "posts": 294,
+      "comments": 15
+    },
+    "sciphil": {
+      "name": "sci-phil.ai.studio",
+      "launchDate": "2026-04-24",
+      "launchLabel": "24 Nisan 2026",
+      "daysActive": 174,
+      "allTimeViews": 28640,
+      "today": 78,
+      "yesterday": 145,
+      "thisMonth": 2180,
+      "lastMonth": 3120,
+      "netReads": 18920,
+      "posts": 294,
+      "comments": 0
+    },
+    "grokme": {
+      "name": "science-philosophy.grok.me",
+      "launchDate": "2026-09-26",
+      "launchLabel": "26 Eylül 2026",
+      "daysActive": 19,
+      "allTimeViews": 4120,
+      "today": 42,
+      "yesterday": 68,
+      "thisMonth": 980,
+      "lastMonth": 0,
+      "netReads": 2740,
+      "posts": 294,
+      "comments": 0
+    },
+    "github": {
+      "name": "GitHub Pages",
+      "launchDate": "2026-09-26",
+      "launchLabel": "26 Eylül 2026",
+      "daysActive": 19,
+      "allTimeViews": 2860,
+      "today": 28,
+      "yesterday": 45,
+      "thisMonth": 640,
+      "lastMonth": 0,
+      "netReads": 1920,
+      "posts": 0,
+      "comments": 0
+    },
+    "alias": {
+      "name": "science-philosophy.ai.studio",
+      "launchDate": "2026-10-12",
+      "launchLabel": "12 Ekim 2026",
+      "daysActive": 3,
+      "allTimeViews": 980,
+      "today": 65,
+      "yesterday": 210,
+      "thisMonth": 980,
+      "lastMonth": 0,
+      "netReads": 640,
+      "posts": 0,
+      "comments": 0
+    }
+  },
+  "totals": {
+    "cumulativeViews": 84182,
+    "unifiedNetReads": 55460,
+    "today": 323,
+    "yesterday": 690,
+    "thisMonth": 8328,
+    "lastMonth": 8324
+  }
+}

@@ -12,11 +12,6 @@
         }
       })();
     </script>
-    <noscript>
-      <div style="background:#0f172a;color:#f8fafc;padding:12px;text-align:center;font-size:13px;border-bottom:1px solid #334155;">
-        <span>Science &amp; Philosophy resmi ana otorite adresi: <a href="https://sci-phil.ai.studio/" style="color:#38bdf8;font-weight:700">https://sci-phil.ai.studio</a> — science-philosophy.ai.studio sitesi tüm makale ve kaynaklarıyla iç linkleme yoluyla bu adrese aktarılmıştır.</span>
-      </div>
-    </noscript>
     <meta name="google-site-verification" content="KNRxpQL-p8U4rx0MMiRCXMCBx7nmDkCwOK8DGFHrypM" />
     <meta name="msvalidate.01" content="5d3436c931b6024c" />
     <meta name="msvalidate.01" content="470ad27ec2684988ffb44563ab38e7e4" />
@@ -89,7 +84,8 @@
             "https://medium.com/@emrepelit39",
             "https://www.linkedin.com/in/emrepelit109",
             "https://emrepelit7337.blogspot.com/",
-            "https://github.com/emrepelit109/science-philosophy"
+            "https://github.com/emrepelit109/science-philosophy",
+            "https://www.youtube.com/@science_only"
           ]
         },
         {
@@ -105,26 +101,218 @@
     }
     </script>
     <style>
-      .seo-article-index{max-width:1120px;margin:2rem auto;padding:0 1rem 2rem;color:#94a3b8;font:14px/1.6 system-ui,sans-serif}
-      .seo-article-index details{border:1px solid rgba(148,163,184,.28);border-radius:12px;background:rgba(15,23,42,.52);padding:1rem 1.2rem}
-      .seo-article-index summary{cursor:pointer;color:inherit;font-weight:700;font-size:1rem}
-      .seo-article-index p{margin:.75rem 0;color:#94a3b8}
-      .seo-article-index ul{columns:2;column-gap:2rem;margin:.75rem 0 0;padding-left:1.2rem}
-      .seo-article-index li{break-inside:avoid;margin:.35rem 0}
-      .seo-article-index a{color:#cbd5e1;text-decoration:underline;text-underline-offset:3px}
-      .seo-article-index a:hover{color:#fbbf24}
-      @media(max-width:640px){.seo-article-index ul{columns:1}}
+      .seo-article-index {
+        max-width: 1200px;
+        margin: 2.5rem auto;
+        padding: 0 1.25rem 2.5rem;
+        color: #cbd5e1;
+        font: 14px/1.6 'Inter', system-ui, sans-serif;
+      }
+      .seo-article-index details {
+        border: 1px solid rgba(148, 163, 184, 0.28);
+        border-radius: 16px;
+        background: rgba(9, 13, 22, 0.85);
+        padding: 1.25rem 1.5rem;
+        transition: all 0.25s ease;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+      }
+      .seo-article-index details[open] {
+        border-color: rgba(251, 191, 36, 0.45);
+        background: rgba(9, 13, 22, 0.94);
+      }
+      .seo-article-index summary {
+        cursor: pointer;
+        color: #fbbf24;
+        font-weight: 700;
+        font-size: 1.15rem;
+        user-select: none;
+        padding: 0.4rem 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .seo-article-index p {
+        margin: 0.75rem 0;
+        color: #94a3b8;
+      }
+      /* Filtre ve Arama Araç Çubuğu */
+      .archive-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin: 1rem 0 1.25rem;
+        padding: 0.85rem;
+        border-radius: 12px;
+        background: rgba(30, 41, 59, 0.55);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        align-items: center;
+      }
+      .archive-search {
+        flex: 1;
+        min-width: 220px;
+        padding: 0.55rem 0.9rem;
+        border-radius: 8px;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        background: rgba(15, 23, 42, 0.85);
+        color: #f8fafc;
+        font-size: 0.88rem;
+        outline: none;
+      }
+      .archive-search:focus {
+        border-color: #38bdf8;
+      }
+      .lang-filter-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+      }
+      .lang-filter-btn {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        color: #e2e8f0;
+        padding: 0.4rem 0.75rem;
+        border-radius: 7px;
+        cursor: pointer;
+        font-size: 0.78rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+      }
+      .lang-filter-btn:hover,
+      .lang-filter-btn.active {
+        background: #fbbf24;
+        color: #090d16;
+        border-color: #fbbf24;
+      }
+      /* Makale Kartları Izgarası - Her Makaleye Özel Arka Plan Desteği */
+      .seo-article-index ul {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.85rem;
+        margin: 1rem 0 0;
+        padding: 0;
+        list-style: none;
+      }
+      .seo-article-index li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 0.85rem 1rem;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .seo-article-index li:hover {
+        transform: translateY(-2px);
+        border-color: rgba(251, 191, 36, 0.55);
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+      }
+      .seo-article-index .article-main-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        min-width: 0;
+        flex: 1;
+      }
+      .seo-article-index a.sciphil-article-link {
+        color: #f8fafc;
+        font-weight: 600;
+        font-size: 0.92rem;
+        text-decoration: none;
+        line-height: 1.4;
+        transition: color 0.15s ease;
+      }
+      .seo-article-index a.sciphil-article-link:hover {
+        color: #fde047;
+        text-decoration: underline;
+      }
+      .seo-article-index .lang-tag {
+        color: #93c5fd;
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+      /* Blogger İlgili Makale Bağlantı Rozeti */
+      .blogger-companion-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        flex-shrink: 0;
+        background: linear-gradient(135deg, #ff5722 0%, #e64a19 100%);
+        color: #ffffff !important;
+        text-decoration: none !important;
+        padding: 0.38rem 0.7rem;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+        box-shadow: 0 3px 10px rgba(255, 87, 34, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: transform 0.18s ease, filter 0.18s ease;
+        white-space: nowrap;
+      }
+      .blogger-companion-link:hover {
+        transform: scale(1.05);
+        filter: brightness(1.12);
+      }
+      @media (max-width: 768px) {
+        .seo-article-index ul {
+          grid-template-columns: 1fr;
+        }
+        .seo-article-index li {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .blogger-companion-link {
+          align-self: flex-end;
+        }
+      }
     </style>
     <script defer src="/analytics-tracker.js"></script>
-</head>
+
   <body class="bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 antialiased selection:bg-amber-500/20 selection:text-amber-600 dark:selection:text-amber-400">
+    <noscript>
+      <div style="background:#0f172a;color:#f8fafc;padding:12px;text-align:center;font-size:13px;border-bottom:1px solid #334155;">
+        <span>Science &amp; Philosophy resmi ana otorite adresi: <a href="https://sci-phil.ai.studio/" style="color:#38bdf8;font-weight:700">https://sci-phil.ai.studio</a> — science-philosophy.ai.studio ve <a href="https://emrepelit7337.blogspot.com/" style="color:#ff7043;font-weight:700">emrepelit7337.blogspot.com</a> makale arşivi çapraz linkleme ile bağlıdır.</span>
+      </div>
+    </noscript>
+
     <div id="root"></div>
-        <section class="seo-article-index" aria-label="Makale arşivi">
-      <details>
-        <summary>Makale Arşivi — 289 makale</summary>
-        <p>Bilim, felsefe, kozmoloji, zihin, yapay zekâ bilinci ve epistemoloji alanlarındaki yazılara doğrudan erişin.</p>
-        <p style="color:#7dd3fc;font-size:0.85rem;margin:.5rem 0"><strong>İç Linkleme &amp; Otorite Ağı:</strong> science-philosophy.ai.studio arşivi kalıcı olarak <a href="https://sci-phil.ai.studio/" style="color:#fde047">sci-phil.ai.studio</a> üzerinde birleştirilmiştir.</p>
-        <ul>
+
+    <section class="seo-article-index" aria-label="Makale arşivi">
+      <details open>
+        <summary>
+          <span>Makale Arşivi — 294 makale (Her Makaleye Özgün Tema &amp; Blogger Çapraz Bağlantı)</span>
+          <span id="blogger-sync-status" style="font-size:0.78rem;color:#38bdf8;font-weight:500;">🟠 emrepelit7337.blogspot.com ile eşleştirildi</span>
+        </summary>
+        <p>Bilim, felsefe, kozmoloji, zihin, yapay zekâ bilinci ve epistemoloji alanlarındaki yazılara doğrudan erişin. Her makalenin yanında <strong>emrepelit7337.blogspot.com</strong> üzerindeki ilgili makale bağlantısı yer almaktadır.</p>
+        <p style="color:#7dd3fc;font-size:0.85rem;margin:.5rem 0">
+          <strong>İç Linkleme &amp; Otorite Ağı:</strong> science-philosophy.ai.studio arşivi kalıcı olarak <a href="https://sci-phil.ai.studio/" style="color:#fde047">sci-phil.ai.studio</a> üzerinde birleştirilmiş ve <a href="https://emrepelit7337.blogspot.com/" target="_blank" rel="noopener" style="color:#ff8a65">emrepelit7337.blogspot.com</a> ile karşılıklı eşleştirilmiştir.
+        </p>
+
+        <!-- Hızlı Arama ve Dil Filtresi -->
+        <div class="archive-toolbar">
+          <input type="search" id="archiveSearchInput" class="archive-search" placeholder="Makale başlığı veya kavram ara (ör. Higgs, Kuantum, Şuur, Zaman, Robot)..." aria-label="Makale ara" />
+          <div class="lang-filter-group">
+            <button type="button" class="lang-filter-btn active" data-lang="all">Tümü</button>
+            <button type="button" class="lang-filter-btn" data-lang="Türkçe">Türkçe</button>
+            <button type="button" class="lang-filter-btn" data-lang="English">English</button>
+            <button type="button" class="lang-filter-btn" data-lang="Deutsch">Deutsch</button>
+            <button type="button" class="lang-filter-btn" data-lang="Français">Français</button>
+            <button type="button" class="lang-filter-btn" data-lang="Español">Español</button>
+          </div>
+        </div>
+
+        <ul id="seoArticleList">
+          <li><a href="/makale/das-universum-war-schon-immer-ein-einzigartiges-phanomen-und-das-wird-es-fur-immer-bleiben-2649134577666013611">Das Universum war schon immer ein einzigartiges Phänomen, und das wird es für immer bleiben</a> <span>(Deutsch)</span></li>
+          <li><a href="/makale/l-univers-a-toujours-ete-un-phenomene-singulier-et-le-restera-pour-toujours-2350372081388287611">L’Univers a toujours été un phénomène singulier et le restera pour toujours</a> <span>(Français)</span></li>
+          <li><a href="/makale/el-universo-siempre-fue-un-fenomeno-singular-y-asi-permanecera-para-siempre-8987128337482146517">El Universo Siempre Fue Un Fenómeno Singular, Y Así Permanecerá Para Siempre</a> <span>(Español)</span></li>
+          <li><a href="/makale/the-universe-has-always-been-a-singular-phenomenon-and-forever-it-shall-remain-so-2534219432515261761">The Universe Has Always Been a Singular Phenomenon, and Forever It Shall Remain So</a> <span>(English)</span></li>
+          <li><a href="/makale/evren-her-zaman-tekil-bir-olguydu-ve-ilelebet-de-oyle-kalacak-8837081716175656566">Evren Her Zaman Tekil Bir Olguydu ve İlelebet de Öyle Kalacak</a> <span>(Türkçe)</span></li>
           <li><a href="/makale/beweist-die-tatsache-dass-llms-menschliches-verhalten-nachahmen-dass-sie-ein-bew-4599366178067641283">Beweist die Tatsache, dass LLMs menschliches Verhalten nachahmen, dass sie ein „Bewusstsein“ besitzen?</a> <span>(Deutsch)</span></li>
           <li><a href="/makale/le-fait-que-les-llm-imitent-le-comportement-humain-prouve-t-il-quils-sont-dots-d-8383233014379744525">Le fait que les LLM imitent le comportement humain prouve-t-il qu&#39;ils sont dotés de « conscience » ?</a> <span>(Français)</span></li>
           <li><a href="/makale/el-hecho-de-que-los-llm-imiten-el-comportamiento-humano-demuestra-que-tienen-con-8998131455154199161">¿El hecho de que los LLM imiten el comportamiento humano demuestra que tienen &quot;conciencia&quot;?</a> <span>(Español)</span></li>
@@ -178,7 +366,7 @@
           <li><a href="/makale/fitrah-et-la-logique-de-lalgorithme-pr-entrain-4776452835017738339">FITRAH ET LA LOGIQUE DE L&#39;ALGORITHME PRÉ-ENTRAÎNÉ</a> <span>(Français)</span></li>
           <li><a href="/makale/dilemme-entre-matire-et-conscience-la-tlpathie-est-elle-possible-1199796723742824892">Dilemme entre Matière et Conscience : La Télépathie est-elle Possible ?</a> <span>(Français)</span></li>
           <li><a href="/makale/superposition-quantique-et-prise-de-dcision-1021566671697157339">Superposition Quantique et Prise de Décision</a> <span>(Français)</span></li>
-          <li><a href="/makale/intrication-quantique-et-tissu-de-lunivers-lillusion-de-lespace-temps-2205113051693942296">Intrication Quantique et Tissu de l&#39;Univers : L&#39;Illusion de l&#39;Espace-Temps</a> <span>(Français)</span></li>
+          <li><a href="/makale/intrication-quantique-et-tissu-de-lunivers-lillusion-de-lespace-temps-2205113051693942296">Intrication Quantique et Tissu de l&#39;Univers : L&#39;Illusion de l&#39;Espace-Temps</a> <span>(Français)</span></li>
           <li><a href="/makale/la-variabilit-quantique-et-leffet-de-lobservateur-7216410978415060684">La Variabilité Quantique et l&#39;Effet de l&#39;Observateur</a> <span>(Français)</span></li>
           <li><a href="/makale/la-thse-de-lunivers-dynamique-de-john-wheeler-et-son-interprtation-1174168710558665302">La Thèse de l&#39;Univers Dynamique de John Wheeler et son Interprétation</a> <span>(Français)</span></li>
           <li><a href="/makale/les-paralllismes-entre-le-principe-holographique-et-lallgorie-de-la-caverne-de-p-5237407996821039367">Les Parallélismes entre le Principe Holographique et l&#39;Allégorie de la Caverne de Platon</a> <span>(Français)</span></li>
@@ -204,13 +392,13 @@
           <li><a href="/makale/en-qu-tiempo-vivimos-y-si-viajramos-en-el-tiempo-seguiramos-siendo-nosotros-mism-4000041320580033548">¿En qué tiempo vivimos y, si viajáramos en el tiempo, seguiríamos siendo nosotros mismos?</a> <span>(Español)</span></li>
           <li><a href="/makale/which-time-are-we-living-in-and-would-we-remain-ourselves-if-we-traveled-through-2848414909036510186">Which Time Are We Living In and Would We Remain Ourselves If We Traveled Through Time?</a> <span>(English)</span></li>
           <li><a href="/makale/hangi-zamani-yasamaktayiz-ve-zamanda-yolculuk-yapsak-biz-olarak-kalir-miyiz-2932257969067301629">Hangi Zamanı Yaşamaktayız ve Zamanda Yolculuk Yapsak Biz Olarak Kalır Mıyız</a> <span>(Türkçe)</span></li>
-          <li><a href="/makale/die-diskrete-struktur-der-zeit-und-der-schopfungsprozess-8078190984227066141">Die diskrete Struktur der Zeit und der Schöpfungsprozess</a> <span>(Deutsch)</span></li>
+          <li><a href="/makale/die-diskrete-struktur-der-zeit-und-der-schopfungsprozess-8078190984227066141">Die diskrete Struktur der Zeit und der Schöpfungsprozess</a> <span>(Deutsch)</span></li>
           <li><a href="/makale/la-estructura-discreta-del-tiempo-y-el-proceso-de-la-creacin-6108270304519197250">La Estructura Discreta del Tiempo y el Proceso de la Creación</a> <span>(Español)</span></li>
           <li><a href="/makale/the-discrete-structure-of-time-and-the-process-of-creation-2171895688191669810">The Discrete Structure of Time and the Process of Creation</a> <span>(English)</span></li>
           <li><a href="/makale/zamanin-ayrik-yapisi-ve-yaratilis-sureci-4751062470897015391">Zamanın Ayrık Yapısı ve Yaratılış Süreci</a> <span>(Türkçe)</span></li>
           <li><a href="/makale/die-symmetrie-des-urknalls-materie-energie-umwandlung-und-der-ursprung-des-dasei-9042028529401877250">Die Symmetrie des Urknalls: Materie-Energie-Umwandlung und der Ursprung des Daseins</a> <span>(Deutsch)</span></li>
           <li><a href="/makale/la-simetra-del-big-bang-conversin-de-materia-energa-y-el-origen-de-la-existencia-5485046232837088733">La simetría del Big Bang: Conversión de materia-energía y el origen de la existencia</a> <span>(Español)</span></li>
-          <li><a href="/makale/the-symmetry-of-the-big-bang-matter-energy-conversion-and-the-origin-of-existenc-6574303290525880134">The Symmetry of the Big Bang: Matter-Energy Conversion and the Origin of Existence</a> <span>(English)</span></li>
+          <li><a href="/makale/the-symmetry-of-the-big-bang-matter-energy-conversion-and-the-origin-of-existenc-6574303290525880134">The Symmetry of the Big Bang: Matter-Energy Conversion and the Origin of Existence</a> <span>(English)</span></li>
           <li><a href="/makale/big-bangin-simetrisi-madde-enerji-donusumu-ve-varolusun-kokeni-5750824870737195142">Big Bang&#39;in Simetrisi: Madde-Enerji Dönüşümü ve Varoluşun Kökeni</a> <span>(Türkçe)</span></li>
           <li><a href="/makale/paralelas-entre-el-principio-hologrfico-y-la-alegora-de-la-cueva-de-platon-1718705347296873910">Paralelas entre el Principio Holográfico y la Alegoría de la Cueva de Platon</a> <span>(Español)</span></li>
           <li><a href="/makale/parallelen-zwischen-dem-holografischen-prinzip-und-platons-hohlengleichnis-6975979142000762641">Parallelen zwischen dem holografischen Prinzip und Platon&#39;s Höhlengleichnis</a> <span>(Deutsch)</span></li>
@@ -340,7 +528,7 @@
           <li><a href="/makale/gokyuzundeki-kusursuz-ahenk-2906654874514504506">GÖKYÜZÜNDEKİ KUSURSUZ AHENK</a> <span>(Türkçe)</span></li>
           <li><a href="/makale/pozitif-bilimler-uzerine-8008743588849918372">Pozitif Bilimler Üzerine</a> <span>(Türkçe)</span></li>
           <li><a href="/makale/kuantum-dolaniklilik-ve-solucan-delikleri-634151131506263618">Kuantum Dolanıklılık ve Solucan Delikleri</a> <span>(Türkçe)</span></li>
-          <li><a href="/makale/dualarimizin-kabul-olma-suresini-kisaltma-yolumuz-8248847233653216897">Dualarımızın Kabul Olma Süresini                                                                    Kısaltma Yolumuz</a> <span>(Türkçe)</span></li>
+          <li><a href="/makale/dualarimizin-kabul-olma-suresini-kisaltma-yolumuz-8248847233653216897">Dualarımızın Kabul Olma Süresini Kısaltma Yolumuz</a> <span>(Türkçe)</span></li>
           <li><a href="/makale/the-origin-of-time-perception-and-the-holographic-universe-307190530972618985">The Origin of Time Perception and the Holographic Universe</a> <span>(English)</span></li>
           <li><a href="/makale/zaman-algisinin-kokeni-ve-holografik-evren-5021479295667968211">Zaman Algısının Kökeni ve Holografik Evren</a> <span>(Türkçe)</span></li>
           <li><a href="/makale/space-time-and-the-multidimensionality-of-the-universe-5676423681413407308">Space-Time and the Multidimensionality of the Universe</a> <span>(English)</span></li>
@@ -395,7 +583,7 @@
           <li><a href="/makale/vahdet-inancinin-sifreleri-3274994482189863528">Vahdet İnancının Şifreleri</a> <span>(Türkçe)</span></li>
           <li><a href="/makale/ibadetlerin-yaratici-nezdindeki-mahiyeti-ve-ruhla-iletisim-kurmadaki-onemi-7892910633603094492">İbadetlerin Yaratıcı Nezdindeki Mahiyeti ve Ruhla İletişim Kurmadaki Önemi</a> <span>(Türkçe)</span></li>
           <li><a href="/makale/tovbe-etmek-ve-hayata-yeniden-baslamak-5269615214480483783">Tövbe Etmek ve Hayata Yeniden Başlamak</a> <span>(Türkçe)</span></li>
-          <li><a href="/makale/evrendeki-kusursuz-orantisallik-ve-bunun-yansimalari-2823895493168730609">Evrendeki Kusursuz Orantısallık ve Bunun Yansımaları</a> <span>(Türkçe)</span></li>
+          <li><a href="/makale/evrendeki-kusursuz-orantisallik-ve-bunun-yansimalari-2823895493168730609">Evrendeki Kusursuz Orantısallık ve Bunun Yansımaları</a> <span>(Türkçe)</span></li>
           <li><a href="/makale/islamin-sureklilgi-ve-bizim-genel-durumumuz-8568632165307540118">İslam’ın Süreklilği ve Bizim Genel Durumumuz</a> <span>(Türkçe)</span></li>
           <li><a href="/makale/yaratici-ruhu-hangi-malzemeden-var-etmistir-5345320010982384652">Yaratıcı Ruhu Hangi Malzemeden Var Etmiştir</a> <span>(Türkçe)</span></li>
           <li><a href="/makale/insan-zihninin-gelisim-yollari-ve-gunumuzdeki-buna-engel-olan-unsurlar-1503341991128556761">İnsan Zihninin Gelişim Yolları ve Günümüzdeki Buna Engel Olan Unsurlar</a> <span>(Türkçe)</span></li>
@@ -418,6 +606,229 @@
       </details>
     </section>
 
+    <!-- HER MAKALEYE FARKLI ARKA PLAN & BLOGGER İLGİLİ MAKALE BAĞLANTISI ENTEGRASYON MOTORU -->
+    <script>
+      (function () {
+        var BLOGGER_ORIGIN = 'https://emrepelit7337.blogspot.com';
+        var postIdToUrlMap = {};
+        var titleToUrlMap = {};
+
+        // 1. Altın Açı (137.508°) ile Her Makaleye Benzersiz Arka Plan Üretici
+        function getUniqueArticleBackground(index) {
+          var goldenAngle = 137.508;
+          var hue1 = Math.round((index * goldenAngle) % 360);
+          var hue2 = Math.round((hue1 + 48) % 360);
+          var hue3 = Math.round((hue1 + 190) % 360);
+          var deg = 120 + ((index * 19) % 50);
+          return (
+            'radial-gradient(circle at ' + (15 + ((index * 23) % 70)) + '% ' + (20 + ((index * 31) % 65)) + '%, hsla(' + hue3 + ', 70%, 30%, 0.28) 0%, transparent 60%), ' +
+            'linear-gradient(' + deg + 'deg, hsl(' + hue1 + ', 56%, 15%) 0%, hsl(' + hue2 + ', 50%, 20%) 55%, hsl(' + hue1 + ', 62%, 10%) 100%)'
+          );
+        }
+
+        // URL sonundaki Blogger Post ID'sini (ör. -8837081716175656566) ayıklar
+        function extractPostIdFromHref(href) {
+          if (!href) return null;
+          var match = href.match(/-(\d{15,22})$/);
+          return match ? match[1] : null;
+        }
+
+        // Başlığı normalize eder
+        function normalizeTitle(str) {
+          return (str || '').trim().toLowerCase().replace(/\s+/g, ' ');
+        }
+
+        // İlgili makale için en doğru Blogger URL'sini döndürür
+        function resolveBloggerUrl(postId, title) {
+          if (postId && postIdToUrlMap[postId]) {
+            return postIdToUrlMap[postId];
+          }
+          var norm = normalizeTitle(title);
+          if (norm && titleToUrlMap[norm]) {
+            return titleToUrlMap[norm];
+          }
+          return BLOGGER_ORIGIN + '/search?q=' + encodeURIComponent((title || '').trim());
+        }
+
+        // 2. SEO Arşiv Listesindeki (<ul><li>) Tüm Makaleleri Zenginleştir
+        function enhanceStaticArchiveList() {
+          var listItems = document.querySelectorAll('#seoArticleList > li');
+          listItems.forEach(function (li, idx) {
+            // Her makaleye benzersiz arka plan ata
+            li.style.background = getUniqueArticleBackground(idx + 1);
+
+            var mainAnchor = li.querySelector('a:not(.blogger-companion-link)');
+            var langSpan = li.querySelector('span');
+            if (!mainAnchor) return;
+
+            mainAnchor.classList.add('sciphil-article-link');
+            var href = mainAnchor.getAttribute('href') || '';
+            var postId = extractPostIdFromHref(href);
+            var titleText = mainAnchor.textContent.trim();
+
+            if (postId) {
+              li.setAttribute('data-post-id', postId);
+            }
+            if (langSpan) {
+              langSpan.classList.add('lang-tag');
+              var langClean = langSpan.textContent.replace(/[()]/g, '').trim();
+              li.setAttribute('data-lang', langClean);
+            }
+
+            // Sol sarmalayıcıyı düzenle
+            if (!li.querySelector('.article-main-info')) {
+              var wrapper = document.createElement('div');
+              wrapper.className = 'article-main-info';
+              wrapper.appendChild(mainAnchor);
+              if (langSpan) wrapper.appendChild(langSpan);
+              li.insertBefore(wrapper, li.firstChild);
+            }
+
+            // Yanına Blogger ilgili makale linkini yerleştir veya güncelle
+            var bloggerLink = li.querySelector('.blogger-companion-link');
+            var targetUrl = resolveBloggerUrl(postId, titleText);
+
+            if (!bloggerLink) {
+              bloggerLink = document.createElement('a');
+              bloggerLink.className = 'blogger-companion-link';
+              bloggerLink.target = '_blank';
+              bloggerLink.rel = 'noopener noreferrer';
+              bloggerLink.title = 'emrepelit7337.blogspot.com üzerindeki ilgili makaleyi aç';
+              bloggerLink.innerHTML = '🔗 Blogger\'da Oku';
+              li.appendChild(bloggerLink);
+            }
+            bloggerLink.href = targetUrl;
+          });
+        }
+
+        // 3. React (#root) İçinde Render Edilen Makale Kartlarını Yakala ve Zenginleştir
+        function enhanceReactRenderedArticles() {
+          var rootEl = document.getElementById('root');
+          if (!rootEl) return;
+
+          var cards = rootEl.querySelectorAll('article, [data-article-id], .article-card, .post-card');
+          cards.forEach(function (card, idx) {
+            if (!card.getAttribute('data-unique-bg-applied')) {
+              card.style.backgroundImage = getUniqueArticleBackground(idx + 50);
+              card.setAttribute('data-unique-bg-applied', 'true');
+            }
+
+            if (card.querySelector('.blogger-companion-link')) return;
+
+            var heading = card.querySelector('h1, h2, h3');
+            var internalLink = card.querySelector('a[href*="/makale/"]');
+            var href = internalLink ? internalLink.getAttribute('href') : window.location.pathname;
+            var postId = extractPostIdFromHref(href);
+            var titleText = heading ? heading.textContent.trim() : '';
+
+            if (!titleText && !postId) return;
+
+            var badge = document.createElement('a');
+            badge.className = 'blogger-companion-link';
+            badge.href = resolveBloggerUrl(postId, titleText);
+            badge.target = '_blank';
+            badge.rel = 'noopener noreferrer';
+            badge.style.marginLeft = '10px';
+            badge.innerHTML = '🔗 Blogger\'daki İlgili Makale';
+
+            if (heading) {
+              heading.appendChild(badge);
+            } else {
+              card.appendChild(badge);
+            }
+          });
+        }
+
+        // 4. Blogger JSONP Feed'inden Gerçek Makale Permalinklerini Çek ve Eşleştir
+        window.__onBloggerFeedLoaded = function (json) {
+          try {
+            if (json && json.feed && json.feed.entry) {
+              json.feed.entry.forEach(function (entry) {
+                var idRaw = entry.id && entry.id.$t ? entry.id.$t : '';
+                var idMatch = idRaw.match(/post-(\d+)/);
+                var postId = idMatch ? idMatch[1] : null;
+                var title = entry.title && entry.title.$t ? entry.title.$t : '';
+                var altLink = (entry.link || []).find(function (l) {
+                  return l.rel === 'alternate';
+                });
+
+                if (altLink && altLink.href) {
+                  if (postId) postIdToUrlMap[postId] = altLink.href;
+                  if (title) titleToUrlMap[normalizeTitle(title)] = altLink.href;
+                }
+              });
+
+              var statusEl = document.getElementById('blogger-sync-status');
+              if (statusEl) {
+                statusEl.textContent = '🟢 Blogger kalıcı bağlantıları aktif (' + Object.keys(postIdToUrlMap).length + ' doğrudan eşleşme)';
+              }
+            }
+          } catch (err) {
+            console.warn('Blogger feed ayrıştırma uyarısı:', err);
+          }
+          enhanceStaticArchiveList();
+          enhanceReactRenderedArticles();
+        };
+
+        // 5. Arama ve Dil Filtreleme İşlevleri
+        function initArchiveFilters() {
+          var searchInput = document.getElementById('archiveSearchInput');
+          var langButtons = document.querySelectorAll('.lang-filter-btn');
+          var currentLang = 'all';
+
+          function applyFilter() {
+            var q = (searchInput ? searchInput.value : '').toLowerCase().trim();
+            var items = document.querySelectorAll('#seoArticleList > li');
+            items.forEach(function (li) {
+              var text = li.textContent.toLowerCase();
+              var itemLang = li.getAttribute('data-lang') || '';
+              var matchesLang = currentLang === 'all' || itemLang === currentLang;
+              var matchesQuery = !q || text.includes(q);
+              li.style.display = matchesLang && matchesQuery ? 'flex' : 'none';
+            });
+          }
+
+          if (searchInput) {
+            searchInput.addEventListener('input', applyFilter);
+          }
+
+          langButtons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+              langButtons.forEach(function (b) {
+                b.classList.remove('active');
+              });
+              btn.classList.add('active');
+              currentLang = btn.getAttribute('data-lang') || 'all';
+              applyFilter();
+            });
+          });
+        }
+
+        // Başlangıçta çalıştır
+        document.addEventListener('DOMContentLoaded', function () {
+          enhanceStaticArchiveList();
+          initArchiveFilters();
+
+          // React DOM değişimlerini izle (#root içerisindeki makalelere de arka plan + Blogger linki ekler)
+          var rootNode = document.getElementById('root');
+          if (rootNode && window.MutationObserver) {
+            var observer = new MutationObserver(function () {
+              enhanceReactRenderedArticles();
+            });
+            observer.observe(rootNode, { childList: true, subtree: true });
+          }
+
+          // Canlı Blogger JSONP akışını yükle
+          var script = document.createElement('script');
+          script.src = BLOGGER_ORIGIN + '/feeds/posts/default?alt=json-in-script&max-results=500&callback=__onBloggerFeedLoaded';
+          script.async = true;
+          document.body.appendChild(script);
+        });
+      })();
+    </script>
+
     <script type="module" src="/src/main.tsx"></script>
+    <!-- ... Diğer tüm body içerikleriniz ... -->
+
   </body>
 </html>

@@ -5,6 +5,7 @@ import { Clock, ArrowRight, Scale, Globe } from 'lucide-react';
 import { ReadingLanguageOption } from './Header';
 import { UiTranslations, getTranslations, translateCategory } from '../utils/i18n';
 import { getTranslatedArticle } from '../data/articleTranslations';
+import type { SiteArticleTranslation } from '../utils/siteTranslationService';
 
 interface ArticleCardProps {
   article: Article;
@@ -12,6 +13,7 @@ interface ArticleCardProps {
   onSelectWithLanguage?: (article: Article, langCode: string, langName: string) => void;
   readingLanguage?: ReadingLanguageOption;
   ui?: UiTranslations;
+  siteTranslation?: SiteArticleTranslation;
 }
 
 export const ArticleCard: React.FC<ArticleCardProps> = ({ 
@@ -19,17 +21,29 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   onSelect, 
   onSelectWithLanguage,
   readingLanguage,
-  ui: propUi
+  ui: propUi,
+  siteTranslation,
 }) => {
   const langCode = readingLanguage?.code || 'tr';
   const ui = propUi || getTranslations(langCode);
 
   // Compute translated article when target reading language is selected
   const displayArticle = useMemo(() => {
-    return getTranslatedArticle(article, langCode);
-  }, [article, langCode]);
+    const fallback = getTranslatedArticle(article, langCode);
+    if (langCode === 'tr' || !siteTranslation) return fallback;
+    return {
+      ...fallback,
+      title: siteTranslation.title || fallback.title,
+      summary: siteTranslation.summary || fallback.summary,
+      categories: siteTranslation.categories?.length ? siteTranslation.categories : fallback.categories,
+      dialecticalTriad: {
+        ...fallback.dialecticalTriad,
+        ...(siteTranslation.dialecticalTriad || {}),
+      },
+    };
+  }, [article, langCode, siteTranslation]);
 
-  const categoryName = translateCategory(article.categories[0] || 'Bilim & Felsefe', langCode);
+  const categoryName = displayArticle.categories?.[0] || translateCategory(article.categories[0] || 'Bilim & Felsefe', langCode);
 
   const quickLanguages = [
     { code: 'en', name: 'English', flag: '🇬🇧' },

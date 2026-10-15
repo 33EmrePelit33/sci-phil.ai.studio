@@ -15,6 +15,7 @@ import {
 import { ReadingLanguageOption } from './Header';
 import { UiTranslations, getTranslations, translateCategory } from '../utils/i18n';
 import { getTranslatedArticle } from '../data/articleTranslations';
+import type { SiteArticleTranslation } from '../utils/siteTranslationService';
 
 interface FeaturedShowcaseProps {
   article: Article;
@@ -22,6 +23,7 @@ interface FeaturedShowcaseProps {
   onSelectWithLanguage?: (article: Article, lang: { code: string; name: string }) => void;
   readingLanguage?: ReadingLanguageOption;
   ui?: UiTranslations;
+  siteTranslation?: SiteArticleTranslation;
 }
 
 export const FeaturedShowcase: React.FC<FeaturedShowcaseProps> = ({
@@ -30,13 +32,22 @@ export const FeaturedShowcase: React.FC<FeaturedShowcaseProps> = ({
   onSelectWithLanguage,
   readingLanguage,
   ui: propUi,
+  siteTranslation,
 }) => {
   const langCode = readingLanguage?.code || 'tr';
   const ui = propUi || getTranslations(langCode);
 
   const displayArticle = useMemo(() => {
-    return getTranslatedArticle(article, langCode);
-  }, [article, langCode]);
+    const fallback = getTranslatedArticle(article, langCode);
+    if (langCode === 'tr' || !siteTranslation) return fallback;
+    return {
+      ...fallback,
+      title: siteTranslation.title || fallback.title,
+      summary: siteTranslation.summary || fallback.summary,
+      categories: siteTranslation.categories?.length ? siteTranslation.categories : fallback.categories,
+      dialecticalTriad: { ...fallback.dialecticalTriad, ...(siteTranslation.dialecticalTriad || {}) },
+    };
+  }, [article, langCode, siteTranslation]);
 
   const publishedDateFormatted = React.useMemo(() => {
     try {
@@ -97,7 +108,7 @@ export const FeaturedShowcase: React.FC<FeaturedShowcaseProps> = ({
             </div>
 
             <h2 
-              onClick={() => onSelect(displayArticle)}
+              onClick={() => onSelect(article)}
               className="font-reading text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white group-hover:text-amber-300 transition-colors leading-snug cursor-pointer"
             >
               {displayArticle.title}
@@ -118,7 +129,7 @@ export const FeaturedShowcase: React.FC<FeaturedShowcaseProps> = ({
           {/* Action Buttons */}
           <div className="flex flex-wrap items-center gap-3 pt-2">
             <button
-              onClick={() => onSelect(displayArticle)}
+              onClick={() => onSelect(article)}
               className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-neutral-950 font-bold text-sm shadow-xl shadow-amber-500/25 transition-all cursor-pointer hover:scale-[1.02]"
             >
               <BookOpen className="w-4 h-4" />

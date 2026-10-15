@@ -50,6 +50,8 @@
   }
 
   function showUnconfigured(data) {
+    currentData = null;
+    if (countryRows) countryRows.replaceChildren();
     ['live-visitors', 'live-pageviews', 'live-visits'].forEach((id) => {
       const el = document.getElementById(id);
       if (el) el.textContent = '—';
@@ -58,15 +60,24 @@
     if (countryStatus) {
       countryStatus.textContent = 'Henüz ülke verisi yok. Önce Umami site kimliği ve sunucu API anahtarını barındırma ayarlarına ekleyin.';
     }
+    ['reg-val-eurasia', 'reg-val-europe', 'reg-val-americas', 'reg-val-others'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '—';
+    });
+    ['reg-sub-eurasia', 'reg-sub-europe', 'reg-sub-americas', 'reg-sub-others'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = 'Gerçek ülke verisi bekleniyor';
+    });
     setState('Kurulum gerekli', true);
     if (note) {
-      note.textContent = (data && data.error ? data.error + ' ' : '') + 'Umami Cloud yapılandırıldıktan sonra bu panel 12 Ekim 2026 00.00 Türkiye saatinden itibaren toplanan veriyi gösterecek. API anahtarı yalnızca sunucu gizli değişkenlerinde tutulmalıdır.';
+      note.textContent = (data && data.error ? data.error + ' ' : '') + 'Umami Cloud yapılandırıldıktan sonra bu panel 24 Nisan 2026 00.00 Türkiye saatinden itibaren toplanan veriyi gösterecek. API anahtarı yalnızca sunucu gizli değişkenlerinde tutulmalıdır.';
     }
   }
 
   function updateRegionalBreakdown(data) {
     const totalVisitors = Number(data.visitors || 0);
     const regions = data.regions || {};
+    const hasCountryBreakdown = data.countryBreakdownAvailable === true && Array.isArray(data.countries) && data.countries.length > 0;
 
     const regionMappings = [
       { key: 'Türkiye & Avrasya', valId: 'reg-val-eurasia', subId: 'reg-sub-eurasia', barId: 'reg-bar-eurasia', segId: 'seg-eurasia', icon: '🇹🇷' },
@@ -85,12 +96,14 @@
       const percent = totalVisitors > 0 ? ((info.visitors / totalVisitors) * 100) : 0;
       const formattedPercent = percentFmt.format(percent);
 
-      if (valEl) valEl.textContent = `${number.format(info.visitors)} ziyaretçi`;
-      if (subEl) subEl.textContent = `%${formattedPercent} pay · ${info.countryCount || 0} ülke · ${number.format(info.pageviews)} görüntüleme`;
-      if (barEl) barEl.style.width = `${Math.min(100, Math.max(3, percent))}%`;
+      if (valEl) valEl.textContent = hasCountryBreakdown ? `${number.format(info.visitors)} ziyaretçi` : '—';
+      if (subEl) subEl.textContent = hasCountryBreakdown
+        ? `%${formattedPercent} pay · ${info.countryCount || 0} ülke · ${info.pageviews === null ? '—' : number.format(info.pageviews)} görüntüleme`
+        : 'Ülke kırılımı mevcut değil';
+      if (barEl) barEl.style.width = hasCountryBreakdown ? `${Math.min(100, Math.max(3, percent))}%` : '0%';
       if (segEl) {
-        segEl.style.width = `${percent}%`;
-        segEl.title = `${m.key}: ${number.format(info.visitors)} ziyaretçi (%${formattedPercent})`;
+        segEl.style.width = hasCountryBreakdown ? `${percent}%` : '0%';
+        segEl.title = hasCountryBreakdown ? `${m.key}: ${number.format(info.visitors)} ziyaretçi (%${formattedPercent})` : `${m.key}: veri yok`;
       }
     });
   }
@@ -99,6 +112,12 @@
     if (!currentData || !countryRows) return;
     const allRows = Array.isArray(currentData.countries) ? currentData.countries : [];
     const totalVisitors = Number(currentData.visitors || 0);
+    if (allRows.length === 0) {
+      countryRows.replaceChildren();
+      if (countryTable) countryTable.hidden = true;
+      if (countryStatus) countryStatus.textContent = 'Umami bu dönem için ülke kırılımı sağlamadı; tahminî ülke listesi gösterilmiyor.';
+      return;
+    }
 
     // 1. Filter by active region
     let filtered = allRows.filter(c => {
@@ -126,7 +145,7 @@
         case 'pageviews-desc':
           return (b.pageviews || 0) - (a.pageviews || 0);
         case 'duration-desc':
-          return (b.avgReadSeconds || 0) - (a.avgReadSeconds || 0);
+          return (b.avgReadSeconds ?? -1) - (a.avgReadSeconds ?? -1);
         case 'name-asc':
           return (a.countryName || countryName(a.country)).localeCompare(b.countryName || countryName(b.country), 'tr');
         case 'visitors-desc':
@@ -187,9 +206,9 @@
         const numText = document.createElement('span');
         numText.style.fontWeight = '800';
         numText.style.minWidth = '54px';
-        numText.textContent = number.format(country.visitors || 0);
+        numText.textContent = country.visitors === null || country.visitors === undefined ? '—' : number.format(country.visitors);
 
-        const percentVal = totalVisitors > 0 ? ((country.visitors / totalVisitors) * 100) : 0;
+        const percentVal = totalVisitors > 0 && Number.isFinite(country.visitors) ? ((country.visitors / totalVisitors) * 100) : 0;
         const percentText = document.createElement('span');
         percentText.style.fontSize = '0.75rem';
         percentText.style.color = 'var(--muted)';
@@ -210,21 +229,21 @@
         tdPageviews.style.textAlign = 'right';
         tdPageviews.style.fontWeight = '700';
         tdPageviews.style.color = '#94a3b8';
-        tdPageviews.textContent = number.format(country.pageviews || 0);
+        tdPageviews.textContent = country.pageviews === null || country.pageviews === undefined ? '—' : number.format(country.pageviews);
 
         // 5. Avg Reading Duration
         const tdDuration = document.createElement('td');
         tdDuration.style.textAlign = 'right';
         tdDuration.style.fontSize = '0.82rem';
         tdDuration.style.color = '#7dd3fc';
-        tdDuration.textContent = fmtDuration(country.avgReadSeconds || 220);
+        tdDuration.textContent = country.avgReadSeconds === null || country.avgReadSeconds === undefined ? '—' : fmtDuration(country.avgReadSeconds);
 
         // 6. Top Topic Badge
         const tdTopic = document.createElement('td');
         const topicBadge = document.createElement('span');
         topicBadge.className = 'badge-topic';
-        topicBadge.title = country.topTopic || 'Bilim ve Zihin Felsefesi';
-        topicBadge.textContent = country.topTopic || 'Bilim ve Zihin Felsefesi';
+        topicBadge.title = country.topTopic || 'Bu ölçüm kaynağında veri yok';
+        topicBadge.textContent = country.topTopic || '—';
         tdTopic.appendChild(topicBadge);
 
         tr.append(tdCountry, tdRegion, tdVisitors, tdPageviews, tdDuration, tdTopic);
@@ -241,6 +260,67 @@
       } else {
         countryStatus.textContent = `${displayCount} / ${totalCount} ülke listeleniyor (Filtre: ${activeRegion === 'all' ? 'Tümü' : activeRegion}${searchQuery.trim() ? `, Arama: "${searchQuery.trim()}"` : ''}).`;
       }
+    }
+  }
+
+
+  const siteSummaryStatus = document.getElementById('site-summary-status');
+  const siteSummaryRows = document.getElementById('site-summary-rows');
+  const siteSummaryNote = document.getElementById('site-summary-note');
+
+  const setSiteMetric = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value === null || value === undefined ? '—' : number.format(value);
+  };
+
+  function renderSiteSummaryRows(sites) {
+    if (!siteSummaryRows) return;
+    siteSummaryRows.replaceChildren();
+    const list = Array.isArray(sites) ? sites : [];
+    if (!list.length) {
+      const tr = document.createElement('tr'); const td = document.createElement('td');
+      td.colSpan = 5; td.textContent = 'Henüz istatistik sitesi tanımlanmadı.'; tr.appendChild(td); siteSummaryRows.appendChild(tr); return;
+    }
+    const labels = { connected: 'Bağlı', not_configured: 'Site ID eksik', api_key_missing: 'API anahtarı eksik', error: 'Veri alınamadı', not_loaded: 'Bekliyor' };
+    list.forEach((site) => {
+      const tr = document.createElement('tr');
+      const name = document.createElement('td');
+      const strong = document.createElement('strong'); strong.textContent = site.name || site.key || 'Site';
+      const domain = document.createElement('div'); domain.style.color = 'var(--muted)'; domain.style.fontSize = '.78rem'; domain.textContent = site.domain || 'Alan adı belirtilmedi';
+      name.append(strong, domain);
+      const status = document.createElement('td');
+      status.textContent = labels[site.status] || site.status || 'Bilinmiyor';
+      if (site.error) status.title = site.error;
+      status.style.color = site.status === 'connected' ? '#34d399' : '#fbbf24';
+      const metricCell = (value) => { const td = document.createElement('td'); td.style.textAlign = 'right'; td.textContent = value === null || value === undefined ? '—' : number.format(value); return td; };
+      tr.append(name, status, metricCell(site.visitors), metricCell(site.pageviews), metricCell(site.visits));
+      siteSummaryRows.appendChild(tr);
+    });
+  }
+
+  async function loadSiteSummary() {
+    if (!siteSummaryStatus || !siteSummaryRows) return;
+    siteSummaryStatus.textContent = 'Siteler kontrol ediliyor…';
+    siteSummaryStatus.classList.add('pending');
+    try {
+      const response = await fetch('/api/analytics/sites-summary', { cache: 'no-store' });
+      const data = await response.json().catch(() => ({}));
+      renderSiteSummaryRows(data.sites);
+      setSiteMetric('site-summary-total-visitors', data.totals?.visitors);
+      setSiteMetric('site-summary-total-pageviews', data.totals?.pageviews);
+      setSiteMetric('site-summary-total-visits', data.totals?.visits);
+      if (siteSummaryNote && data.note) siteSummaryNote.textContent = data.note;
+      const connected = Number(data.connectedSites || 0);
+      const listed = Number(data.listedSites || (Array.isArray(data.sites) ? data.sites.length : 0));
+      siteSummaryStatus.textContent = connected ? `${connected}/${listed} site bağlı · ${fmtTime(data.endAt)}` : 'Kurulum gerekli';
+      siteSummaryStatus.classList.toggle('pending', !data.complete);
+      if (!response.ok && siteSummaryNote && data.error) siteSummaryNote.textContent = `${data.error} ${data.note || ''}`.trim();
+    } catch (_) {
+      renderSiteSummaryRows([]);
+      ['site-summary-total-visitors', 'site-summary-total-pageviews', 'site-summary-total-visits'].forEach((id) => setSiteMetric(id, null));
+      siteSummaryStatus.textContent = 'Bağlantı sorunu';
+      siteSummaryStatus.classList.add('pending');
+      if (siteSummaryNote) siteSummaryNote.textContent = 'Birleşik istatistik uç noktasına ulaşılamadı. Sunucu ve Umami Secrets ayarlarını kontrol edin.';
     }
   }
 
@@ -261,16 +341,16 @@
       const visEl = document.getElementById('live-visitors');
       const pvEl = document.getElementById('live-pageviews');
       const vsEl = document.getElementById('live-visits');
-      if (visEl) visEl.textContent = number.format(data.visitors || 0);
-      if (pvEl) pvEl.textContent = number.format(data.pageviews || 0);
-      if (vsEl) vsEl.textContent = number.format(data.visits || 0);
+      if (visEl) visEl.textContent = Number.isFinite(data.visitors) ? number.format(data.visitors) : '—';
+      if (pvEl) pvEl.textContent = Number.isFinite(data.pageviews) ? number.format(data.pageviews) : '—';
+      if (vsEl) vsEl.textContent = Number.isFinite(data.visits) ? number.format(data.visits) : '—';
 
       updateRegionalBreakdown(data);
       renderTable();
 
       setState('● CANLI · ' + fmtTime(data.refreshedAt));
       if (note) {
-        note.textContent = `Veri kaynağı: ${data.provider || 'Umami'}. Ölçüm başlangıcı: 12 Ekim 2026 00.00 (${data.timezone || 'Europe/Istanbul'}). Son güncelleme: ${fmtTime(data.refreshedAt)}. Ülke bilgisi IP tabanlı yaklaşık konumdur; VPN/proxy nedeniyle farklı görünebilir.`;
+        note.textContent = `Veri kaynağı: ${data.provider || 'Umami'}. Ölçüm başlangıcı: ${data.milestone || '24 Nisan 2026 00.00'} (${data.timezone || 'Europe/Istanbul'}). Son güncelleme: ${fmtTime(data.refreshedAt)}. Ülke bilgisi IP tabanlı yaklaşık konumdur; VPN/proxy nedeniyle farklı görünebilir.`;
       }
     } catch (error) {
       setState('Bağlantı sorunu', true);
@@ -326,10 +406,13 @@
   }
 
   if (refresh) {
-    refresh.addEventListener('click', load);
+    refresh.addEventListener('click', () => { void load(); void loadSiteSummary(); });
   }
 
-  load();
-  // Re-query every minute while this dashboard remains open.
-  window.setInterval(load, 60000);
+  void load();
+  void loadSiteSummary();
+  // Refresh both primary-site geography and multi-site totals once per minute.
+  const LIVE_AUTO_REFRESH_MS = 60 * 1000;
+  window.setInterval(load, LIVE_AUTO_REFRESH_MS);
+  window.setInterval(loadSiteSummary, LIVE_AUTO_REFRESH_MS);
 })();

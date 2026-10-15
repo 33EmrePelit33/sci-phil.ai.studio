@@ -5,6 +5,7 @@
     counterBase: 'https://countapi.mileshilliard.com/api/v1',
     baselineUrl: '/stats/read-baseline.json',
     fallbackBaselineUrl: 'https://raw.githubusercontent.com/emrepelit109/science-philosophy/main/stats/read-baseline.json',
+    // Auto-refresh every minute.
     refreshMs: 60_000,
     counters: {
       bloggerNet: 'science-philosophy-blogger-new-post-reads-2026-09-30-b4e71c',
@@ -107,7 +108,7 @@
 
     button.disabled = true;
     status.className = 'status';
-    status.textContent = 'İstatistikler yenileniyor…';
+    status.textContent = 'İstatistikler gerçek verilere senkronize ediliyor…';
 
     try {
       const [base, counterResults, catalogResult] = await Promise.all([
@@ -117,21 +118,39 @@
       ]);
       const live = Object.fromEntries(counterResults);
 
-      const bloggerNet = valueWithLive(base.blogger_post_reads_baseline, live.bloggerNet);
-      const bloggerViews = valueWithLive(base.blogger_page_views_baseline, live.bloggerViews);
-      const sourceNet = valueWithLive(base.website_web_reads_baseline, live.sourceNet);
-      const sourceViews = valueWithLive(base.website_page_views_baseline, live.sourceViews);
-      const pagesNet = valueWithLive(base.github_pages_net_read_baseline, live.pagesNet);
-      const pagesViews = valueWithLive(base.github_pages_page_views_baseline, live.pagesViews);
-      const appNet = valueWithLive(base.website_app_reads_baseline, live.appNet);
-      const appViews = valueWithLive(base.ai_studio_page_views_baseline, live.appViews);
-      const bottomNet = Number.isFinite(Number(base.article_bottom_reads_baseline))
-        ? Number(base.article_bottom_reads_baseline) : null;
+      const readBaseline = (key) => {
+        const value = base?.[key];
+        if (value === null || value === undefined || value === '') return null;
+        const number = Number(value);
+        return Number.isFinite(number) && number >= 0 ? number : null;
+      };
+      const baseBloggerNet = readBaseline('blogger_post_reads_baseline');
+      const baseBloggerViews = readBaseline('blogger_page_views_baseline');
+      const baseSourceNet = readBaseline('website_web_reads_baseline');
+      const baseSourceViews = readBaseline('website_page_views_baseline');
+      const basePagesNet = readBaseline('github_pages_net_read_baseline');
+      const basePagesViews = readBaseline('github_pages_page_views_baseline');
+      const baseBottomNet = readBaseline('article_bottom_reads_baseline');
+      const baseAppNet = readBaseline('website_app_reads_baseline');
+      const baseAppViews = readBaseline('ai_studio_page_views_baseline');
 
-      const netComponents = [bloggerNet, sourceNet, pagesNet, appNet, bottomNet];
-      const viewComponents = [bloggerViews, sourceViews, pagesViews, appViews];
-      const totalNet = netComponents.every(Number.isFinite) ? netComponents.reduce((a, b) => a + b, 0) : null;
-      const totalViews = viewComponents.every(Number.isFinite) ? viewComponents.reduce((a, b) => a + b, 0) : null;
+      const addLiveCounter = (baseline, current) => valueWithLive(baseline, current);
+      const bloggerNet = addLiveCounter(baseBloggerNet, live.bloggerNet);
+      const bloggerViews = addLiveCounter(baseBloggerViews, live.bloggerViews);
+      const sourceNet = addLiveCounter(baseSourceNet, live.sourceNet);
+      const sourceViews = addLiveCounter(baseSourceViews, live.sourceViews);
+      const pagesNet = addLiveCounter(basePagesNet, live.pagesNet);
+      const pagesViews = addLiveCounter(basePagesViews, live.pagesViews);
+      const appNet = addLiveCounter(baseAppNet, live.appNet);
+      const appViews = addLiveCounter(baseAppViews, live.appViews);
+      const bottomNet = baseBottomNet;
+
+      // A combined total is shown only when each live counter that contributes to it is available.
+      const sumIfComplete = (values) => values.every((value) => value !== null && Number.isFinite(value))
+        ? values.reduce((sum, value) => sum + value, 0)
+        : null;
+      const totalNet = sumIfComplete([bloggerNet, sourceNet, pagesNet, appNet, bottomNet]);
+      const totalViews = sumIfComplete([bloggerViews, sourceViews, pagesViews, appViews]);
 
       showNumber('total-net', totalNet);
       showNumber('total-views', totalViews);
@@ -142,8 +161,8 @@
       showNumber('app-views', appViews);
       showNumber('bottom-net', bottomNet);
 
-      const missingCounters = Object.values(live).some(value => value === null);
-      const missingBase = !base || !Number.isFinite(Number(base.blogger_post_reads_baseline)) || !Number.isFinite(Number(base.article_bottom_reads_baseline));
+      const missingCounters = Object.values(live).some((value) => value === null);
+      const missingBase = [baseBloggerNet, baseBloggerViews, baseSourceNet, baseSourceViews, basePagesNet, basePagesViews, baseBottomNet, baseAppNet, baseAppViews].some((value) => value === null);
       if (catalogResult && Array.isArray(catalogResult.posts)) {
         const posts = catalogResult.posts;
         showNumber('article-total', posts.length);
@@ -161,12 +180,16 @@
         renderLanguages(null);
       }
 
-      const issues = [];
-      if (missingBase) issues.push('başlangıç verisinin bazı alanları eksik');
-      if (missingCounters) issues.push('en az bir canlı sayaç yanıt vermedi');
-      if (!catalogResult) issues.push('katalog yüklenemedi');
-      status.textContent = `${issues.length ? 'KISMİ VERİ — ' + issues.join('; ') : 'Canlı sayaçlar ve katalog yüklendi.'} Son güncelleme: ${new Date().toLocaleTimeString('tr-TR')}`;
-      if (issues.length) status.className = 'status error';
+      if (missingBase) {
+        status.textContent = 'Başlangıç sayaç dosyası eksik veya geçersiz. Doğrulanamayan toplamlar — olarak gösterilir.';
+        status.className = 'status error';
+      } else if (missingCounters) {
+        status.textContent = `Bazı canlı sayaçlara ulaşılamadı; doğrulanamayan toplamlar — olarak gösteriliyor. Son kontrol: ${new Date().toLocaleTimeString('tr-TR')}`;
+        status.className = 'status error';
+      } else {
+        status.textContent = `Sayaçlar güncellendi · 60 saniyede bir otomatik yenilenir. Son güncelleme: ${new Date().toLocaleTimeString('tr-TR')}`;
+        status.className = 'status';
+      }
     } catch (_) {
       status.className = 'status error';
       status.textContent = 'İstatistikler yüklenemedi. Başlangıç dosyası veya canlı sayaç servisi yanıt vermiyor.';
@@ -203,35 +226,42 @@
   window.addEventListener('sci-phil-cwv-updated', updateCwvDisplay);
   updateCwvDisplay();
 
-  // CSV Exporter for Weekly Report
+  // Exports contain only the values currently displayed by live counters.
+  function currentSnapshot() {
+    const fields = [
+      ['Toplam net okunma', 'total-net'], ['Toplam görüntüleme', 'total-views'],
+      ['Blogger net okunma', 'blogger-net'], ['Kaynak site net okunma', 'source-net'],
+      ['GitHub Pages net okunma', 'pages-net'], ['Uygulama net okunma', 'app-net'],
+      ['Uygulama görüntüleme', 'app-views'], ['Makale altı okunma', 'bottom-net'],
+      ['Makale sayısı', 'article-total'], ['Toplam kelime', 'total-words'],
+      ['Kategori sayısı', 'total-categories']
+    ];
+    return { generatedAt: new Date().toISOString(), rows: fields.map(([label, id]) => ({ label, value: $(id)?.textContent?.trim() || '—' })) };
+  }
+
   $('export-csv-btn')?.addEventListener('click', () => {
-    const csvContent = "data:text/csv;charset=utf-8," + 
-      "Dönem,İndekslenen URL,GSC Durumu,Ortalama Pozisyon,Haftalık Gösterim,LCP INP Sağlığı,Otorite Durumu\n" +
-      "12-19 Ekim 2026,291/291 URL,Sitemap Aktif,14.2,~2450 Gösterim,1.2s/45ms,sci-phil.ai.studio (301)\n" +
-      "Önceki Dönem,Parçalı,Dağınık,28.6,Blogger Ağı,2.8s/180ms,science-philosophy.grok.me\n";
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `sci-phil-weekly-report-${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const snapshot = currentSnapshot();
+    const escapeCsv = (value) => `"${String(value).replace(/"/g, '""')}"`;
+    const rows = [['Ölçüm', 'Gösterilen değer', 'Rapor zamanı'], ...snapshot.rows.map((row) => [row.label, row.value, snapshot.generatedAt])];
+    const csvContent = '\ufeff' + rows.map((row) => row.map(escapeCsv).join(',')).join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `sci-phil-analytics-${snapshot.generatedAt.slice(0, 10)}.csv`;
+    document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
   });
 
-  // Google Sheets TSV Clipboard Copy
   $('copy-sheets-btn')?.addEventListener('click', async () => {
-    const tsv = "Dönem\tİndekslenen URL\tGSC Durumu\tOrtalama Pozisyon\tHaftalık Gösterim\tLCP / INP Sağlığı\tOtorite Durumu\n" +
-      "12-19 Ekim 2026\t291 / 291 URL\tSitemap Aktif & Gönderildi\t14.2 (Niş Felsefe/Bilim)\t~ 2,450 Gösterim\t1.2s / 45ms (Passed)\tsci-phil.ai.studio (301 Konsolidasyon)\n" +
-      "Önceki Dönem\tParçalı / Blogspot\tÇift Kanonik / Dağınık\t28.6 (Genel Arama)\tBlogger Ağı\t2.8s / 180ms\tscience-philosophy.grok.me";
+    const snapshot = currentSnapshot();
+    const tsv = [['Ölçüm', 'Gösterilen değer', 'Rapor zamanı'], ...snapshot.rows.map((row) => [row.label, row.value, snapshot.generatedAt])]
+      .map((row) => row.join('\t')).join('\n');
     try {
       await navigator.clipboard.writeText(tsv);
-      const fb = $('sheets-feedback');
-      if (fb) {
-        fb.style.display = 'block';
-        setTimeout(() => { fb.style.display = 'none'; }, 4000);
-      }
+      const feedback = $('sheets-feedback');
+      if (feedback) { feedback.style.display = 'block'; setTimeout(() => { feedback.style.display = 'none'; }, 4000); }
     } catch (_) {
-      alert("Panoya kopyalanamadı; lütfen tarayıcı izinlerini kontrol edin.");
+      alert('Panoya kopyalanamadı; tarayıcı izinlerini kontrol edin.');
     }
   });
 
