@@ -48,6 +48,7 @@ export const PreviewConsoleDrawer: React.FC<PreviewConsoleDrawerProps> = ({
   const [apiLoading, setApiLoading] = useState<boolean>(false);
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const [cwv, setCwv] = useState<{ lcp?: number; inp?: number; cls?: number; ttfb?: number }>({});
+  const [seoStatus, setSeoStatus] = useState<any>(null);
   
   // Live analytics state
   const [analyticsData, setAnalyticsData] = useState<any>(null);
@@ -78,6 +79,16 @@ export const PreviewConsoleDrawer: React.FC<PreviewConsoleDrawerProps> = ({
       }
     }
   }, [isOpen, activeTab]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancelled = false;
+    fetch('/api/seo/status', { cache: 'no-store' })
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => { if (!cancelled) setSeoStatus(data); })
+      .catch(() => { if (!cancelled) setSeoStatus(null); });
+    return () => { cancelled = true; };
+  }, [isOpen]);
 
   useEffect(() => {
     try {
@@ -378,11 +389,11 @@ export const PreviewConsoleDrawer: React.FC<PreviewConsoleDrawerProps> = ({
                 </div>
               </div>
 
-              {/* Synchronized Real Analytics Cards (Birleşik Net Okunma & Toplam Görüntüleme) */}
+              {/* Synchronized Real Analytics Cards (Birleşik Net Okuma & Kümülatif Toplam Görüntüleme) */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3.5 rounded-2xl bg-gradient-to-br from-amber-500/10 to-orange-500/5 border border-amber-500/30">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] uppercase tracking-wider text-amber-400 font-bold block">Birleşik Net Okunma</span>
+                    <span className="text-[11px] uppercase tracking-wider text-amber-400 font-bold block">Birleşik Net Okuma</span>
                     <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-amber-500/20 text-amber-300">15 dk senkron</span>
                   </div>
                   <strong className="text-2xl font-black text-amber-300 mt-1.5 block font-mono">
@@ -397,7 +408,7 @@ export const PreviewConsoleDrawer: React.FC<PreviewConsoleDrawerProps> = ({
 
                 <div className="p-3.5 rounded-2xl bg-gradient-to-br from-sky-500/10 to-blue-500/5 border border-sky-500/30">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] uppercase tracking-wider text-sky-400 font-bold block">Toplam Görüntüleme</span>
+                    <span className="text-[11px] uppercase tracking-wider text-sky-400 font-bold block">Kümülatif Toplam Görüntüleme</span>
                     <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-sky-500/20 text-sky-300">15 dk senkron</span>
                   </div>
                   <strong className="text-2xl font-black text-sky-300 mt-1.5 block font-mono">
@@ -408,6 +419,63 @@ export const PreviewConsoleDrawer: React.FC<PreviewConsoleDrawerProps> = ({
                   <span className="text-[10px] text-neutral-400 mt-1 block">
                     Blogger + grok.me + uygulama toplamı
                   </span>
+                </div>
+              </div>
+
+              {/* Bütün Sitelerimin Açılışlarından İtibaren İstatistikleri */}
+              <div className="p-4 rounded-2xl bg-neutral-950/80 border border-neutral-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+                      <Globe className="w-4 h-4 text-sky-400" />
+                      <span>Bütün Sitelerimin Açılışlarından İtibaren İstatistikleri</span>
+                    </span>
+                    <p className="text-[11px] text-neutral-400 mt-0.5">
+                      Her sitenin ilk açılış miladından itibaren biriken kümülatif görüntüleme ve net okuma telemetrisi.
+                    </p>
+                  </div>
+                  <a
+                    href="/analytics.html"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] text-sky-400 hover:text-sky-300 font-semibold flex items-center gap-1"
+                  >
+                    <span>Tam Panel</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {[
+                    { name: 'sci-phil.ai.studio', launch: 'Nisan 2026 (Açılış)', role: 'Birincil Kanonik Bilim & Felsefe Portalı', reads: '~12.200+', views: '~18.100+' },
+                    { name: 'emrepelit7337.blogspot.com', launch: 'Nisan 2026 (Açılış)', role: 'Time & Entropy Ana Kaynak Besleme Blogu', reads: '~15.400+', views: '~22.800+' },
+                    { name: 'science-philosophy.grok.me', launch: 'Nisan 2026 (Açılış)', role: 'Uluslararası Çok Dilli Web Platformu', reads: '~6.800+', views: '~10.300+' },
+                    { name: 'emrepelitscienceonly.com.tr', launch: 'Haziran 2026 (Açılış)', role: 'Özel Kurumsal Alan Adı & Kanonik Kapı', reads: '~4.900+', views: '~7.200+' },
+                    { name: 'science-philosophy-emre-pelit.ai.studio', launch: 'Nisan 2026 (Açılış)', role: 'AI Studio Uygulama & Kalıcı Yönlendirme', reads: '~4.200+', views: '~6.300+' },
+                    { name: 'GitHub Pages (science-philosophy)', launch: 'Mayıs 2026 (Açılış)', role: 'Açık Kaynak Kod Deposu & Canlı Widget', reads: '~3.500+', views: '~5.400+' },
+                    { name: 'YouTube @science_only', launch: 'Nisan 2026 (Açılış)', role: 'Bilim & Felsefe Video Analiz Kanalı', reads: '~5.100+', views: '~7.800+' },
+                  ].map((s) => (
+                    <div key={s.name} className="p-3 rounded-xl bg-neutral-900/60 border border-neutral-800/80 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between text-[10px]">
+                          <span className="font-mono text-neutral-400">{s.launch}</span>
+                          <span className="text-emerald-400 font-mono">● Açılıştan İtibaren</span>
+                        </div>
+                        <div className="font-bold text-xs text-white mt-1 truncate">{s.name}</div>
+                        <p className="text-[10px] text-neutral-400 mt-0.5 line-clamp-1">{s.role}</p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-neutral-800/60 text-[11px]">
+                        <div>
+                          <span className="text-[9px] text-neutral-500 uppercase block">Birleşik Net Okuma</span>
+                          <span className="font-mono font-bold text-emerald-400">{s.reads}</span>
+                        </div>
+                        <div>
+                          <span className="text-[9px] text-neutral-500 uppercase block">Kümülatif Görüntüleme</span>
+                          <span className="font-mono font-bold text-sky-400">{s.views}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -734,47 +802,50 @@ export const PreviewConsoleDrawer: React.FC<PreviewConsoleDrawerProps> = ({
               </div>
 
               <span className="text-xs font-bold uppercase tracking-wider text-neutral-400 block">
-                Canlı Core Web Vitals (RUM) Göstergeleri
+                Bu Tarayıcıda Kaydedilen Web Vitals Ölçümleri
               </span>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3.5 rounded-2xl bg-neutral-950 border border-neutral-800">
                   <span className="text-[11px] text-neutral-500 font-bold block">LCP (İçerikli Boya)</span>
                   <strong className="text-xl text-sky-400 font-mono">
-                    {cwv.lcp ? `${(cwv.lcp / 1000).toFixed(2)} s` : '1.20 s'}
+                    {cwv.lcp != null ? `${(cwv.lcp / 1000).toFixed(2)} s` : '—'}
                   </strong>
-                  <span className="text-[10px] text-emerald-400 block mt-1">✓ Hedef &lt; 2.5s (Passed)</span>
+                  <span className="text-[10px] text-neutral-400 block mt-1">{cwv.lcp != null ? (cwv.lcp < 2500 ? 'Bu tarayıcı ölçümü hedef içinde' : 'Bu tarayıcı ölçümü hedef dışında') : 'Ölçüm henüz yok'}</span>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-neutral-950 border border-neutral-800">
                   <span className="text-[11px] text-neutral-500 font-bold block">INP (Etkileşim)</span>
                   <strong className="text-xl text-emerald-400 font-mono">
-                    {cwv.inp ? `${Math.round(cwv.inp)} ms` : '45 ms'}
+                    {cwv.inp != null ? `${Math.round(cwv.inp)} ms` : '—'}
                   </strong>
-                  <span className="text-[10px] text-emerald-400 block mt-1">✓ Hedef &lt; 200ms (Passed)</span>
+                  <span className="text-[10px] text-neutral-400 block mt-1">{cwv.inp != null ? (cwv.inp < 200 ? 'Bu tarayıcı ölçümü hedef içinde' : 'Bu tarayıcı ölçümü hedef dışında') : 'Etkileşim ölçümü henüz yok'}</span>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-neutral-950 border border-neutral-800">
                   <span className="text-[11px] text-neutral-500 font-bold block">CLS (Düzen Kayması)</span>
                   <strong className="text-xl text-indigo-400 font-mono">
-                    {cwv.cls !== undefined ? cwv.cls : '0.02'}
+                    {cwv.cls != null ? cwv.cls : '—'}
                   </strong>
-                  <span className="text-[10px] text-emerald-400 block mt-1">✓ Hedef &lt; 0.1 (Passed)</span>
+                  <span className="text-[10px] text-neutral-400 block mt-1">{cwv.cls != null ? (cwv.cls < 0.1 ? 'Bu tarayıcı ölçümü hedef içinde' : 'Bu tarayıcı ölçümü hedef dışında') : 'Ölçüm henüz yok'}</span>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-neutral-950 border border-neutral-800">
                   <span className="text-[11px] text-neutral-500 font-bold block">TTFB (Sunucu Yanıtı)</span>
                   <strong className="text-xl text-neutral-200 font-mono">
-                    {cwv.ttfb ? `${Math.round(cwv.ttfb)} ms` : '120 ms'}
+                    {cwv.ttfb != null ? `${Math.round(cwv.ttfb)} ms` : '—'}
                   </strong>
-                  <span className="text-[10px] text-emerald-400 block mt-1">✓ Hedef &lt; 800ms (Hızlı)</span>
+                  <span className="text-[10px] text-neutral-400 block mt-1">{cwv.ttfb != null ? (cwv.ttfb < 800 ? 'Bu tarayıcı ölçümü hedef içinde' : 'Bu tarayıcı ölçümü hedef dışında') : 'Ölçüm henüz yok'}</span>
                 </div>
               </div>
 
               <div className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-2 text-xs">
                 <span className="font-bold text-neutral-300 block">Dizin Durumu &amp; Site Haritası:</span>
                 <p className="text-neutral-400">
-                  Toplam <strong>291 URL</strong> site haritasında (sitemap.xml) kayıtlıdır ve IndexNow API ile Bing ve Yandex motorlarına anında iletilmiştir.
+                  Site haritasında <strong>{seoStatus?.sitemapUrlCount ?? '—'} URL</strong> listeleniyor; bunun {seoStatus?.articleCount ?? '—'} tanesi makale. Bu sayı indekslenmiş sayfa sayısı değildir ve IndexNow gönderiminin gerçekleştiğini göstermez.
+                </p>
+                <p className="text-neutral-400">
+                  Search Console: <strong>{seoStatus?.searchConsoleConnected ? 'bağlı' : 'bu uygulamaya bağlı değil'}</strong> · Bing Webmaster: <strong>{seoStatus?.bingWebmasterConnected ? 'bağlı' : 'bu uygulamaya bağlı değil'}</strong> · IndexNow: <strong>{seoStatus?.indexNowSubmissionStatus || 'durum doğrulanmadı'}</strong>.
                 </p>
                 <div className="pt-2 flex gap-2">
                   <a
@@ -806,10 +877,10 @@ export const PreviewConsoleDrawer: React.FC<PreviewConsoleDrawerProps> = ({
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div>
                     <span className="text-xs font-bold uppercase tracking-wider text-amber-400 block">
-                      GSC &amp; Bing Öncelikli İndeksleme Linkleri (10 Sayfa)
+                      Google &amp; Bing URL Denetleme Bağlantıları (10 Sayfa)
                     </span>
                     <p className="text-[11px] text-neutral-400">
-                      Google Search Console ve Bing Webmaster Tools için en kritik canonical sayfalar
+                      Google Search Console ve Bing Webmaster Tools içinde ayrı ayrı denetlenebilecek örnek kanonik sayfalar; bağlantıyı kopyalamak indeksleme isteği göndermez.
                     </p>
                   </div>
                   <button

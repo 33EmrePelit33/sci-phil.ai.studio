@@ -12,6 +12,18 @@
     scroll-behavior: smooth;
   }
 
+  /* Orijinal temiz nötr arka plan: karanlık modda neutral-950, aydınlık modda neutral-50 */
+  body {
+    background-color: #0a0a0a;
+    color: #f5f5f5;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  html:not(.dark) body {
+    background-color: #fafafa;
+    color: #171717;
+  }
+
   .font-reading {
     font-family: var(--font-serif);
   }
@@ -37,7 +49,7 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(156, 163, 175, 0.5);
+  background: rgba(245, 158, 11, 0.5);
 }
 
 /* Article rendered HTML styling */
@@ -64,7 +76,7 @@
 }
 
 .article-prose blockquote {
-  border-left: 3px solid #d97706;
+  border-left: 3px solid #f59e0b;
   padding-left: 1.25rem;
   margin: 1.75rem 0;
   font-style: italic;
@@ -76,7 +88,7 @@
   margin: 2rem auto;
   max-width: 100%;
   height: auto;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25);
 }
 
 .article-prose ul, .article-prose ol {
@@ -86,4 +98,37 @@
 
 .article-prose li {
   margin-bottom: 0.5rem;
+}
+
+/* Matematiksel Formülasyon Kartları & Tipografi */
+.math-formula-box {
+  margin: 1.75rem 0;
+  padding: 1.25rem 1.5rem;
+  border-radius: 1rem;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.html:not(.dark) .math-formula-box {
+  background: rgba(248, 250, 252, 0.95);
+  border-color: rgba(217, 119, 6, 0.35);
+}
+
+.math-equation {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  font-size: 1.05rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: 0.75rem;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fde68a;
+  text-align: center;
+  overflow-x: auto;
+  margin: 0.75rem 0;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.html:not(.dark) .math-equation {
+  background: #0f172a;
+  color: #fef08a;
 }

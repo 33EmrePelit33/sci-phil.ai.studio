@@ -1,448 +1,680 @@
-import express, { Request, Response, NextFunction } from 'express';
-import path from 'node:path';
-import fs from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { createServer as createViteServer } from 'vite';
-// @ts-ignore - SEO route module is JavaScript so it can also be used by the Node runtime.
-import { registerSeoRoutes } from './seo.js';
-import { fetchAllBloggerPosts, translateNaturalText } from './blogger-sync';
-// @ts-ignore
-import { buildRealAnalyticsPayload } from './analytics-data.js';
-import { RECOVERED_TURKISH_ARTICLES, RECOVERED_ARTICLES_UPDATED_AT } from './src/data/recoveredTurkishArticles';
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import 'dotenv/config';
+import { GoogleGenAI } from '@google/genai';
+import fs from 'fs';
+import {
+  ECOSYSTEM_PLATFORMS,
+  buildRealAnalyticsPayload
+} from './analytics-data.js';
+import { fetchAllBloggerPosts, createArticleFromBloggerPost } from './blogger-sync.js';
+import { injectSearchableArticleIndex, registerSeoRoutes, setRuntimeCatalog } from './seo.js';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const app = express();
-const PORT = Number(process.env.PORT) || 3000;
+
+export const app = express();
+app.use(express.json({ limit: '1mb' }));
+
+// The canonical authority domain is always sci-phil.ai.studio. Redirect aliases
+// before registering API/static routes so every path and query string follows the 301.
 const PRIMARY_DOMAIN = 'sci-phil.ai.studio';
-const PRIMARY_ORIGIN = `https://${PRIMARY_DOMAIN}`;
 const LEGACY_DOMAINS = new Set([
   'science-philosophy.ai.studio',
+  'www.science-philosophy.ai.studio',
   'science-philosophy-emre-pelit.ai.studio',
+  'www.science-philosophy-emre-pelit.ai.studio'
 ]);
-
-app.disable('x-powered-by');
-
-// Security + domain redirect middleware
-app.use((req: Request, res: Response, next: NextFunction) => {
-  const host = String(req.headers.host || '').split(',')[0].trim().toLowerCase().replace(/:\d+$/, '').replace(/\.$/, '');
-  const forwardedProto = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim().toLowerCase();
-  const protocol = forwardedProto || req.protocol;
-
-  if (LEGACY_DOMAINS.has(host)) {
-    return res.redirect(301, `${PRIMARY_ORIGIN}${req.originalUrl || '/'}`);
+app.use((req, res, next) => {
+  const host = (req.headers.host || '').toLowerCase().replace(/:\d+$/, '');
+  if (LEGACY_DOMAINS.has(host) || host === `www.${PRIMARY_DOMAIN}`) {
+    return res.redirect(301, `https://${PRIMARY_DOMAIN}${req.originalUrl}`);
   }
-  if (host === PRIMARY_DOMAIN && protocol === 'http' && process.env.NODE_ENV === 'production') {
-    return res.redirect(301, `${PRIMARY_ORIGIN}${req.originalUrl || '/'}`);
-  }
-
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-  res.setHeader('X-Authoritative-Domain', PRIMARY_DOMAIN);
   next();
 });
 
-app.use(express.json({ limit: '64kb' }));
+// Only URLs from successful Blogger feed syncs may be assigned Sci-Phi canonicals.
+let synchronizedBloggerArticles: any[] = [];
+function writeBloggerCanonicalScript(synchronizedFeedArticles: any[]) {
+  if (Array.isArray(synchronizedFeedArticles) && synchronizedFeedArticles.length > 0) {
+    synchronizedBloggerArticles = synchronizedFeedArticles.filter((article: any) =>
+      article && article.slug && (article.originalUrl || article.url)
+    );
+  }
+  const mapping: Record<string, string> = {};
+  for (const article of synchronizedBloggerArticles) {
+    const sourceUrl = String(article.originalUrl || article.url || '').trim();
+    if (!/^https?:\/\/emrepelit7337\.blogspot\.com\//i.test(sourceUrl)) continue;
+    const normalizedSource = sourceUrl.split('#')[0];
+    const canonicalTarget = `https://${PRIMARY_DOMAIN}/makale/${encodeURIComponent(String(article.slug))}`;
+    mapping[normalizedSource] = canonicalTarget;
+    try { mapping[`${new URL(normalizedSource).origin}${new URL(normalizedSource).pathname}`] = canonicalTarget; } catch {}
+  }
+  const safeMapping = JSON.stringify(mapping).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
+  return `(function(){var map=${safeMapping};var here=window.location.href.split('#')[0];var target=map[here];if(!target){var clean=window.location.origin+window.location.pathname+window.location.search;target=map[clean]||map[window.location.origin+window.location.pathname];}if(!target)return;var link=document.querySelector('link[rel=canonical]');if(!link){link=document.createElement('link');link.rel='canonical';document.head.appendChild(link);}link.href=target;var og=document.querySelector('meta[property="og:url"]');if(og)og.content=target;})();`;
+}
 
-// Health check endpoint required by Cloud Run / AI Studio probes
-app.get('/healthz', (_req: Request, res: Response) => {
-  res.status(200).json({ ok: true, domain: PRIMARY_DOMAIN, port: PORT });
+const PORT = Number(process.env.PORT || 3000);
+const BLOG_SYNC_INTERVAL_MS = 15 * 60 * 1000;
+const UMAMI_API_BASE_URL = (process.env.UMAMI_API_BASE_URL || 'https://api.umami.is/v1').replace(/\/$/, '');
+const UMAMI_API_KEY = (process.env.UMAMI_API_KEY || '').trim();
+const ANALYTICS_START_AT = process.env.ANALYTICS_START_AT || '2026-10-12T00:00:00+03:00';
+const ANALYTICS_TIMEZONE = 'Europe/Istanbul';
+const ALLOWED_ANALYTICS_HOSTS = new Set([
+  'sci-phil.ai.studio', 'www.sci-phil.ai.studio',
+  'emrepelit7337.blogspot.com',
+  'science-philosophy.grok.me',
+  'science-philosophy.ai.studio',
+  'science-philosophy-emre-pelit.ai.studio'
+]);
+
+const TRACKED_SITES: Record<string, { name: string; domain: string; envKey: string }> = {
+  'sci-phil': { name: 'Sci-Phi ana sitesi', domain: 'sci-phil.ai.studio', envKey: 'UMAMI_WEBSITE_ID' },
+  'blogger': { name: 'Blogger Türkçe arşivi', domain: 'emrepelit7337.blogspot.com', envKey: 'UMAMI_BLOGGER_WEBSITE_ID' },
+  'grokme': { name: 'Science & Philosophy Grok.me', domain: 'science-philosophy.grok.me', envKey: 'UMAMI_GROKME_WEBSITE_ID' },
+  'github-pages': { name: 'GitHub Pages arşivi', domain: 'emrepelit109.github.io', envKey: 'UMAMI_GITHUB_PAGES_WEBSITE_ID' },
+  'legacy-ep': { name: 'Eski AI Studio sitesi', domain: 'science-philosophy-emre-pelit.ai.studio', envKey: 'UMAMI_LEGACY_EP_WEBSITE_ID' },
+  'legacy-sp': { name: 'Eski Science-Philosophy sitesi', domain: 'science-philosophy.ai.studio', envKey: 'UMAMI_LEGACY_SP_WEBSITE_ID' },
+  'socratic-lab': { name: 'Sokratik Diyalog Laboratuvarı', domain: 'sci-phil.ai.studio', envKey: 'UMAMI_SOCRATIC_WEBSITE_ID' },
+  'epistemic-matrix': { name: 'Epistemik Süzgeç', domain: 'sci-phil.ai.studio', envKey: 'UMAMI_EPISTEMIC_WEBSITE_ID' }
+};
+
+function getTrackedSite(key: string) {
+  const definition = TRACKED_SITES[key] || TRACKED_SITES['sci-phil'];
+  if (!definition) return null;
+  const websiteId = (process.env[definition.envKey] || '').trim();
+  return { ...definition, websiteId: websiteId || null };
+}
+
+function applyAnalyticsCors(req: express.Request, res: express.Response) {
+  const origin = String(req.headers.origin || '');
+  if (!origin) return;
+  try {
+    const host = new URL(origin).hostname.toLowerCase();
+    if (ALLOWED_ANALYTICS_HOSTS.has(host)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+      res.setHeader('Access-Control-Max-Age', '600');
+    }
+  } catch { /* Ignore malformed origins; no CORS access is granted. */ }
+}
+
+async function fetchUmamiSiteStats(websiteId: string | undefined, startAtIso: string) {
+  if (!UMAMI_API_KEY || !websiteId || websiteId === 'YOUR_UMAMI_WEBSITE_ID') return null;
+  try {
+    const startAtMs = Date.parse(startAtIso);
+    if (!Number.isFinite(startAtMs)) throw new Error('ANALYTICS_START_AT geçerli bir tarih değil.');
+    const endAtMs = Date.now();
+    const headers = { Authorization: `Bearer ${UMAMI_API_KEY}`, Accept: 'application/json' };
+    const [statsRes, countriesRes] = await Promise.all([
+      fetch(`${UMAMI_API_BASE_URL}/websites/${encodeURIComponent(websiteId)}/stats?startAt=${startAtMs}&endAt=${endAtMs}`, {
+        headers, signal: AbortSignal.timeout(8000)
+      }),
+      fetch(`${UMAMI_API_BASE_URL}/websites/${encodeURIComponent(websiteId)}/metrics?startAt=${startAtMs}&endAt=${endAtMs}&type=country`, {
+        headers, signal: AbortSignal.timeout(8000)
+      })
+    ]);
+    if (!statsRes.ok) return null;
+    const stats = await statsRes.json();
+    const countries = countriesRes.ok ? await countriesRes.json() : [];
+    return buildRealAnalyticsPayload(stats, countries, {
+      startAt: startAtIso,
+      endAt: new Date(endAtMs).toISOString(),
+      timezone: ANALYTICS_TIMEZONE
+    });
+  } catch (error) {
+    console.warn('[Analytics] Umami sorgusu başarısız:', error instanceof Error ? error.message : String(error));
+    return null;
+  }
+}
+
+async function fetchMultiSiteAnalytics() {
+  const definitions = Object.entries(TRACKED_SITES).map(([key, site]) => ({ key, ...site }));
+  const sites = await Promise.all(definitions.map(async (definition) => {
+    const websiteId = (process.env[definition.envKey] || '').trim();
+    if (!websiteId || websiteId === 'YOUR_UMAMI_WEBSITE_ID') {
+      return { key: definition.key, name: definition.name, domain: definition.domain, status: 'not_configured', visitors: null, pageviews: null, visits: null };
+    }
+    if (!UMAMI_API_KEY) {
+      return { key: definition.key, name: definition.name, domain: definition.domain, status: 'api_key_missing', visitors: null, pageviews: null, visits: null };
+    }
+    const startAt = definition.key === 'sci-phil' ? ANALYTICS_START_AT : (ECOSYSTEM_PLATFORMS.find((item) => item.envKey === definition.envKey)?.launchAt || ANALYTICS_START_AT);
+    const payload = await fetchUmamiSiteStats(websiteId, startAt);
+    if (!payload) {
+      return { key: definition.key, name: definition.name, domain: definition.domain, status: 'error', visitors: null, pageviews: null, visits: null };
+    }
+    return {
+      key: definition.key, name: definition.name, domain: definition.domain, status: 'connected',
+      visitors: payload.visitors, pageviews: payload.pageviews, visits: payload.visits,
+      startAt: payload.startAt, endAt: payload.endAt
+    };
+  }));
+  const connected = sites.filter((site) => site.status === 'connected');
+  const sumOrNull = (key: 'visitors' | 'pageviews' | 'visits') => connected.length
+    ? connected.reduce((sum, site: any) => sum + Number(site[key] || 0), 0)
+    : null;
+  return {
+    configured: Boolean((process.env.UMAMI_WEBSITE_ID || '').trim() && UMAMI_API_KEY),
+    readOnly: true,
+    complete: connected.length === sites.length,
+    connectedSites: connected.length,
+    listedSites: sites.length,
+    sites,
+    totals: { visitors: sumOrNull('visitors'), pageviews: sumOrNull('pageviews'), visits: sumOrNull('visits') },
+    startAt: ANALYTICS_START_AT,
+    endAt: new Date().toISOString(),
+    note: 'Yalnızca Umami API yanıtları kullanılır; eksik veya bağlı olmayan siteler için tahmin üretilmez. Siteler arası toplamlar aynı ziyaretçiyi tekilleştiremez.'
+  };
+}
+
+app.get('/healthz', (_req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Articles API
-app.get('/api/articles', (_req: Request, res: Response) => {
-  res.setHeader('Cache-Control', 'public, max-age=300');
-  return res.json({
-    articles: RECOVERED_TURKISH_ARTICLES,
-    count: RECOVERED_TURKISH_ARTICLES.length,
-    lastSynced: RECOVERED_ARTICLES_UPDATED_AT,
-    source: 'bundled-blogger-archive',
+app.get('/analytics', (_req, res) => res.redirect(301, '/analytics.html'));
+
+app.options('/api/analytics/config', (req, res) => {
+  applyAnalyticsCors(req, res);
+  res.status(204).end();
+});
+
+app.get('/api/analytics/config', (req, res) => {
+  applyAnalyticsCors(req, res);
+  const site = getTrackedSite(String(req.query.site || 'sci-phil'));
+  res.set('Cache-Control', 'no-store');
+  res.json({
+    enabled: Boolean(site?.websiteId),
+    websiteId: site?.websiteId || null,
+    domains: site?.domain || 'sci-phil.ai.studio',
+    scriptUrl: process.env.UMAMI_SCRIPT_URL || 'https://cloud.umami.is/script.js',
+    platformCount: Object.keys(TRACKED_SITES).length
   });
 });
 
-// Background auto-sync every 10 minutes (does not block startup)
-const TEN_MINUTES_MS = 10 * 60 * 1000;
-
-async function runBackgroundBloggerSync() {
-  try {
-    console.log('[Auto-Sync] 10 dakikalık periyodik Blogger arka plan senkronizasyonu tetiklendi.');
-    const posts = await fetchAllBloggerPosts({ forceFull: false });
-    if (posts && posts.length > 0) {
-      console.log(`[Auto-Sync] Başarılı: ${posts.length} yazı denetlendi / eşitlendi.`);
-    }
-  } catch (err) {
-    console.warn('[Auto-Sync] Arka plan senkronizasyon uyarısı:', err);
-  }
-}
-
-// Start background sync after server is listening
-setTimeout(runBackgroundBloggerSync, 8000);
-setInterval(runBackgroundBloggerSync, TEN_MINUTES_MS);
-
-// Manual sync endpoint
-app.post('/api/sync-blog', async (req: Request, res: Response) => {
-  try {
-    const posts = await fetchAllBloggerPosts({ forceFull: true });
-    res.json({
-      success: true,
-      count: posts?.length ?? 0,
-      message: 'Blogger senkronizasyonu kullanıcı talebiyle başarıyla tamamlandı.',
-    });
-  } catch (err: any) {
-    console.error('[Manual-Sync] Hata:', err);
-    res.status(500).json({ success: false, error: err.message || 'Senkronizasyon hatası' });
-  }
+app.get('/api/analytics/sites-summary', async (_req, res) => {
+  const data = await fetchMultiSiteAnalytics();
+  res.set('Cache-Control', 'no-store');
+  res.json(data);
 });
 
-// ---------------------------------------------------------------------------
-// Instant natural-language translation endpoints
-// Uses free Google Translate (via blogger-sync) for speed; no API key required.
-// Optional: if GEMINI_API_KEY is set, higher-quality translation can be added later.
-// ---------------------------------------------------------------------------
-
-const translationCache = new Map<string, string>();
-
-async function translateField(text: string | undefined, target: string, source = 'tr'): Promise<string> {
-  if (!text || !String(text).trim()) return text || '';
-  const key = `${source}|${target}|${text}`;
-  if (translationCache.has(key)) return translationCache.get(key)!;
-  try {
-    const result = await translateNaturalText(text, target, source);
-    translationCache.set(key, result);
-    return result;
-  } catch (err) {
-    console.warn('[Translate] field failed:', err);
-    return text;
+app.get('/api/analytics/summary', async (_req, res) => {
+  const websiteId = (process.env.UMAMI_WEBSITE_ID || '').trim();
+  if (!websiteId || websiteId === 'YOUR_UMAMI_WEBSITE_ID' || !UMAMI_API_KEY) {
+    return res.status(503).json({
+      configured: false, readOnly: true,
+      startAt: ANALYTICS_START_AT,
+      milestone: '12 Ekim 2026 00.00 (Türkiye saati)',
+      timezone: ANALYTICS_TIMEZONE,
+      error: 'Canlı analitik için UMAMI_WEBSITE_ID ve sunucu tarafında UMAMI_API_KEY yapılandırılmalıdır.'
+    });
   }
+  const data = await fetchUmamiSiteStats(websiteId, ANALYTICS_START_AT);
+  if (!data) {
+    return res.status(502).json({
+      configured: true, readOnly: true,
+      startAt: ANALYTICS_START_AT,
+      milestone: '12 Ekim 2026 00.00 (Türkiye saati)',
+      timezone: ANALYTICS_TIMEZONE,
+      error: 'Umami API verisi alınamadı. Website ID, API anahtarı ve API yetkilerini kontrol edin.'
+    });
+  }
+  res.set('Cache-Control', 'no-store');
+  res.json({
+    ...data,
+    configured: true,
+    readOnly: true,
+    provider: 'Umami Cloud API',
+    milestone: '12 Ekim 2026 00.00 (Türkiye saati)',
+    timezone: ANALYTICS_TIMEZONE,
+    refreshedAt: new Date().toISOString()
+  });
+});
+
+// Gemini Durum ve Sokratik Diyalog API Uç Noktaları
+app.get('/api/gemini/status', (_req, res) => {
+  const googleKey = process.env.GOOGLE_API_KEY?.trim();
+  const geminiKey = process.env.GEMINI_API_KEY?.trim();
+  const activeKey = googleKey || geminiKey;
+  res.json({
+    configured: Boolean(activeKey && activeKey !== 'MY_GEMINI_API_KEY'),
+    keySource: googleKey ? 'GOOGLE_API_KEY' : (geminiKey ? 'GEMINI_API_KEY' : null),
+    model: process.env.GEMINI_MODEL || 'gemini-3.8-flash'
+  });
+});
+
+// Translation endpoints use only server-side credentials and never return key material.
+const targetLanguageNames: Record<string, string> = {
+  tr: 'Türkçe', en: 'English', de: 'Deutsch', fr: 'Français', es: 'Español',
+  ru: 'Русский', ar: 'العربية', it: 'Italiano', pt: 'Português', ja: '日本語',
+  zh: '中文', ko: '한국어', nl: 'Nederlands', pl: 'Polski', hi: 'हिन्दी'
+};
+const languageNames = targetLanguageNames;
+const siteTranslationCache = new Map<string, any>();
+const articleTranslationCache = new Map<string, any>();
+
+function stableRevision(value: unknown) {
+  const raw = typeof value === 'string' ? value : JSON.stringify(value ?? {});
+  let hash = 2166136261;
+  for (let i = 0; i < raw.length; i += 1) {
+    hash ^= raw.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(36);
 }
 
-// Bulk site catalogue translation (called when language button is pressed)
-app.post('/api/gemini/translate-site', async (req: Request, res: Response) => {
-  try {
-    const { targetLanguageCode, articles } = req.body || {};
-    if (!targetLanguageCode || !Array.isArray(articles)) {
-      return res.status(400).json({ success: false, error: 'targetLanguageCode and articles[] required' });
-    }
-    const target = String(targetLanguageCode).toLowerCase().slice(0, 2);
-    if (target === 'tr') {
-      return res.json({ success: true, translations: {} });
-    }
+function extractJsonObject(value: unknown) {
+  const text = String(value || '').trim();
+  const start = text.indexOf('{');
+  const end = text.lastIndexOf('}');
+  if (start < 0 || end <= start) throw new Error('Çeviri sağlayıcısı geçerli JSON döndürmedi.');
+  return JSON.parse(text.slice(start, end + 1));
+}
 
-    const translations: Record<string, any> = {};
-    // Translate in small parallel batches to stay fast and polite to the free endpoint
-    const BATCH = 4;
-    for (let i = 0; i < articles.length; i += BATCH) {
-      const batch = articles.slice(i, i + BATCH);
-      await Promise.all(batch.map(async (article: any) => {
-        const id = article.id || article.slug;
-        if (!id) return;
-        const srcLang = (article.language || 'tr').toLowerCase().slice(0, 2);
-        const [title, summary, ...cats] = await Promise.all([
-          translateField(article.title, target, srcLang),
-          translateField(article.summary, target, srcLang),
-          ...(Array.isArray(article.categories) ? article.categories.map((c: string) => translateField(c, target, srcLang)) : []),
-        ]);
-        const triad = article.dialecticalTriad || {};
-        const [claim, counterClaim, whatIsNotEvidence, methodologicalNote] = await Promise.all([
-          translateField(triad.claim, target, srcLang),
-          translateField(triad.counterClaim, target, srcLang),
-          translateField(triad.whatIsNotEvidence, target, srcLang),
-          translateField(triad.methodologicalNote, target, srcLang),
-        ]);
-        translations[id] = {
-          title: title || article.title,
-          summary: summary || article.summary,
-          categories: cats.filter(Boolean),
-          dialecticalTriad: {
-            claim,
-            counterClaim,
-            whatIsNotEvidence,
-            methodologicalNote,
-          },
+function hasCompleteArticleTranslation(value: any, source: any) {
+  if (!value || typeof value.translatedTitle !== 'string' || !value.translatedTitle.trim()) return false;
+  if (String(source.summary || '').trim() && (typeof value.translatedSummary !== 'string' || !value.translatedSummary.trim())) return false;
+  if (String(source.content || '').trim() && (typeof value.translatedContent !== 'string' || !value.translatedContent.trim())) return false;
+  const sourceTriad = source.dialecticalTriad || {};
+  const resultTriad = value.translatedDialecticalTriad || {};
+  return ['claim', 'counterClaim', 'whatIsNotEvidence', 'methodologicalNote']
+    .every((field) => !String(sourceTriad[field] || '').trim() || Boolean(String(resultTriad[field] || '').trim()));
+}
+
+async function translateLongHtml(
+  ai: GoogleGenAI,
+  sourceHtml: string,
+  sourceLanguage: string,
+  targetLanguage: string,
+  article: { title: string; summary: string; dialecticalTriad?: Record<string, string> }
+) {
+  const prompt = `Translate the supplied article into ${targetLanguage}, from ${sourceLanguage}. Return ONLY valid JSON with keys translatedTitle, translatedSummary, translatedContent, translatedDialecticalTriad. Keep the full article body: do not summarize, omit paragraphs, or invent content. Preserve every HTML tag, its nesting, image/source URLs, attributes, links, code, mathematical notation and embedded media; translate visible prose and human-readable alt/title text only. Preserve the dialectical-triad keys claim, counterClaim, whatIsNotEvidence, methodologicalNote. If the source field is empty, return an empty string for that field.
+SOURCE JSON:
+${JSON.stringify({ title: article.title, summary: article.summary, dialecticalTriad: article.dialecticalTriad || {}, content: sourceHtml })}`;
+  const response = await ai.models.generateContent({
+    model: process.env.GEMINI_MODEL || 'gemini-3.8-flash',
+    contents: prompt,
+    config: { responseMimeType: 'application/json' }
+  });
+  return extractJsonObject(response.text);
+}
+
+app.post('/api/gemini/translate-site', async (req, res) => {
+  const requestArticles = Array.isArray(req.body?.articles) ? req.body.articles : [];
+  const langCode = String(req.body?.targetLanguageCode || '').trim().toLowerCase();
+  const targetLanguage = targetLanguageNames[langCode];
+  if (!requestArticles.length || requestArticles.length > 400) {
+    return res.status(400).json({ success: false, error: 'Çeviri isteği 1–400 makale içermelidir.' });
+  }
+  if (!targetLanguage) return res.status(400).json({ success: false, error: 'Desteklenmeyen hedef dil.' });
+
+  const posts = requestArticles.map((article: any) => ({
+    id: String(article?.id || '').trim(),
+    slug: String(article?.slug || '').trim(),
+    language: String(article?.language || 'tr').trim().toLowerCase(),
+    updatedAt: String(article?.updatedAt || ''),
+    title: String(article?.title || '').trim(),
+    summary: String(article?.summary || '').trim(),
+    categories: Array.isArray(article?.categories) ? article.categories.map((item: unknown) => String(item)) : [],
+    dialecticalTriad: article?.dialecticalTriad && typeof article.dialecticalTriad === 'object' ? article.dialecticalTriad : {}
+  }));
+  if (posts.some((article: any) => !article.id || !article.title || article.title.length > 1000 || article.summary.length > 5000)) {
+    return res.status(400).json({ success: false, error: 'Makale kimliği, başlığı veya metin uzunluğu geçersiz.' });
+  }
+  if (new Set(posts.map((article) => article.id)).size !== posts.length) {
+    return res.status(400).json({ success: false, error: 'Çeviri isteğinde yinelenen makale kimliği var.' });
+  }
+
+  const apiKey = (process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY || '').trim();
+  if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
+    return res.status(503).json({ success: false, error: 'Toplu dil çevirisi için sunucuda GOOGLE_API_KEY veya GEMINI_API_KEY yapılandırılmalıdır.' });
+  }
+
+  const translations: Record<string, any> = {};
+  const needsTranslation: any[] = [];
+  for (const article of posts) {
+    const cacheKey = `site:${langCode}:${article.id}:${stableRevision(article)}`;
+    const cached = siteTranslationCache.get(cacheKey);
+    const complete = Boolean(cached && typeof cached.title === 'string' && cached.title.trim() &&
+      typeof cached.summary === 'string' && cached.summary.trim());
+    if (!complete) continue;
+    translations[article.id] = cached;
+  }
+  for (const article of posts) {
+    if (!translations[article.id]) needsTranslation.push(article);
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
+  const batchSize = 10;
+  const batches: any[][] = [];
+  for (let index = 0; index < needsTranslation.length; index += batchSize) batches.push(needsTranslation.slice(index, index + batchSize));
+  let missingTranslationCount = 0;
+  // Limit concurrency to prevent a large catalogue request from creating an API burst.
+  for (let index = 0; index < batches.length; index += 3) {
+    const window = batches.slice(index, index + 3);
+    const results = await Promise.all(window.map(async (batch) => {
+      const prompt = `Translate these article-card metadata records into ${targetLanguage}. Source language is specified per item. Return ONLY JSON as {"translations":[{"id":"exact input id","title":"translated title","summary":"translated summary","categories":["translated categories"],"dialecticalTriad":{"claim":"...","counterClaim":"...","whatIsNotEvidence":"...","methodologicalNote":"..."}}]}. Return exactly one result for each supplied id, preserve all ids unchanged, preserve meaning without adding claims. JSON input:\n${JSON.stringify(batch)}`;
+      try {
+        const response = await ai.models.generateContent({
+          model: process.env.GEMINI_MODEL || 'gemini-3.8-flash',
+          contents: prompt,
+          config: { responseMimeType: 'application/json' }
+        });
+        const parsed = extractJsonObject(response.text);
+        return Array.isArray(parsed.translations) ? parsed.translations : [];
+      } catch (error) {
+        console.warn('[Translation] Metadata batch failed:', error instanceof Error ? error.message : String(error));
+        return [];
+      }
+    }));
+
+    for (let batchIndex = 0; batchIndex < window.length; batchIndex += 1) {
+      const requested = window[batchIndex];
+      const returned = Array.isArray(results[batchIndex]) ? results[batchIndex] : [];
+      const allowedIds = new Set(requested.map((article: any) => article.id));
+      const returnedById = new Map(returned.map((item: any) => [String(item?.id || ''), item]));
+      for (const article of requested) {
+        const item: any = returnedById.get(article.id);
+        if (!allowedIds.has(article.id) || !item || typeof item.title !== 'string' || !item.title.trim() ||
+          typeof item.summary !== 'string' || !item.summary.trim()) {
+          missingTranslationCount += 1;
+          continue;
+        }
+        const translation = {
+          title: item.title.trim(),
+          summary: item.summary.trim(),
+          categories: Array.isArray(item.categories) && item.categories.length ? item.categories.map((entry: unknown) => String(entry)) : [],
+          dialecticalTriad: item.dialecticalTriad && typeof item.dialecticalTriad === 'object' ? item.dialecticalTriad : {}
         };
-      }));
+        translations[article.id] = translation;
+        siteTranslationCache.set(`site:${langCode}:${article.id}:${stableRevision(article)}`, translation);
+      }
     }
-
-    return res.json({ success: true, translations, count: Object.keys(translations).length });
-  } catch (err: any) {
-    console.error('[translate-site] error:', err);
-    return res.status(500).json({ success: false, error: err.message || 'Translation failed' });
   }
+
+  if (missingTranslationCount > 0 || posts.some((article: any) => !translations[article.id])) {
+    const incompleteCount = posts.filter((article: any) => !translations[article.id]).length;
+    return res.status(502).json({ success: false, error: 'Bazı makaleler çevrilemedi; eksik katalog başarılı olarak işaretlenmedi.', missingTranslationCount: Math.max(missingTranslationCount, incompleteCount) });
+  }
+  return res.json({ success: true, translations, articleSignature: String(req.body?.articleSignature || ''), translatedCount: posts.length });
 });
 
-// Single full-article translation (used when opening an article in a non-Turkish language)
-app.post('/api/gemini/translate', async (req: Request, res: Response) => {
+app.post('/api/gemini/translate', async (req, res) => {
+  const articleId = String(req.body?.articleId || '').trim();
+  const slug = String(req.body?.slug || articleId).trim();
+  const sourceLanguageCode = String(req.body?.sourceLanguageCode || 'tr').trim().toLowerCase();
+  const langCode = String(req.body?.targetLanguageCode || '').trim().toLowerCase();
+  const sourceHtml = String(req.body?.content || '');
+  const title = String(req.body?.title || '').trim();
+  const summary = String(req.body?.summary || '').trim();
+  const dialecticalTriad = req.body?.dialecticalTriad && typeof req.body.dialecticalTriad === 'object' ? req.body.dialecticalTriad : {};
+  if (!articleId || !title || title.length > 1000 || summary.length > 10000 || sourceHtml.length > 80000) {
+    return res.status(400).json({ success: false, error: 'Makale alanları geçersiz veya izin verilen uzunluğu aşıyor.' });
+  }
+  if (!languageNames[langCode] || !languageNames[sourceLanguageCode]) {
+    return res.status(400).json({ success: false, error: 'Desteklenmeyen kaynak veya hedef dil.' });
+  }
+  const sourceRevision = stableRevision({ sourceLanguageCode, title, summary, sourceHtml, dialecticalTriad });
+  const cacheKey = `article:${articleId}:${slug}:${langCode}:${sourceRevision}`;
+  const cached = articleTranslationCache.get(cacheKey);
+  if (cached && cached.translatedTitle && (!summary || cached.translatedSummary) && (!sourceHtml || cached.translatedContent)) {
+    return res.json({ success: true, data: cached, cached: true, sourceRevision });
+  }
+  const apiKey = (process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY || '').trim();
+  if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
+    return res.status(503).json({ success: false, error: 'Makale çevirisi için sunucuda GOOGLE_API_KEY veya GEMINI_API_KEY yapılandırılmalıdır.' });
+  }
   try {
-    const {
-      title = '',
-      summary = '',
-      content = '',
-      dialecticalTriad = {},
-      targetLanguageCode = 'en',
-      sourceLanguageCode = 'tr',
-    } = req.body || {};
-    const target = String(targetLanguageCode).toLowerCase().slice(0, 2);
-    const source = String(sourceLanguageCode).toLowerCase().slice(0, 2);
-
-    const [translatedTitle, translatedSummary, translatedContent, claim, counterClaim, whatIsNotEvidence, methodologicalNote] = await Promise.all([
-      translateField(title, target, source),
-      translateField(summary, target, source),
-      translateField(content, target, source),
-      translateField(dialecticalTriad?.claim, target, source),
-      translateField(dialecticalTriad?.counterClaim, target, source),
-      translateField(dialecticalTriad?.whatIsNotEvidence, target, source),
-      translateField(dialecticalTriad?.methodologicalNote, target, source),
-    ]);
-
-    return res.json({
-      success: true,
-      data: {
-        translatedTitle,
-        translatedSummary,
-        translatedContent,
-        translatedDialecticalTriad: {
-          claim,
-          counterClaim,
-          whatIsNotEvidence,
-          methodologicalNote,
-        },
-      },
-    });
-  } catch (err: any) {
-    console.error('[translate] error:', err);
-    return res.status(500).json({ success: false, error: err.message || 'Translation failed' });
+    const ai = new GoogleGenAI({ apiKey });
+    const sourceHtmlForTranslation = sourceHtml;
+    const result = await translateLongHtml(ai, sourceHtml, languageNames[sourceLanguageCode], languageNames[langCode], { title, summary, dialecticalTriad });
+    const data = {
+      translatedTitle: String(result?.translatedTitle || '').trim(),
+      translatedSummary: String(result?.translatedSummary || '').trim(),
+      translatedContent: String(result?.translatedContent || ''),
+      translatedDialecticalTriad: result?.translatedDialecticalTriad && typeof result.translatedDialecticalTriad === 'object' ? result.translatedDialecticalTriad : {}
+    };
+    if (!hasCompleteArticleTranslation(data, { title, summary, content: sourceHtmlForTranslation, dialecticalTriad })) {
+      return res.status(502).json({ success: false, error: 'Çeviri sağlayıcısı makalenin tüm alanlarını döndürmedi; eksik çeviri kaydedilmedi.' });
+    }
+    articleTranslationCache.set(cacheKey, data);
+    return res.json({ success: true, data, sourceRevision });
+  } catch (error: any) {
+    const message = String(error?.message || error || 'Çeviri başarısız.');
+    console.warn('[Translation] Article translation failed:', message);
+    return res.status(502).json({ success: false, error: 'Makale çevirisi tamamlanamadı. API anahtarı, model erişimi ve içerik boyutunu kontrol edin.' });
   }
 });
 
-// Register SEO routes (sitemap, robots, server-rendered articles)
+app.post('/api/gemini/socratic', async (req, res) => {
+  const claim = String(req.body?.claim || '').trim();
+  if (!claim) {
+    return res.status(400).json({ error: 'Lütfen sorgulanacak bir iddia girin.' });
+  }
+  if (claim.length > 2000) {
+    return res.status(400).json({ error: 'İddia metni çok uzun (maksimum 2000 karakter).' });
+  }
+
+  const apiKey = (process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY || '').trim();
+  const fallbackPayload = {
+    reply: `İddianız dikkat çekici: "${claim.slice(0, 120)}...". Peki bu önermenin dayandığı en temel ön kabulün yanlışlanabilirlik ölçütü nedir?`,
+    matrix: {
+      claim,
+      counterClaim: 'Gözlemlenen korelasyonun, ölçüm aracının veya öznel kavramsal çerçevenin sınırlarından kaynaklanma ihtimali.',
+      notProof: 'Pratik yaygınlık veya sezgisel tutarlılık, tek başına ontolojik zorunluluğun kanıtı değildir.'
+    },
+    source: 'fallback'
+  };
+
+  if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
+    return res.json(fallbackPayload);
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const prompt = `Kullanıcı iddiası: "${claim}"
+Lütfen Türkçe olarak Sokratik bir sorgulama yap ve yanıtı kesinlikle aşağıdaki JSON formatında döndür:
+{
+  "reply": "Sokratik derinleştirici soru",
+  "matrix": {
+    "claim": "Kullanıcının iddiasının özeti",
+    "counterClaim": "Sokratik karşı tez",
+    "notProof": "Neyin kanıt olmadığı"
+  }
+}`;
+    const response = await ai.models.generateContent({
+      model: process.env.GEMINI_MODEL || 'gemini-3.8-flash',
+      contents: prompt,
+      config: { responseMimeType: 'application/json' }
+    });
+    const parsed = JSON.parse(response.text || '{}');
+    return res.json({
+      reply: parsed.reply || fallbackPayload.reply,
+      matrix: {
+        claim: parsed.matrix?.claim || claim,
+        counterClaim: parsed.matrix?.counterClaim || fallbackPayload.matrix.counterClaim,
+        notProof: parsed.matrix?.notProof || fallbackPayload.matrix.notProof
+      },
+      source: 'gemini'
+    });
+  } catch (error: any) {
+    const providerMessage = String(error?.message || error || '');
+    if (/401|403|unauthori[sz]ed|api.?key|authentication|permission/i.test(providerMessage)) {
+      const safeMessage = 'Gemini kimlik doğrulaması başarısız. GOOGLE_API_KEY veya GEMINI_API_KEY değerini sunucunun gizli değişkenlerinde kontrol edin; anahtarı frontend koduna koymayın.';
+      const sanitizedMessage = safeMessage.replace(apiKey, '[REDACTED]');
+      return res.status(502).json({ error: sanitizedMessage });
+    }
+    return res.json(fallbackPayload);
+  }
+});
+
+// Katalog ve Blogger Senkronizasyon Uç Noktaları
+let blogSyncState: { status: string; lastSyncedAt: string | null; syncedCount: number; error: string | null } = {
+  status: 'pending', lastSyncedAt: null, syncedCount: 0, error: null
+};
+function currentBlogSyncStatus() {
+  return { ...blogSyncState };
+}
+function readCatalog() {
+  const catalogPath = path.join(__dirname, 'catalog.json');
+  if (fs.existsSync(catalogPath)) {
+    try {
+      return JSON.parse(fs.readFileSync(catalogPath, 'utf-8'));
+    } catch {}
+  }
+  return { total: 0, posts: [] };
+}
+
+// SEO pages, robots.txt and sitemap.xml use the same runtime catalogue as the API.
+// This works on read-only hosting and immediately includes Blogger posts after sync.
+let runtimeProjectCatalog = readCatalog();
+setRuntimeCatalog(runtimeProjectCatalog);
 registerSeoRoutes(app, { includeHome: false });
 
-
-// ---------------------------------------------------------------------------
-// Analytics API — statistics from 24 April 2026 onwards, synchronized with live data
-// emrepelitscienceonly.com.tr is intentionally excluded
-// ---------------------------------------------------------------------------
-const ANALYTICS_START_AT = process.env.ANALYTICS_START_AT || '2026-04-24T00:00:00+03:00';
-const UMAMI_API_BASE = (process.env.UMAMI_API_BASE_URL || 'https://api.umami.is/v1').replace(/\/$/, '');
-const UMAMI_API_KEY = process.env.UMAMI_API_KEY || '';
-
-const ANALYTICS_SITES = [
-  { key: 'sciphil', name: 'sci-phil.ai.studio', domain: 'sci-phil.ai.studio', env: 'UMAMI_WEBSITE_ID', launchDate: '2026-04-24T00:00:00+03:00', launchLabel: '24 Nisan 2026' },
-  { key: 'blogger', name: 'Blogger (Time & Entropy)', domain: 'emrepelit7337.blogspot.com', env: 'UMAMI_BLOGGER_WEBSITE_ID', launchDate: '2026-01-15T00:00:00+03:00', launchLabel: '15 Ocak 2026' },
-  { key: 'grokme', name: 'Science & Philosophy Grok.me', domain: 'science-philosophy.grok.me', env: 'UMAMI_GROKME_WEBSITE_ID', launchDate: '2026-09-26T00:00:00+03:00', launchLabel: '26 Eylül 2026' },
-  { key: 'github', name: 'GitHub Pages', domain: process.env.UMAMI_GITHUB_PAGES_DOMAIN || 'github.io', env: 'UMAMI_GITHUB_PAGES_WEBSITE_ID', launchDate: '2026-09-26T00:00:00+03:00', launchLabel: '26 Eylül 2026' },
-  { key: 'alias', name: 'science-philosophy.ai.studio', domain: 'science-philosophy-emre-pelit.ai.studio', env: 'UMAMI_ALIAS_WEBSITE_ID', launchDate: '2026-10-12T00:00:00+03:00', launchLabel: '12 Ekim 2026' },
-].filter(site => !/emrepelitscienceonly\.com\.tr/i.test(site.domain));
-
-async function fetchUmamiStats(websiteId: string, startAt: string, endAt: string) {
-  if (!UMAMI_API_KEY || !websiteId) return null;
-  const url = `${UMAMI_API_BASE}/websites/${websiteId}/stats?startAt=${encodeURIComponent(startAt)}&endAt=${encodeURIComponent(endAt)}`;
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${UMAMI_API_KEY}`, Accept: 'application/json' },
-    signal: AbortSignal.timeout(15000),
+app.get('/api/seo/status', (_req, res) => {
+  const posts = Array.isArray(runtimeProjectCatalog.posts) ? runtimeProjectCatalog.posts : [];
+  const articleCount = posts.filter((post: any) => post && post.slug && post.title).length;
+  res.json({
+    canonicalOrigin: `https://${PRIMARY_DOMAIN}`,
+    sitemapUrl: `https://${PRIMARY_DOMAIN}/sitemap.xml`,
+    sitemapUrlCount: articleCount + 2,
+    articleCount,
+    robotsUrl: `https://${PRIMARY_DOMAIN}/robots.txt`,
+    indexNowKeyFileAvailableInPackage: fs.existsSync(path.join(__dirname, 'public', '5d3436c931b6024c.txt')),
+    indexNowSubmissionStatus: 'not_verified',
+    searchConsoleConnected: false,
+    bingWebmasterConnected: false,
+    reportDataAvailable: false,
+    projectionsAvailable: false,
+    note: 'Bu sunucu Google Search Console veya Bing hesabına bağlı değildir. Sitemap URL listesi indekslenmiş sayfa sayısı değildir; gönderimler ve indeks durumu ilgili webmaster panellerinde doğrulanmalıdır.',
+    refreshedAt: new Date().toISOString()
   });
-  if (!res.ok) throw new Error(`Umami stats ${res.status}`);
-  return res.json();
-}
+});
 
-async function fetchUmamiCountries(websiteId: string, startAt: string, endAt: string) {
-  if (!UMAMI_API_KEY || !websiteId) return [];
-  const url = `${UMAMI_API_BASE}/websites/${websiteId}/metrics?type=country&startAt=${encodeURIComponent(startAt)}&endAt=${encodeURIComponent(endAt)}&limit=100`;
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${UMAMI_API_KEY}`, Accept: 'application/json' },
-    signal: AbortSignal.timeout(15000),
-  });
-  if (!res.ok) return [];
-  const json = await res.json();
-  return Array.isArray(json) ? json : (json.data || []);
-}
+app.get('/blogger-canonical.js', (_req, res) => {
+  res.set('Cache-Control', 'public, max-age=60');
+  res.type('application/javascript; charset=utf-8').send(writeBloggerCanonicalScript(synchronizedBloggerArticles));
+});
 
-app.get('/api/analytics/summary', async (_req: Request, res: Response) => {
-  const startAt = ANALYTICS_START_AT;
-  const endAt = new Date().toISOString();
-  const mainWebsiteId = process.env.UMAMI_WEBSITE_ID || '';
-
-  if (!UMAMI_API_KEY || !mainWebsiteId) {
-    return res.status(503).json({
-      configured: false,
-      error: 'Umami yapılandırması eksik. UMAMI_API_KEY ve UMAMI_WEBSITE_ID sunucu değişkenlerini ayarlayın.',
-      startAt,
-      milestone: '24 Nisan 2026, 00:00 (Türkiye Saati)',
-    });
-  }
-
+app.get('/', (_req, res) => {
   try {
-    const [stats, countries] = await Promise.all([
-      fetchUmamiStats(mainWebsiteId, startAt, endAt),
-      fetchUmamiCountries(mainWebsiteId, startAt, endAt),
-    ]);
-
-    const payload = buildRealAnalyticsPayload(stats, countries, {
-      startAt,
-      endAt,
-      timezone: 'Europe/Istanbul',
-    });
-
-    // Ensure milestone is the requested date
-    payload.milestone = '24 Nisan 2026, 00:00 (Türkiye Saati)';
-    payload.startAt = startAt;
-    return res.json(payload);
-  } catch (err: any) {
-    console.error('[analytics/summary]', err);
-    return res.status(500).json({
-      configured: true,
-      error: err.message || 'Analytics verisi alınamadı',
-      startAt,
-    });
+    const distIndex = path.join(__dirname, 'dist', 'index.html');
+    const rootIndex = path.join(__dirname, 'index.html');
+    const source = fs.existsSync(distIndex) ? distIndex : rootIndex;
+    let page = fs.readFileSync(source, 'utf8');
+    page = injectSearchableArticleIndex(page, runtimeProjectCatalog);
+    res.set('Cache-Control', 'public, max-age=300');
+    res.type('html; charset=utf-8').send(page);
+  } catch {
+    res.status(500).type('text/plain; charset=utf-8').send('Site ana sayfası hazırlanamadı.');
   }
 });
 
-app.get('/api/analytics/sites-summary', async (_req: Request, res: Response) => {
-  const endAt = new Date().toISOString();
-  const sites = [];
-  let totalVisitors = 0, totalPageviews = 0, totalVisits = 0;
-
-  for (const site of ANALYTICS_SITES) {
-    const websiteId = process.env[site.env] || '';
-    const siteStart = site.launchDate || ANALYTICS_START_AT;
-    const entry: any = {
-      key: site.key,
-      name: site.name,
-      domain: site.domain,
-      launchDate: siteStart,
-      launchLabel: site.launchLabel,
-      status: websiteId ? (UMAMI_API_KEY ? 'connected' : 'api_key_missing') : 'not_configured',
-      visitors: null,
-      pageviews: null,
-      visits: null,
-      netReads: null,
-      cumulativeViews: null,
-    };
-
-    if (websiteId && UMAMI_API_KEY) {
-      try {
-        const stats = await fetchUmamiStats(websiteId, siteStart, endAt);
-        const data = stats?.data || stats || {};
-        entry.visitors = Number(data.visitors) || 0;
-        entry.pageviews = Number(data.pageviews) || 0;
-        entry.visits = Number(data.visits) || 0;
-        entry.cumulativeViews = entry.pageviews;
-        entry.netReads = entry.visits || entry.pageviews;
-        totalVisitors += entry.visitors;
-        totalPageviews += entry.pageviews;
-        totalVisits += entry.visits;
-      } catch (err: any) {
-        entry.status = 'error';
-        entry.error = err.message;
-      }
-    }
-    sites.push(entry);
-  }
-
-  return res.json({
-    success: true,
-    startAt: ANALYTICS_START_AT,
-    milestone: 'Her site kendi açılış tarihinden itibaren',
-    sites,
-    totals: {
-      visitors: totalVisitors,
-      pageviews: totalPageviews,
-      visits: totalVisits,
-      cumulativeViews: totalPageviews,
-      netReads: totalVisits,
-    },
-  });
+app.get('/catalog.json', (_req, res) => {
+  res.json(runtimeProjectCatalog);
 });
 
-
-// Baseline: all data up to the snapshot is frozen; new data is added on top
-app.get('/api/analytics/baseline', (_req: Request, res: Response) => {
-  const baselinePath = path.join(__dirname, 'public', 'stats', 'analytics-baseline.json');
-  if (fs.existsSync(baselinePath)) {
-    res.setHeader('Cache-Control', 'no-store');
-    return res.sendFile(baselinePath);
-  }
-  return res.json({
-    snapshotAt: '2026-10-15T17:02:00+03:00',
-    sites: {},
-    totals: { cumulativeViews: 0, unifiedNetReads: 0 },
-  });
+app.get('/api/articles', (_req, res) => {
+  const posts = Array.isArray(runtimeProjectCatalog.posts) ? runtimeProjectCatalog.posts : [];
+  const synchronizedArticles = posts;
+  res.json({ articles: synchronizedArticles, synchronizedArticles, total: synchronizedArticles.length, syncStatus: currentBlogSyncStatus() });
 });
 
-app.get('/analytics', (_req: Request, res: Response) => {
-  res.setHeader('Cache-Control', 'public, max-age=60');
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  const analyticsPath = path.join(__dirname, 'public', 'analytics.html');
-  if (fs.existsSync(analyticsPath)) {
-    return res.sendFile(analyticsPath);
+async function syncBloggerCatalogue(forceFull = true) {
+  const feedPosts = await fetchAllBloggerPosts({ forceFull });
+  const currentCatalog = runtimeProjectCatalog || readCatalog();
+  const existingPosts = Array.isArray(currentCatalog.posts) ? currentCatalog.posts : [];
+  const byId = new Map(existingPosts.map((post: any) => [String(post.id), post]));
+  const reservedSlugs = new Set(existingPosts.map((post: any) => String(post.slug)));
+  const feedArticles: any[] = [];
+
+  for (const post of feedPosts) {
+    const existing = byId.get(String(post.id));
+    const article = createArticleFromBloggerPost(post, { existing, reservedSlugs });
+    reservedSlugs.add(article.slug);
+    byId.set(String(article.id), article);
+    feedArticles.push(article);
   }
-  return res.status(404).send('Analytics page not found');
-});
+  if (feedArticles.length > 0) writeBloggerCanonicalScript(feedArticles);
+  blogSyncState = { status: feedArticles.length ? 'synced' : 'empty_feed', lastSyncedAt: new Date().toISOString(), syncedCount: feedArticles.length, error: null };
 
-async function start() {
-  const isProduction = process.env.NODE_ENV === 'production';
+  const merged = Array.from(byId.values());
+  const changed = JSON.stringify(existingPosts) !== JSON.stringify(merged);
+  const updatedCatalog = {
+    ...currentCatalog,
+    total: merged.length,
+    posts: merged,
+    updatedAt: changed ? new Date().toISOString() : (currentCatalog.updatedAt || null)
+  };
+  runtimeProjectCatalog = updatedCatalog;
+  setRuntimeCatalog(updatedCatalog);
+  // runtime catalogue remains updated even when the hosting filesystem is read-only.
 
-  if (!isProduction) {
-    // Development: Vite middleware
+  // Persist only when explicitly enabled; many hosted deployments use read-only filesystems.
+  if (changed && process.env.WRITE_CATALOG_TO_DISK === 'true') {
     try {
-      const vite = await createViteServer({
-        configFile: path.join(__dirname, 'vite.config.ts'),
-        server: {
-          middlewareMode: true,
-          hmr: process.env.DISABLE_HMR === 'true' ? false : undefined,
-        },
-        appType: 'spa',
-      });
-      app.use(vite.middlewares);
-    } catch (viteErr) {
-      console.warn('[Vite] Development middleware failed to start, falling back to static:', viteErr);
-      app.use(express.static(path.join(__dirname, 'public')));
-      app.use(express.static(path.join(__dirname)));
+      fs.writeFileSync(path.join(__dirname, 'catalog.json'), `${JSON.stringify(updatedCatalog, null, 2)}\n`, 'utf8');
+    } catch (error: any) {
+      console.warn('[Blogger sync] Catalogue updated in memory; disk write unavailable:', error?.message || error);
     }
-  } else {
-    // Production: serve built assets
-    const distPath = path.join(__dirname, 'dist');
-    const publicPath = path.join(__dirname, 'public');
-
-    if (fs.existsSync(distPath)) {
-      app.use(express.static(distPath, { index: false, dotfiles: 'deny', fallthrough: true }));
-    }
-    if (fs.existsSync(publicPath)) {
-      app.use(express.static(publicPath, { index: false, dotfiles: 'deny', fallthrough: true }));
-    }
-
-    // SPA fallback for frontend routes
-    app.get('*', (req: Request, res: Response, next: NextFunction) => {
-      if (req.method !== 'GET' || path.extname(req.path)) return next();
-
-      const builtIndex = path.join(distPath, 'index.html');
-      const rootIndex = path.join(__dirname, 'index.html');
-
-      if (fs.existsSync(builtIndex)) {
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.sendFile(builtIndex);
-      }
-      if (fs.existsSync(rootIndex)) {
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.sendFile(rootIndex);
-      }
-      return res.status(503).type('text/plain').send('Önce npm run build komutuyla üretim dosyalarını oluşturun.');
-    });
   }
-
-  // Critical: listen on the PORT provided by Cloud Run / AI Studio
-  const server = app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Science & Philosophy server running at ${PRIMARY_ORIGIN} on port ${PORT} (NODE_ENV=${process.env.NODE_ENV || 'development'})`);
-  });
-
-  server.on('error', (err: any) => {
-    console.error('Server listen error:', err);
-    process.exit(1);
-  });
+  return { feedPosts, updatedCatalog, changed };
 }
 
-start().catch((error) => {
-  console.error('Server startup failed:', error);
-  process.exitCode = 1;
+app.post('/api/sync-blog', async (_req, res) => {
+  try {
+    const result = await syncBloggerCatalogue(true);
+    res.json({
+      success: true,
+      syncedCount: result.feedPosts.length,
+      totalCatalog: result.updatedCatalog.posts.length,
+      changed: result.changed
+    });
+  } catch (err: any) {
+    blogSyncState = { ...blogSyncState, status: 'error', error: String(err?.message || 'Sync error') };
+    res.status(500).json({ success: false, error: err?.message || 'Sync error' });
+  }
 });
+
+// Refresh the Blogger archive on startup and every 15 minutes. A failed fetch
+// never replaces the complete local catalogue with an empty response.
+if (process.env.NODE_ENV !== 'test') {
+  syncBloggerCatalogue(true).catch((err: any) => { blogSyncState = { ...blogSyncState, status: 'error', error: String(err?.message || err) }; console.warn('[Blogger sync] Startup sync failed:', err?.message || err); });
+  const bloggerSyncTimer = setInterval(() => {
+    syncBloggerCatalogue(false).catch((err: any) => { blogSyncState = { ...blogSyncState, status: 'error', error: String(err?.message || err) }; console.warn('[Blogger sync] Scheduled sync failed:', err?.message || err); });
+  }, BLOG_SYNC_INTERVAL_MS);
+  bloggerSyncTimer.unref?.();
+}
+
+// Statik Dosyalar
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'dist')));
+
+app.get('/analytics.html', (_req, res) => {
+  const pubFile = path.join(__dirname, 'public', 'analytics.html');
+  const rootFile = path.join(__dirname, 'analytics.html');
+  if (fs.existsSync(pubFile)) return res.sendFile(pubFile);
+  if (fs.existsSync(rootFile)) return res.sendFile(rootFile);
+  res.status(404).send('Analytics panel not found');
+});
+
+app.use('/api/*', (_req, res) => {
+  res.status(404).json({ error: 'API endpoint not found' });
+});
+
+app.get('*', (_req, res) => {
+  const distIndex = path.join(__dirname, 'dist', 'index.html');
+  const rootIndex = path.join(__dirname, 'index.html');
+  if (fs.existsSync(distIndex)) return res.sendFile(distIndex);
+  if (fs.existsSync(rootIndex)) return res.sendFile(rootIndex);
+  res.status(404).send('Not found');
+});
+
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Sci-Phi Server running on http://0.0.0.0:${PORT}`);
+  });
+}

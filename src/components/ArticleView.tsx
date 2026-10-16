@@ -10,6 +10,7 @@ import { ChineseRoomSimulator } from './interactive/ChineseRoomSimulator';
 import { BlockUniverseSimulator } from './interactive/BlockUniverseSimulator';
 import { FallacyInspector } from './interactive/FallacyInspector';
 import { getTranslations, translateCategory, UiTranslations } from '../utils/i18n';
+import { getFormulationsForArticle } from '../data/mathematicalFormulations';
 import DOMPurify from 'dompurify';
 import { 
   ArrowLeft, 
@@ -25,6 +26,7 @@ import {
   BriefcaseBusiness,
   Scale,
   Headphones,
+  Sigma,
   MessageSquareWarning,
   Sparkles,
   UserCheck,
@@ -231,6 +233,14 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
               isTranslating={isTranslating}
               onResetOriginal={handleResetOriginal}
             />
+            <button
+              onClick={() => setActiveTab('audio')}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-indigo-500/40 bg-indigo-50/70 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-xs font-bold text-indigo-900 dark:text-indigo-200 shadow-sm transition-all"
+              title="Makaleyi sesli dinle"
+            >
+              <Headphones className="w-3.5 h-3.5" />
+              Dinle
+            </button>
             {translationError && <p className="basis-full text-xs text-rose-700 dark:text-rose-300" role="status" aria-live="polite">{translationError}</p>}
 
             {/* Typography Controls */}
@@ -458,6 +468,37 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                   `}
                   dangerouslySetInnerHTML={{ __html: sanitizedContent }}
                 />
+                {/* Mathematical Formulations (when available) */}
+                {(() => {
+                  const math = getFormulationsForArticle(displayArticle.id) || getFormulationsForArticle(displayArticle.slug);
+                  if (!math || !math.formulas?.length) return null;
+                  return (
+                    <section className="mt-10 p-6 rounded-3xl bg-gradient-to-br from-indigo-50/80 to-purple-50/60 dark:from-indigo-950/40 dark:to-purple-950/30 border border-indigo-200 dark:border-indigo-800/60 space-y-5">
+                      <div className="flex items-center gap-2">
+                        <Sigma className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                        <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-900 dark:text-indigo-200">
+                          Matematiksel Formülasyonlar
+                        </h3>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
+                          {math.topicTitle}
+                        </span>
+                      </div>
+                      <div className="space-y-4">
+                        {math.formulas.map((f, i) => (
+                          <div key={i} className="p-4 rounded-2xl bg-white/70 dark:bg-neutral-900/70 border border-indigo-100 dark:border-indigo-800/40">
+                            <div className="font-semibold text-sm text-indigo-900 dark:text-indigo-200 mb-2">{f.name}</div>
+                            <div className="font-mono text-sm bg-neutral-100 dark:bg-neutral-800 p-3 rounded-xl overflow-x-auto text-neutral-800 dark:text-neutral-200 mb-3">
+                              {f.latex}
+                            </div>
+                            <p className="text-sm text-neutral-700 dark:text-neutral-300 mb-1"><strong>Açıklama:</strong> {f.explanation}</p>
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400 italic"><strong>Önemi:</strong> {f.significance}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  );
+                })()}
+
 
                 {/* Citation footer */}
                 <footer className="pt-8 border-t border-neutral-200 dark:border-neutral-800 text-xs text-neutral-500 dark:text-neutral-400 space-y-2">

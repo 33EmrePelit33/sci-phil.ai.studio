@@ -7,7 +7,7 @@
   const countryStatus = document.getElementById('live-countries-status');
   const countryTable = document.getElementById('live-country-table');
   const countryRows = document.getElementById('live-country-rows');
-  const refresh = document.getElementById('live-analytics-refresh');
+  const refresh = document.getElementById('analytics-refresh') || document.getElementById('live-analytics-refresh');
   const searchInput = document.getElementById('live-country-search');
   const sortSelect = document.getElementById('live-country-sort');
   const regionPills = document.getElementById('live-region-pills');
@@ -70,7 +70,7 @@
     });
     setState('Kurulum gerekli', true);
     if (note) {
-      note.textContent = (data && data.error ? data.error + ' ' : '') + 'Umami Cloud yapılandırıldıktan sonra bu panel 24 Nisan 2026 00.00 Türkiye saatinden itibaren toplanan veriyi gösterecek. API anahtarı yalnızca sunucu gizli değişkenlerinde tutulmalıdır.';
+      note.textContent = (data && data.error ? data.error + ' ' : '') + 'Umami Cloud yapılandırıldıktan sonra bu panel 12 Ekim 2026 00.00 Türkiye saatinden itibaren toplanan veriyi gösterecek. API anahtarı yalnızca sunucu gizli değişkenlerinde tutulmalıdır.';
     }
   }
 
@@ -350,7 +350,7 @@
 
       setState('● CANLI · ' + fmtTime(data.refreshedAt));
       if (note) {
-        note.textContent = `Veri kaynağı: ${data.provider || 'Umami'}. Ölçüm başlangıcı: ${data.milestone || '24 Nisan 2026 00.00'} (${data.timezone || 'Europe/Istanbul'}). Son güncelleme: ${fmtTime(data.refreshedAt)}. Ülke bilgisi IP tabanlı yaklaşık konumdur; VPN/proxy nedeniyle farklı görünebilir.`;
+        note.textContent = `Veri kaynağı: ${data.provider || 'Umami'}. Ölçüm başlangıcı: ${data.milestone || '12 Ekim 2026 00.00'} (${data.timezone || 'Europe/Istanbul'}). Son güncelleme: ${fmtTime(data.refreshedAt)}. Ülke bilgisi IP tabanlı yaklaşık konumdur; VPN/proxy nedeniyle farklı görünebilir.`;
       }
     } catch (error) {
       setState('Bağlantı sorunu', true);

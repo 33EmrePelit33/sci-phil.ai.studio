@@ -155,6 +155,17 @@
           }
         }
       }
+    },
+    "/api/seo/status": {
+      "get": {
+        "summary": "Canonical domain, sitemap inventory and external indexing-connection status",
+        "description": "Reports the number of canonical URLs listed in the sitemap. It does not claim that listed URLs are indexed and does not report Search Console, Bing Webmaster Tools or IndexNow submission success unless independently verified.",
+        "responses": {
+          "200": {
+            "description": "SEO configuration and verification status"
+          }
+        }
+      }
     }
   }
 }

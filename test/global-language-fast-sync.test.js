@@ -32,11 +32,12 @@ test('full article prose has an HTML-preserving translation path and source-sens
   assert.match(client, /translationSourceRevision/);
 });
 
-test('Blogger catalogue refresh is scheduled every minute and browser refreshes on return', () => {
+test('Blogger server sync is scheduled every 15 minutes and browser refreshes on return', () => {
   const server = read('server.ts');
   const app = read('src/App.tsx');
-  assert.match(server, /const BLOG_SYNC_INTERVAL_MS = 60 \* 1000/);
-  assert.match(server, /setInterval\(\(\) => \{ void runBloggerSync\(true\); \}, BLOG_SYNC_INTERVAL_MS\)/);
+  assert.match(server, /const BLOG_SYNC_INTERVAL_MS = 15 \* 60 \* 1000/);
+  assert.match(server, /setInterval\(\(\) => \{\s*syncBloggerCatalogue\(false\)/);
+  assert.match(server, /\}, BLOG_SYNC_INTERVAL_MS\)/);
   assert.match(app, /setInterval\(\(\) => \{ void fetchArticles\(\); \}, 60 \* 1000\)/);
   assert.match(app, /addEventListener\('focus', refreshOnReturn\)/);
 });

@@ -56,7 +56,7 @@ API anahtarı eklenmeden panel gerçek ülke istatistiği uydurmaz; kurulum gere
 
 ## Raporlama miladı ve doğruluk
 
-Raporlama aralığının başlangıcı 24 Nisan 2026 saat 00.00 Türkiye saati olarak tanımlıdır. Gerçek veri, izleyici kodu dağıtıldıktan ve Umami yapılandırıldıktan sonra toplanmaya başlar; önceki günler için geriye dönük ziyaret verisi üretilemez.
+Raporlama aralığının başlangıcı `ANALYTICS_START_AT=2026-10-12T00:00:00+03:00` olarak tanımlıdır (12 Ekim 2026 saat 00.00 Türkiye saati). Gerçek veri, izleyici kodu dağıtıldıktan ve Umami yapılandırıldıktan sonra toplanmaya başlar; önceki günler için geriye dönük ziyaret verisi üretilemez.
 
 IP tabanlı ülke bilgisi yaklaşık konumdur; VPN, proxy, kurumsal ağlar ve gizlilik araçları ülke sonucunu etkileyebilir. Ziyaretçi sayısı analiz sağlayıcısının benzersiz ziyaretçi tanımına göredir; mutlak kişi kimliği/kimlik tespiti değildir.
 

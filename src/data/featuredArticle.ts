@@ -21,6 +21,38 @@ export const FEATURED_70TH_ARTICLE: Article = {
 <br />
 <p dir="ltr"><span face="Arial, sans-serif">Ayrıca eğer Kur’an’ı daha iyi anlayabilseydik, belki de başka birçok bilgiye de ulaşabilirdik.</span></p>
 <br />
+<div class="math-formula-box">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+    <strong style="color:#f59e0b;font-size:0.92rem;display:inline-flex;align-items:center;gap:6px;">
+      📐 Kozmolojik Tekillik ve Döngüsel Evrenin Matematiksel Formülasyonu
+    </strong>
+    <span style="font-family:monospace;font-size:0.75rem;padding:2px 8px;border-radius:6px;background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);">
+      Teorik Fizik &amp; Kuantum Kozmolojisi
+    </span>
+  </div>
+  <p style="font-size:0.85rem;color:#cbd5e1;margin-bottom:10px;">
+    Evrenin tekil bir olgu olarak başlangıçsız ve sonsuz döngüselliği, genel görelilik ve kuantum kütleçekiminde şu temel denklemlerle modellenir:
+  </p>
+  <div class="math-equation">
+    ds² = -c² dt² + a(t)² [ dr² / (1 - k r²) + r² (dθ² + sin²θ dφ²) ]
+  </div>
+  <div class="math-equation">
+    H(t)² = (ȧ / a)² = (8πG / 3) ρ(t) - (k c² / a²) + (Λ c² / 3)
+  </div>
+  <div class="math-equation">
+    Ĥ |Ψ(a, φ)⟩ = 0 &nbsp;&nbsp;[Wheeler-DeWitt Kuantum Tekillik Operatörü]
+  </div>
+  <div style="font-size:0.8rem;color:#94a3b8;line-height:1.6;margin-top:10px;border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;">
+    <p><strong>Değişkenler ve Ontolojik Tanım:</strong></p>
+    <ul style="padding-left:18px;margin:4px 0;">
+      <li><strong>a(t):</strong> Evrenin kozmik ölçek faktörü (Scale factor). a(t) → 0 limitinde klasik eğrilik R → ∞ tekilliğe giderken, kuantum ölçeğinde Planck hacmi minimum bir taban belirler.</li>
+      <li><strong>k:</strong> Uzaysal eğrilik parametresi (k = +1 kapalı döngüsel evren, k = 0 düz evren).</li>
+      <li><strong>ρ(t) &amp; Λ:</strong> Toplam enerji-madde yoğunluğu ve kozmolojik sabit / karanlık enerji.</li>
+      <li><strong>Ĥ |Ψ⟩ = 0:</strong> Wheeler-DeWitt denklemi gereği evrenin toplam Hamiltoniyeni sıfırdır; yani evren bir bütün olarak zamanın dışındadır, "Vahid" tekilliği tüm eonlar boyunca süreklidir.</li>
+    </ul>
+  </div>
+</div>
+<br />
 <p dir="ltr"><span face="Arial, sans-serif"><strong>Yazan:</strong> Emre Pelit</span></p>`,
   cleanText: `Evren Her Zaman Tekil Bir Olguydu ve İlelebet de Öyle Kalacak. Çoğumuz düşünmüşüzdür: "Büyük Patlama'dan önce ne vardı ya da Büyük Patlama'da olaydan etkilenen olgu neydi?" Bu soru üzerine düşündükçe aklıma tümevarımcı fikirler geliyor. Mesela İslam'ı biraz araştırdıysanız Allah'ın "Vahid", yani Bir ve Tek olarak tanımlandığını bilirsiniz. Ben de bu kavramı evrenin olası döngüsel var oluş-yok oluş hipoteziyle birleştirmeyi düşündüm. Yani başlangıcını bilemediğimiz bir zamandan beri bir evrensel oluşum yok olurken yeni bir evrensel oluşumun başlangıcına sebep olduğu döngüsel bir hipotez var; onu kastediyorum. Sonra aklıma şu geldi: Kur'an ve sahih hadislerde Allah'ın bu kâinat dışında 80 bin âlem yarattığı ve bunların her birinin birbirinden farklı olduğu belirtilmiyor mu? Bunu düşündükten sonra, kâinatların biri yok olup diğeri oluşurken hiç gelişme olmuyor mu diye bir fikir belirdi. Daha sonra Kur'an'daki "Biz insanı yedi kâinattan üstün yarattık" ayeti aklıma geldi. Ardından insanların farklı özelliklere sahip yaratılışları üzerine düşündüm ve "Acaba bu kâinattan önceki kâinatta yaptıklarımız sebebiyle mi bu kâinattaki yaratılış özelliklerimize sahibiz?" diye sordum. Yani aslında birbirini takip eden kâinatların ilkinde başlangıçta bütün insanlar eşit koşullarda yaratılmış; sonra her insan, davranışları dolayısıyla bir sonraki kâinattaki yaratılış özelliklerini belirlemişse, fark etmesek bile bütün insanlar aslında eşit imkânlara sahip olduğu kâinatlardan buraya elene elene gelmiştir. Dolayısıyla insanlar hiçbir koşuldan dolayı şikâyet etme hakkına sahip değildir. Ayrıca eğer Kur'an'ı daha iyi anlayabilseydik, belki de başka birçok bilgiye de ulaşabilirdik. Yazan: Emre Pelit`,
   publishedAt: '2026-10-13T03:29:38.335+03:00',

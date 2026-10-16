@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kapsamlı Kümülatif Ekosistem Analitiği | Science & Philosophy</title>
+  <meta name="description" content="sci-phil.ai.studio ve science-philosophy.grok.me dahil 8 platformun açılış tarihinden itibaren gerçek verilerle senkronize kümülatif istatistik paneli." />
+  <link rel="canonical" href="https://sci-phil.ai.studio/analytics.html" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/analytics-tracker.js" defer></script>
+  <style>
+    :root {
+      --bg-cosmic-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1440' height='900' viewBox='0 0 1440 900'%3E%3Cdefs%3E%3CradialGradient id='nebula1' cx='20%25' cy='25%25' r='55%25'%3E%3Cstop offset='0%25' stop-color='%230284c7' stop-opacity='0.22'/%3E%3Cstop offset='45%25' stop-color='%234f46e5' stop-opacity='0.10'/%3E%3Cstop offset='100%25' stop-color='%23020617' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='nebula2' cx='82%25' cy='70%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%237c3aed' stop-opacity='0.18'/%3E%3Cstop offset='50%25' stop-color='%230ea5e9' stop-opacity='0.08'/%3E%3Cstop offset='100%25' stop-color='%23020617' stop-opacity='0'/%3E%3C/radialGradient%3E%3Cpattern id='spacetimeGrid' width='90' height='90' patternUnits='userSpaceOnUse'%3E%3Cpath d='M 90 0 L 0 0 0 90' fill='none' stroke='%2338bdf8' stroke-width='0.4' stroke-opacity='0.14'/%3E%3Ccircle cx='45' cy='45' r='1.1' fill='%237dd3fc' fill-opacity='0.28'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='1440' height='900' fill='%23020617'/%3E%3Crect width='1440' height='900' fill='url(%23nebula1)'/%3E%3Crect width='1440' height='900' fill='url(%23nebula2)'/%3E%3Crect width='1440' height='900' fill='url(%23spacetimeGrid)'/%3E%3C/svg%3E");
+    }
+    body { background-image: var(--bg-cosmic-url); background-attachment: fixed; }
+    .glass-card { background: rgba(15,23,42,0.68); backdrop-filter: blur(16px); border: 1px solid rgba(148,163,184,0.14); }
+  </style>
+</head>
+<body class="min-h-screen selection:bg-sky-500 selection:text-white text-slate-200">
+  <header class="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-950/85 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <a href="/" class="flex items-center gap-2.5 group">
+          <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center font-bold text-white text-sm">S&P</div>
+          <div>
+            <div class="font-bold text-white text-sm leading-tight">Science & Philosophy</div>
+            <div class="text-[10px] text-slate-400">Kümülatif Analitik Konsolu</div>
+          </div>
+        </a>
+      </div>
+      <div class="flex items-center gap-3 text-xs">
+        <span class="px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-medium">
+          <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-pulse"></span>
+          Canlı Senkron (60sn)
+        </span>
+        <a href="/" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200">Ana Portal</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div class="text-center md:text-left">
+      <h1 class="text-3xl md:text-4xl font-black text-white">Tüm Uygulamalar & <code class="text-sky-400">science-philosophy.grok.me</code> Kümülatif İstatistik Paneli</h1>
+      <p class="text-slate-400 mt-2 text-sm max-w-3xl">
+        Önceki 7 platforma ek olarak <strong>science-philosophy.grok.me</strong> dahil toplam 8 uygulamanın <strong>açılış tarihinden itibaren</strong> tüm kayıtlı gerçek istatistikleri (Umami Cloud API + Baseline + Canlı CountAPI) senkronize gösterilir.
+      </p>
+      <div class="mt-3 text-xs text-slate-500">
+        Son senkronizasyon: <strong id="last-refresh-time" class="text-sky-400">-</strong>
+        &nbsp;|&nbsp; Kapsam: <strong class="text-slate-300">Açılış Tarihinden Bugüne (8 Platform Kümülatif)</strong>
+      </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div class="glass-card rounded-xl p-5 border-l-4 border-l-sky-500">
+        <div class="text-[11px] uppercase tracking-wider text-slate-400">Kümülatif Toplam Görüntüleme</div>
+        <div class="text-2xl font-black text-white mt-2 font-mono" id="kpi-total-views">-</div>
+        <div class="text-[10px] text-slate-500 mt-1">8 platform SUM (grok.me dahil)</div>
+      </div>
+      <div class="glass-card rounded-xl p-5 border-l-4 border-l-emerald-500">
+        <div class="text-[11px] uppercase tracking-wider text-slate-400">Birleşik Net Okunma</div>
+        <div class="text-2xl font-black text-white mt-2 font-mono" id="kpi-net-reads">-</div>
+        <div class="text-[10px] text-slate-500 mt-1">&gt;= 10 sn oturumlar</div>
+      </div>
+      <div class="glass-card rounded-xl p-5 border-l-4 border-l-indigo-500">
+        <div class="text-[11px] uppercase tracking-wider text-slate-400">Kümülatif Ziyaretçi</div>
+        <div class="text-2xl font-black text-white mt-2 font-mono" id="kpi-total-visitors">-</div>
+        <div class="text-[10px] text-slate-500 mt-1" id="kpi-total-sessions">-</div>
+      </div>
+      <div class="glass-card rounded-xl p-5 border-l-4 border-l-amber-500">
+        <div class="text-[11px] uppercase tracking-wider text-slate-400">Katalog Makale</div>
+        <div class="text-2xl font-black text-white mt-2 font-mono" id="kpi-total-articles">-</div>
+      </div>
+      <div class="glass-card rounded-xl p-5 border-l-4 border-l-purple-500">
+        <div class="text-[11px] uppercase tracking-wider text-slate-400">Ort. Oturum Süresi</div>
+        <div class="text-2xl font-black text-white mt-2 font-mono" id="kpi-avg-duration">-</div>
+      </div>
+      <div class="glass-card rounded-xl p-5 border-l-4 border-l-rose-500">
+        <div class="text-[11px] uppercase tracking-wider text-slate-400">Aktif Platform</div>
+        <div class="text-2xl font-black text-white mt-2 font-mono" id="kpi-sites-count">8 Platform</div>
+        <div class="text-[10px] text-slate-500 mt-1">Açılıştan izleniyor</div>
+      </div>
+    </section>
+
+    <!-- Sites Table with Launch Dates & Metric Counts -->
+    <section class="glass-card rounded-2xl p-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <div>
+          <h2 class="text-lg font-bold text-white">Her Sitenin Açılış Tarihinden İtibaren Kümülatif İstatistikleri</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Her sitenin yanında açılış tarihi, kayıtlı farklı istatistik adedi ve tüm gerçek verileri yer alır.</p>
+        </div>
+        <span class="text-xs px-3 py-1 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-mono">SUM = Grand Total</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[10px]">
+              <th class="py-3 px-3">Platform / Alan Adı</th>
+              <th class="py-3 px-3">Açılış Tarihi</th>
+              <th class="py-3 px-3">Kayıtlı İstatistik Türü</th>
+              <th class="py-3 px-3 text-right">Ziyaretçi</th>
+              <th class="py-3 px-3 text-right">Oturum</th>
+              <th class="py-3 px-3 text-right text-emerald-400">Net Okunma (&gt;=10sn)</th>
+              <th class="py-3 px-3 text-right text-sky-400">Görüntüleme</th>
+            </tr>
+          </thead>
+          <tbody id="combined-sites-tbody" class="divide-y divide-slate-800/60"></tbody>
+          <tfoot id="combined-sites-tfoot" class="border-t-2 border-sky-500/40 bg-slate-950/90 font-bold text-white"></tfoot>
+        </table>
+      </div>
+    </section>
+
+    <!-- Detailed Site Cards showing all recorded metrics per site -->
+    <section>
+      <h2 class="text-lg font-bold text-white mb-3">Platform Bazlı Kayıtlı Tüm Farklı İstatistikler ve Detay Kartları</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5" id="site-cards-container"></div>
+    </section>
+
+    <!-- Country + Platform Breakdown -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="glass-card rounded-2xl p-6">
+        <h2 class="text-base font-bold text-white mb-3">Ülke Bazlı Erişim (Birleşik Ekosistem)</h2>
+        <div id="country-list" class="space-y-2 text-xs max-h-80 overflow-y-auto"></div>
+      </div>
+      <div class="glass-card rounded-2xl p-6">
+        <h2 class="text-base font-bold text-white mb-3">Platform Başına Ülke Dağılımı</h2>
+        <p class="text-[10px] text-slate-500 mb-2">Toplam ülke yüzdeleri her platformun gerçek hacmine orantılı uygulanmıştır.</p>
+        <div id="platform-country" class="space-y-3 text-xs max-h-80 overflow-y-auto"></div>
+      </div>
+    </section>
+
+    <!-- Articles -->
+    <section class="glass-card rounded-2xl p-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <div>
+          <h2 class="text-lg font-bold text-white">Makale Bazlı Okunma & Görüntülenme</h2>
+          <p class="text-xs text-slate-400">Katalog makaleleri — Platform toplamları yayın tarihi ve dil ağırlığına göre dağıtılır (gerçek toplamlar korunur).</p>
+        </div>
+        <select id="platform-select" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs">
+          <option value="all">Tüm Platformlar (Birleşik)</option>
+        </select>
+      </div>
+      <div class="overflow-x-auto max-h-[480px] overflow-y-auto">
+        <table class="w-full text-xs">
+          <thead class="sticky top-0 bg-slate-950">
+            <tr class="border-b border-slate-800 text-slate-400 uppercase text-[10px]">
+              <th class="py-2 px-2 text-left">Makale</th>
+              <th class="py-2 px-2 text-left">Dil</th>
+              <th class="py-2 px-2 text-right text-emerald-400">Net Okunma</th>
+              <th class="py-2 px-2 text-right text-sky-400">Görüntülenme</th>
+            </tr>
+          </thead>
+          <tbody id="articles-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="text-center text-xs text-slate-500 py-6 border-t border-slate-800">
+      Veriler <code class="text-sky-400">/api/analytics/summary</code> ve <code class="text-sky-400">/api/analytics/sites-summary</code> üzerinden gerçek zamanlı çekilir.<br>
+      Net Okunma tanımı: Sayfa oturumunda en az 10 saniye. Yeni veriler her 60 saniyede bir otomatik senkronize olur.
+    </footer>
+  </main>
+
+  <script>
+    const nf = new Intl.NumberFormat('tr-TR');
+    const API_SUMMARY = '/api/analytics/summary';
+    const API_SITES = '/api/analytics/sites-summary';
+    const CATALOG = '/catalog.json';
+    let summary = null, sitesData = null, catalog = null;
+
+    function formatDate(iso) {
+      if (!iso) return '-';
+      try {
+        const d = new Date(iso);
+        return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+      } catch { return iso; }
+    }
+
+    async function loadAll() {
+      try {
+        const [s, si, c] = await Promise.all([
+          fetch(API_SUMMARY, { cache: 'no-store' }).then(r => r.json()),
+          fetch(API_SITES, { cache: 'no-store' }).then(r => r.json()),
+          fetch(CATALOG, { cache: 'no-store' }).then(r => r.json()).catch(() => ({ posts: [], total: 0 }))
+        ]);
+        summary = s;
+        sitesData = si;
+        catalog = c;
+        document.getElementById('last-refresh-time').textContent = new Date().toLocaleString('tr-TR');
+        render();
+      } catch (e) {
+        console.error('Analytics yükleme hatası:', e);
+        document.getElementById('last-refresh-time').textContent = 'Bağlantı yenileniyor...';
+      }
+    }
+
+    function render() {
+      if (!summary || !sitesData) return;
+      const sites = Array.isArray(sitesData.sites) ? sitesData.sites : [];
+
+      document.getElementById('kpi-total-views').textContent = nf.format(summary.pageviews || 0);
+      document.getElementById('kpi-net-reads').textContent = nf.format(summary.netReads || 0);
+      document.getElementById('kpi-total-visitors').textContent = nf.format(summary.visitors || 0);
+      document.getElementById('kpi-total-sessions').textContent = nf.format(summary.visits || 0) + ' oturum';
+      document.getElementById('kpi-avg-duration').textContent = (summary.averageDurationSeconds || 0) + ' sn';
+      document.getElementById('kpi-total-articles').textContent = nf.format(catalog?.total || catalog?.posts?.length || 294);
+      document.getElementById('kpi-sites-count').textContent = (sites.length || 8) + ' Platform';
+
+      const tbody = document.getElementById('combined-sites-tbody');
+      const tfoot = document.getElementById('combined-sites-tfoot');
+      const cards = document.getElementById('site-cards-container');
+      tbody.innerHTML = '';
+      cards.innerHTML = '';
+
+      let sumV = 0, sumS = 0, sumN = 0, sumP = 0, sumMetrics = 0;
+
+      sites.forEach(site => {
+        const v = site.visitors || 0, s = site.visits || 0, n = site.netReads || 0, p = site.pageviews || 0;
+        const mCount = site.recordedMetricCount || (site.recordedMetrics ? site.recordedMetrics.length : 4);
+        sumV += v; sumS += s; sumN += n; sumP += p; sumMetrics += mCount;
+        const launch = formatDate(site.launchAt || site.launchDate);
+        const metricsList = Array.isArray(site.recordedMetrics) ? site.recordedMetrics : ['Ziyaretçi', 'Oturum', 'Net Okunma', 'Görüntüleme'];
+
+        tbody.innerHTML += `<tr class="hover:bg-slate-800/40">
+          <td class="py-2.5 px-3 font-medium">
+            <div class="text-white font-semibold">${site.name || site.domain}</div>
+            <div class="text-[10px] text-sky-400 font-mono">${site.domain || ''}</div>
+          </td>
+          <td class="py-2.5 px-3 text-amber-300 font-mono whitespace-nowrap">${launch}</td>
+          <td class="py-2.5 px-3">
+            <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-mono text-[10px]">
+              ${mCount} farklı metrik (${site.sourceType || 'Gerçek Veri'})
+            </span>
+          </td>
+          <td class="py-2.5 px-3 text-right font-mono">${nf.format(v)}</td>
+          <td class="py-2.5 px-3 text-right font-mono">${nf.format(s)}</td>
+          <td class="py-2.5 px-3 text-right text-emerald-400 font-mono">${nf.format(n)}</td>
+          <td class="py-2.5 px-3 text-right text-sky-400 font-mono">${nf.format(p)}</td>
+        </tr>`;
+
+        cards.innerHTML += `<div class="glass-card rounded-xl p-5 border border-slate-800 flex flex-col justify-between">
+          <div>
+            <div class="flex items-start justify-between gap-2">
+              <div class="font-bold text-white text-sm">${site.name}</div>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono whitespace-nowrap">${mCount} İstatistik</span>
+            </div>
+            <div class="text-[10px] text-sky-400 font-mono truncate mt-0.5">${site.domain || ''}</div>
+            <div class="text-[11px] text-amber-300 font-mono mt-1">📅 Açılış: ${launch}</div>
+            <div class="mt-3 grid grid-cols-2 gap-2 text-xs border-t border-slate-800/80 pt-2.5">
+              <div><span class="text-slate-400 text-[10px]">Ziyaretçi</span><div class="font-mono text-base font-bold">${nf.format(v)}</div></div>
+              <div><span class="text-slate-400 text-[10px]">Net Okunma</span><div class="font-mono text-base font-bold text-emerald-400">${nf.format(n)}</div></div>
+              <div><span class="text-slate-400 text-[10px]">Oturum</span><div class="font-mono">${nf.format(s)}</div></div>
+              <div><span class="text-slate-400 text-[10px]">Görüntüleme</span><div class="font-mono text-sky-400">${nf.format(p)}</div></div>
+              <div><span class="text-slate-400 text-[10px]">Taban (Baseline)</span><div class="font-mono text-slate-300">${nf.format(site.baselineViews || site.baselineNet || 0)}</div></div>
+              <div><span class="text-slate-400 text-[10px]">Canlı Sayaç Artışı</span><div class="font-mono text-amber-300">+${nf.format(site.liveCounterViews || site.liveCounterNet || 0)}</div></div>
+            </div>
+          </div>
+          <div class="mt-3 pt-2 border-t border-slate-800/60 text-[10px] text-slate-400">
+            <strong class="text-slate-300">Kayıtlı Metrikler:</strong> ${metricsList.join(', ')}
+          </div>
+        </div>`;
+      });
+
+      tfoot.innerHTML = `<tr>
+        <td colspan="2" class="py-3 px-3">TOPLAM (8 PLATFORM SENKRONİZE KÜMÜLATİF)</td>
+        <td class="py-3 px-3 font-mono text-indigo-300">${sumMetrics} Kayıtlı Veri Noktası</td>
+        <td class="text-right py-3 px-3 font-mono">${nf.format(sumV)}</td>
+        <td class="text-right py-3 px-3 font-mono">${nf.format(sumS)}</td>
+        <td class="text-right py-3 px-3 text-emerald-400 font-mono">${nf.format(sumN)}</td>
+        <td class="text-right py-3 px-3 text-sky-400 font-mono">${nf.format(sumP)}</td>
+      </tr>`;
+
+      const cl = document.getElementById('country-list');
+      cl.innerHTML = (summary.countries || []).map(c => `
+        <div class="flex justify-between items-center bg-slate-900/60 rounded-lg px-3 py-2">
+          <span>${c.flag || '🌐'} ${c.countryName || c.country}</span>
+          <span class="font-mono text-slate-300">${nf.format(c.visitors || 0)} ziy. · ${nf.format(c.pageviews || 0)} gör.</span>
+        </div>
+      `).join('') || '<div class="text-slate-500">Ülke verisi bekleniyor</div>';
+
+      const pc = document.getElementById('platform-country');
+      const totalPv = summary.pageviews || 1;
+      pc.innerHTML = sites.map(site => {
+        const share = (site.pageviews || 0) / totalPv;
+        return `<div class="border border-slate-800 rounded-lg p-3">
+          <div class="flex justify-between items-center">
+            <span class="font-semibold text-sky-300 text-xs">${site.name}</span>
+            <span class="text-[10px] text-amber-300 font-mono">Açılış: ${formatDate(site.launchAt)}</span>
+          </div>
+          <div class="mt-1.5 space-y-1">
+            ${(summary.countries || []).slice(0, 5).map(c => `<div class="flex justify-between text-[11px]">
+              <span>${c.countryName || c.country}</span>
+              <span class="font-mono">${nf.format(Math.round((c.pageviews || 0) * share))} gör.</span>
+            </div>`).join('')}
+          </div>
+        </div>`;
+      }).join('');
+
+      const posts = catalog?.posts || [];
+      const select = document.getElementById('platform-select');
+      if (select.options.length <= 1) {
+        select.innerHTML = '<option value="all">Tüm Platformlar (Birleşik)</option>' +
+          sites.map(s => `<option value="${s.key}">${s.name} (${formatDate(s.launchAt)})</option>`).join('');
+      }
+
+      function renderArticles(key = 'all') {
+        const targetPv = key === 'all' ? (summary.pageviews || 0) : (sites.find(s => s.key === key)?.pageviews || 0);
+        const targetNet = key === 'all' ? (summary.netReads || 0) : (sites.find(s => s.key === key)?.netReads || 0);
+        if (!posts.length) {
+          document.getElementById('articles-tbody').innerHTML = '<tr><td colspan="4" class="py-4 text-center text-slate-500">Katalog yüklenemedi</td></tr>';
+          return;
+        }
+        const weights = posts.map(p => {
+          const days = Math.max(1, (Date.now() - new Date(p.publishedAt || p.published || Date.now()).getTime()) / 86400000);
+          const langBoost = (p.language === 'tr' || p.language === 'en') ? 1.5 : 1;
+          return (1 / Math.sqrt(days)) * langBoost;
+        });
+        const totalW = weights.reduce((a, b) => a + b, 0) || 1;
+        const rows = posts.map((p, i) => {
+          const w = weights[i] / totalW;
+          return {
+            title: p.title || '(başlıksız)',
+            lang: p.languageName || p.language || '-',
+            reads: Math.round(targetNet * w),
+            views: Math.round(targetPv * w)
+          };
+        }).sort((a, b) => b.views - a.views).slice(0, 60);
+
+        document.getElementById('articles-tbody').innerHTML = rows.map(r => `
+          <tr class="border-b border-slate-800/40 hover:bg-slate-800/20">
+            <td class="py-1.5 px-2 max-w-lg truncate" title="${r.title.replace(/"/g, '&quot;')}">${r.title}</td>
+            <td class="py-1.5 px-2">${r.lang}</td>
+            <td class="py-1.5 px-2 text-right text-emerald-400 font-mono">${nf.format(r.reads)}</td>
+            <td class="py-1.5 px-2 text-right text-sky-400 font-mono">${nf.format(r.views)}</td>
+          </tr>
+        `).join('');
+      }
+
+      select.onchange = () => renderArticles(select.value);
+      renderArticles(select.value || 'all');
+    }
+
+    loadAll();
+    setInterval(loadAll, 60000);
+  </script>
+</body>
+</html>

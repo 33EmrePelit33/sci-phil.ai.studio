@@ -1,6 +1,6 @@
 {
-  "name": "Science & Philosophy — Emre Pelit",
-  "description": "Emre Pelit'in Bilim ve Felsefe Makaleleri Portalı: emrepelit7337.blogspot.com senkronizasyonu, açık/koyu tema ve Gemini destekli güncel sektör uzmanı görüşleri.",
+  "name": "Sci-Phi | Science & Philosophy — Emre Pelit",
+  "description": "Sci-Phi ana makale arşivi: bilim, kozmoloji, zihin felsefesi, yapay zekâ ve epistemoloji konularında çok dilli içerikler; Blogger Türkçe arşiv senkronizasyonu.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

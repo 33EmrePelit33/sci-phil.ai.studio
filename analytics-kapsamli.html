@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kapsamlı Kümülatif İstatistik Paneli | sci-phil.ai.studio Ekosistemi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    body { background: #020617; color: #e2e8f0; }
+    .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.1); }
+    .kpi { @apply glass rounded-2xl p-6 border-l-4; }
+    table th { @apply text-[10px] uppercase tracking-wider text-slate-400 font-semibold; }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+  <div class="max-w-7xl mx-auto space-y-8">
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-black bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">
+          sci-phil.ai.studio Kapsamlı İstatistik Paneli
+        </h1>
+        <p class="text-slate-400 mt-1 text-sm">Açılış tarihinden itibaren gerçek Umami + katalog verileri • Net Okunma = sayfa oturumu ≥10 saniye</p>
+      </div>
+      <div class="text-xs font-mono bg-emerald-500/10 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/20">
+        <i class="fas fa-sync-alt mr-1"></i> Canlı API • Son güncelleme: <span id="last-sync">-</span>
+      </div>
+    </header>
+
+    <!-- KPI Cards -->
+    <section class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4" id="kpi-grid">
+      <div class="kpi border-l-sky-500">
+        <div class="text-[11px] uppercase text-slate-400">Kümülatif Toplam Görüntüleme</div>
+        <div class="text-2xl font-black mt-1" id="kpi-pageviews">-</div>
+        <div class="text-[10px] text-slate-500 mt-1">7 platform SUM</div>
+      </div>
+      <div class="kpi border-l-emerald-500">
+        <div class="text-[11px] uppercase text-slate-400">Birleşik Net Okunma</div>
+        <div class="text-2xl font-black mt-1" id="kpi-netreads">-</div>
+        <div class="text-[10px] text-slate-500 mt-1">≥10 sn oturumlar</div>
+      </div>
+      <div class="kpi border-l-indigo-500">
+        <div class="text-[11px] uppercase text-slate-400">Kümülatif Ziyaretçi</div>
+        <div class="text-2xl font-black mt-1" id="kpi-visitors">-</div>
+      </div>
+      <div class="kpi border-l-amber-500">
+        <div class="text-[11px] uppercase text-slate-400">Kümülatif Oturum</div>
+        <div class="text-2xl font-black mt-1" id="kpi-sessions">-</div>
+      </div>
+      <div class="kpi border-l-purple-500">
+        <div class="text-[11px] uppercase text-slate-400">Ortalama Oturum</div>
+        <div class="text-2xl font-black mt-1" id="kpi-avgdur">-</div>
+      </div>
+      <div class="kpi border-l-rose-500">
+        <div class="text-[11px] uppercase text-slate-400">Aktif Platform</div>
+        <div class="text-2xl font-black mt-1" id="kpi-sites">7</div>
+      </div>
+    </section>
+
+    <!-- Sites Table -->
+    <section class="glass rounded-2xl p-6">
+      <h2 class="text-xl font-bold mb-1">Her İncelenen Sitenin Açılışından Beri Toplam İstatistikleri</h2>
+      <p class="text-xs text-slate-400 mb-4">Gerçek Umami verileri • Tablo toplamı üst KPI'larla birebir eşleşir</p>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-slate-800">
+              <th class="text-left py-3 px-2">Platform</th>
+              <th class="text-left py-3 px-2">Açılış</th>
+              <th class="text-right py-3 px-2">Ziyaretçi</th>
+              <th class="text-right py-3 px-2">Oturum</th>
+              <th class="text-right py-3 px-2 text-emerald-400">Net Okunma (≥10sn)</th>
+              <th class="text-right py-3 px-2 text-sky-400">Görüntüleme</th>
+            </tr>
+          </thead>
+          <tbody id="sites-tbody"></tbody>
+          <tfoot id="sites-tfoot" class="border-t-2 border-sky-500/50 font-bold"></tfoot>
+        </table>
+      </div>
+    </section>
+
+    <!-- Country per platform -->
+    <section class="glass rounded-2xl p-6">
+      <h2 class="text-xl font-bold mb-4">Ülke Bazlı Okunma ve Görüntülenme (Ekosistem + Platform Dağılımı)</h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-semibold text-sky-300 mb-2">Genel Ülke Dağılımı (Gerçek Umami)</h3>
+          <div id="country-list" class="space-y-2 text-sm"></div>
+        </div>
+        <div>
+          <h3 class="font-semibold text-indigo-300 mb-2">Platform Başına Tahmini Ülke Payı</h3>
+          <p class="text-xs text-slate-500 mb-2">Toplam ülke yüzdeleri platform metriklerine orantılı uygulanmıştır (sayfa düzeyi ülke verisi herkese açık değil).</p>
+          <div id="platform-country" class="space-y-3 text-xs max-h-96 overflow-y-auto"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Per article -->
+    <section class="glass rounded-2xl p-6">
+      <h2 class="text-xl font-bold mb-1">Her Platformda Makale Bazlı Okunma ve Görüntülenme</h2>
+      <p class="text-xs text-slate-400 mb-4">Katalogdaki 294 makale • Platform toplamları makalelere yayın tarihine ve dil ağırlığına göre dağıtılmıştır (Umami sayfa-path düzeyi herkese açık API'de yok; gerçek toplamlar korunmuştur).</p>
+      <div class="mb-4">
+        <select id="platform-select" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm">
+          <option value="all">Tüm Platformlar (Birleşik)</option>
+        </select>
+      </div>
+      <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
+        <table class="w-full text-xs">
+          <thead class="sticky top-0 bg-slate-950">
+            <tr>
+              <th class="text-left py-2 px-2">Makale</th>
+              <th class="text-left py-2 px-2">Dil</th>
+              <th class="text-right py-2 px-2">Net Okunma</th>
+              <th class="text-right py-2 px-2">Görüntülenme</th>
+            </tr>
+          </thead>
+          <tbody id="articles-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="text-center text-xs text-slate-500 py-8">
+      Veriler sci-phil.ai.studio /api/analytics/summary ve /sites-summary + catalog.json üzerinden gerçek zamanlı çekilmiştir.<br>
+      Net Okunma tanımı: Bir sayfa oturumunda en az 10 saniye oturum süresi.
+    </footer>
+  </div>
+
+  <script>
+    const nf = new Intl.NumberFormat('tr-TR');
+    const API_SUMMARY = 'https://sci-phil.ai.studio/api/analytics/summary';
+    const API_SITES = 'https://sci-phil.ai.studio/api/analytics/sites-summary';
+    const CATALOG = 'https://sci-phil.ai.studio/catalog.json';
+
+    let summary = null, sitesData = null, catalog = null;
+
+    async function loadAll() {
+      try {
+        const [s, si, c] = await Promise.all([
+          fetch(API_SUMMARY).then(r => r.json()),
+          fetch(API_SITES).then(r => r.json()),
+          fetch(CATALOG).then(r => r.json())
+        ]);
+        summary = s; sitesData = si; catalog = c;
+        document.getElementById('last-sync').textContent = new Date().toLocaleString('tr-TR');
+        render();
+      } catch (e) {
+        console.error(e);
+        document.body.insertAdjacentHTML('afterbegin', '<div class="bg-red-900/50 p-4 text-center">API verisi alınamadı. Sayfayı yenileyin.</div>');
+      }
+    }
+
+    function render() {
+      // KPIs
+      document.getElementById('kpi-pageviews').textContent = nf.format(summary.pageviews || 0);
+      document.getElementById('kpi-netreads').textContent = nf.format(summary.netReads || 0);
+      document.getElementById('kpi-visitors').textContent = nf.format(summary.visitors || 0);
+      document.getElementById('kpi-sessions').textContent = nf.format(summary.visits || 0);
+      document.getElementById('kpi-avgdur').textContent = (summary.averageDurationSeconds || 0) + ' sn';
+
+      // Sites table
+      const tbody = document.getElementById('sites-tbody');
+      const tfoot = document.getElementById('sites-tfoot');
+      tbody.innerHTML = '';
+      let sumV=0, sumS=0, sumN=0, sumP=0;
+      sitesData.sites.forEach(site => {
+        sumV += site.visitors||0; sumS += site.visits||0; sumN += site.netReads||0; sumP += site.pageviews||0;
+        tbody.innerHTML += `<tr class="border-b border-slate-800/50 hover:bg-slate-800/30">
+          <td class="py-2 px-2 font-medium">${site.name}</td>
+          <td class="py-2 px-2 text-slate-400">${site.launchAt}</td>
+          <td class="py-2 px-2 text-right">${nf.format(site.visitors)}</td>
+          <td class="py-2 px-2 text-right">${nf.format(site.visits)}</td>
+          <td class="py-2 px-2 text-right text-emerald-400">${nf.format(site.netReads)}</td>
+          <td class="py-2 px-2 text-right text-sky-400">${nf.format(site.pageviews)}</td>
+        </tr>`;
+      });
+      tfoot.innerHTML = `<tr>
+        <td colspan="2" class="py-3 px-2">TOPLAM (Kümülatif)</td>
+        <td class="text-right">${nf.format(sumV)}</td>
+        <td class="text-right">${nf.format(sumS)}</td>
+        <td class="text-right text-emerald-400">${nf.format(sumN)}</td>
+        <td class="text-right text-sky-400">${nf.format(sumP)}</td>
+      </tr>`;
+
+      // Countries
+      const cl = document.getElementById('country-list');
+      cl.innerHTML = summary.countries.map(c => `
+        <div class="flex justify-between items-center bg-slate-900/50 rounded-lg px-3 py-2">
+          <span>${c.flag || ''} ${c.countryName}</span>
+          <span class="font-mono">${nf.format(c.visitors)} ziy. • ${nf.format(c.pageviews)} gör.</span>
+        </div>
+      `).join('');
+
+      // Platform country allocation
+      const pc = document.getElementById('platform-country');
+      pc.innerHTML = sitesData.sites.map(site => {
+        const share = (site.pageviews || 0) / (summary.pageviews || 1);
+        return `<div class="border border-slate-800 rounded-lg p-3">
+          <div class="font-semibold text-sky-300">${site.name}</div>
+          <div class="mt-1 space-y-1">
+            ${summary.countries.map(c => `<div class="flex justify-between"><span>${c.countryName}</span><span>${nf.format(Math.round(c.pageviews * share))} gör. / ${nf.format(Math.round(c.visitors * share))} ziy.</span></div>`).join('')}
+          </div>
+        </div>`;
+      }).join('');
+
+      // Articles: allocate
+      const posts = catalog.posts || [];
+      const totalArticles = posts.length || 1;
+      // Simple allocation: newer and TR/EN get more weight
+      const weights = posts.map(p => {
+        const days = Math.max(1, (Date.now() - new Date(p.published).getTime()) / 86400000);
+        const langBoost = (p.language === 'tr' || p.language === 'en') ? 1.4 : 1;
+        return (1 / Math.sqrt(days)) * langBoost;
+      });
+      const totalWeight = weights.reduce((a,b)=>a+b, 0) || 1;
+
+      const select = document.getElementById('platform-select');
+      select.innerHTML = '<option value="all">Tüm Platformlar (Birleşik)</option>' + 
+        sitesData.sites.map(s => `<option value="${s.key}">${s.name}</option>`).join('');
+
+      function renderArticles(platformKey = 'all') {
+        const targetPageviews = platformKey === 'all' ? summary.pageviews : (sitesData.sites.find(s=>s.key===platformKey)?.pageviews || 0);
+        const targetNet = platformKey === 'all' ? summary.netReads : (sitesData.sites.find(s=>s.key===platformKey)?.netReads || 0);
+        const tbodyA = document.getElementById('articles-tbody');
+        const rows = posts.map((p, i) => {
+          const w = weights[i] / totalWeight;
+          const views = Math.round(targetPageviews * w);
+          const reads = Math.round(targetNet * w);
+          return { title: p.title, lang: p.languageName || p.language, views, reads, date: p.published };
+        }).sort((a,b) => b.views - a.views).slice(0, 50); // top 50
+        tbodyA.innerHTML = rows.map(r => `
+          <tr class="border-b border-slate-800/40 hover:bg-slate-800/20">
+            <td class="py-1.5 px-2 max-w-md truncate" title="${r.title}">${r.title}</td>
+            <td class="py-1.5 px-2">${r.lang}</td>
+            <td class="py-1.5 px-2 text-right text-emerald-400">${nf.format(r.reads)}</td>
+            <td class="py-1.5 px-2 text-right text-sky-400">${nf.format(r.views)}</td>
+          </tr>
+        `).join('');
+      }
+      select.onchange = () => renderArticles(select.value);
+      renderArticles('all');
+    }
+
+    loadAll();
+    setInterval(loadAll, 60000);
+  </script>
+</body>
+</html>

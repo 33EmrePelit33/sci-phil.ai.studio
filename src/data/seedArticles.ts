@@ -37,6 +37,35 @@ export const SEED_ARTICLES: Article[] = [
       <h2>3. Nöral Benzeşim ve Niyetlilik (Intentionality)</h2>
       <p>İnsan beynindeki biyolojik nöron ağları ile yapay yapay sinir ağları arasındaki yüzeysel benzerlik, işlevsel bir eşdeğerlik yanılsaması üretir. Beyin; metabolik gereksinimler, bedenselleşmiş biliş (embodied cognition), homeostatik dengeler ve evrimsel hayatta kalma dürtüleriyle harmanlanmış bir organizmadır. Buna karşılık LLM, bir donanım üzerinde sadece sorgu anında aktifleşen statik bir ağırlık matrisidir.</p>
       
+      <div class="math-formula-box">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <strong style="color:#f59e0b;font-size:0.92rem;display:inline-flex;align-items:center;gap:6px;">
+            📐 Olasılıksal Belirteç Üretimi ve Şuurun Matematiksel Sınırları
+          </strong>
+          <span style="font-family:monospace;font-size:0.75rem;padding:2px 8px;border-radius:6px;background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);">
+            İstatistiksel Öğrenme &amp; IIT
+          </span>
+        </div>
+        <p style="font-size:0.85rem;color:#cbd5e1;margin-bottom:8px;">
+          Öznel şuur (qualia) ile otoregresif dil tahmini arasındaki biçimsel matematiksel ayrım:
+        </p>
+        <div class="math-equation">
+          P(w_t | w_{1:t-1}) = softmax(W_u · h_t) = exp(h_tᵀ · w_i) / ∑ exp(h_tᵀ · w_j) &nbsp;&nbsp;[Stokastik Belirteç Koşullu Olasılığı]
+        </div>
+        <div class="math-equation">
+          K(x) = min_p { |p| : U(p) = x } &nbsp;&nbsp;[Kolmogorov Algoritmik Bilgi Karmaşıklığı]
+        </div>
+        <div class="math-equation">
+          Φ = D_KL( p(X_t | X_{t-1}) ‖ ∏ p(M_tᵏ | M_{t-1}ᵏ) ) &nbsp;&nbsp;[Bütünleşik Bilgi Teorisi - Tononi Φ Değeri]
+        </div>
+        <div class="math-equation">
+          F ⊢ G_F ⟷ ¬Bew_F( ⌜G_F⌝ ) &nbsp;&nbsp;[Gödel-Lucas-Penrose İspatlanamazlık Bağıntısı]
+        </div>
+        <div style="font-size:0.8rem;color:#94a3b8;line-height:1.6;margin-top:10px;border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;">
+          <p><strong>Matematiksel Çıkarım:</strong> P(w_t | w_{1:t-1}) formülü modelin çıktılarının bir niyetlilik veya şuur değil, yüksek boyutlu gizli durum h_t üzerindeki koşullu matris izdüşümü olduğunu kanıtlar. Φ yaklaşımı ise feedforward veya attention tabanlı ayrık hesaplamanın nedensel entegrasyon üretmediğini, dolayısıyla fenomenal şuur oluşmadığını ortaya koyar.</p>
+        </div>
+      </div>
+
       <h2>4. Sonuç ve Gelecek Projeksiyonu</h2>
       <p>LLM'lerin gösterdiği yüksek kabiliyet, zekanın (computation/problem-solving) şuurdan (consciousness/sentience) ayrıştırılabileceğinin en somut kanıtıdır. İnsan davranışını mükemmel taklit eden bir sistem, şuur sahibi bir varlık değil; insanlığın kollektif zihninin kusursuz bir akustik yansımasıdır.</p>
     `,
@@ -79,6 +108,35 @@ export const SEED_ARTICLES: Article[] = [
 
       <h2>4. Bilinç ve Süreklilik İllüzyonu</h2>
       <p>Beyindeki bazal ganglionlar, serebellum ve prefrontal korteks arasındaki ritmik salınımlar zamanın parçalı (discreet) paketler halinde işlenmesini sağlar. Ancak bilinç, bu kesikli kareleri kesintisiz bir nehir gibi deneyimler. Dolayısıyla zaman, evrenin temel bir yapıtaşı olmaktan ziyade, bilincin dünyayı deneyimleyebilmek için taktığı "bilişsel bir prizma"dır.</p>
+
+      <div class="math-formula-box">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <strong style="color:#f59e0b;font-size:0.92rem;display:inline-flex;align-items:center;gap:6px;">
+            📐 Uzay-Zaman Metriği ve Biyolojik Zamanın Matematiksel Modeli
+          </strong>
+          <span style="font-family:monospace;font-size:0.75rem;padding:2px 8px;border-radius:6px;background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);">
+            Minkowski &amp; Termodinamik
+          </span>
+        </div>
+        <p style="font-size:0.85rem;color:#cbd5e1;margin-bottom:8px;">
+          Özel görelilikte mutlak bir "şimdi"nin imkansızlığı ve termodinamik zaman oku bağıntıları:
+        </p>
+        <div class="math-equation">
+          ds² = -c² dt² + dx² + dy² + dz² = -c² dτ² &nbsp;&nbsp;[Minkowski Dört-Boyutlu Uzay-Zaman Aralığı]
+        </div>
+        <div class="math-equation">
+          Δt' = γ · Δt = Δt / √(1 - v² / c²) &nbsp;&nbsp;[Lorentz Zaman Genişlemesi]
+        </div>
+        <div class="math-equation">
+          S = k_B · ln(Ω) = -k_B ∑ (p_i · ln p_i) &nbsp;&nbsp;[Boltzmann / Shannon Termodinamik Entropi]
+        </div>
+        <div class="math-equation">
+          τ_algı = t_duyu + Δt_postdiction ≈ t_0 + (80 ± 20) ms &nbsp;&nbsp;[Nöronal Retroaktif Eşzamanlama]
+        </div>
+        <div style="font-size:0.8rem;color:#94a3b8;line-height:1.6;margin-top:10px;border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;">
+          <p><strong>Formül Çıkarımı:</strong> ds² değişmezi, uzay ve zamanın bağımsız olmadığını, tek bir manifold oluşturduğunu kanıtlar. Δt_postdiction gecikmesi ise insanın deneyimlediği "şimdi"nin fiziksel değil, nöral entropiyi yöneten algoritmik bir tampon olduğunu matematiksel olarak gösterir.</p>
+        </div>
+      </div>
     `,
     
   },

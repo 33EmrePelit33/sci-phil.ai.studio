@@ -1,11 +1,11 @@
 /**
- * Public Blogger feed reader, fast delta synchronizer, cosmic background injector &
- * simultaneous natural-language translator for Science & Philosophy (sci-phil.ai.studio).
+ * Public Blogger feed reader, Turkish original article filter, cosmic background injector &
+ * React-safe simultaneous natural-language translator for Science & Philosophy (sci-phil.ai.studio).
  */
 
 export const BLOGGER_HOME_URL = 'https://emrepelit7337.blogspot.com';
 export const BLOGGER_FEED_URL = `${BLOGGER_HOME_URL}/feeds/posts/default`;
-export const AUTO_SYNC_INTERVAL_MS = 10 * 60 * 1000; // Maksimum 10 dakika
+export const AUTO_SYNC_INTERVAL_MS = 10 * 60 * 1000;
 
 const TURKISH_COMMON_WORDS = new Set([
   've', 'veya', 'bir', 'bu', 'şu', 'o', 'için', 'ile', 'gibi', 'olan', 'olarak',
@@ -116,14 +116,27 @@ export function normalizeBloggerUrl(url) {
 }
 
 export function isTurkishContent(title, content) {
-  const fullText = `${title || ''} ${content || ''}`.toLocaleLowerCase('tr-TR');
+  const fullText = `${title || ''} ${htmlToPlainText(content || '')}`.toLocaleLowerCase('tr-TR');
   const words = fullText.match(/[\p{L}\p{N}]+/gu) || [];
-  if (words.length < 5) return false;
-  let matches = 0;
+  if (words.length < 3) return true;
+
+  let trScore = 0;
+  let foreignScore = 0;
   for (const word of words) {
-    if (TURKISH_COMMON_WORDS.has(word)) matches++;
+    if (TURKISH_COMMON_WORDS.has(word)) trScore++;
+    if (
+      EN_COMMON_WORDS.has(word) ||
+      DE_COMMON_WORDS.has(word) ||
+      FR_COMMON_WORDS.has(word) ||
+      ES_COMMON_WORDS.has(word)
+    ) {
+      foreignScore++;
+    }
   }
-  return matches >= 2;
+  const hasTrChars = /[çğıöşü]/.test(fullText);
+  if (trScore >= 2 && trScore >= foreignScore) return true;
+  if (hasTrChars && foreignScore <= 2) return true;
+  return false;
 }
 
 export function isTurkishPost(post) {
@@ -142,29 +155,7 @@ export function isTurkishPost(post) {
     return true;
   }
 
-  const text = `${post.title || ''} ${htmlToPlainText(post.contentHtml || post.summaryHtml || '')}`.toLocaleLowerCase('tr-TR');
-  const words = text.match(/[a-zçğıöşüâîû]{2,}/gi) || [];
-  let trScore = 0;
-  let enScore = 0;
-  let deScore = 0;
-  let frScore = 0;
-  let esScore = 0;
-
-  for (const w of words) {
-    if (TURKISH_COMMON_WORDS.has(w)) trScore++;
-    if (EN_COMMON_WORDS.has(w)) enScore++;
-    if (DE_COMMON_WORDS.has(w)) deScore++;
-    if (FR_COMMON_WORDS.has(w)) frScore++;
-    if (ES_COMMON_WORDS.has(w)) esScore++;
-  }
-
-  const maxForeign = Math.max(enScore, deScore, frScore, esScore);
-  const hasTrUniqueChars = /[çğıöşü]/.test(text);
-
-  if (trScore >= 2 && trScore > maxForeign) return true;
-  if (hasTrUniqueChars && maxForeign === 0) return true;
-  if (hasTrUniqueChars && trScore >= maxForeign && trScore > 0) return true;
-  return false;
+  return isTurkishContent(post.title || '', post.contentHtml || post.summaryHtml || post.content || '');
 }
 
 function parseEntryId(rawId) {
@@ -346,7 +337,7 @@ export async function fetchAllBloggerPosts(options = {}) {
         const deltaData = await deltaRes.json();
         const deltaPosts = parseBloggerFeedPayload(deltaData);
         for (const post of deltaPosts) {
-          if (post.id) syncStateCache.postsById.set(post.id, post);
+          if (post.id && isTurkishPost(post)) syncStateCache.postsById.set(post.id, post);
         }
         syncStateCache.lastSyncTime = new Date().toISOString();
         syncStateCache.allPostsSorted = Array.from(syncStateCache.postsById.values()).sort(
@@ -356,28 +347,15 @@ export async function fetchAllBloggerPosts(options = {}) {
       }
     }
 
-    const headers = { Accept: 'application/json, application/atom+xml, */*' };
-    if (!forceFull && syncStateCache.etag) headers['If-None-Match'] = syncStateCache.etag;
-    if (!forceFull && syncStateCache.lastModified) headers['If-Modified-Since'] = syncStateCache.lastModified;
-
     const firstUrl = `${BLOGGER_FEED_URL}?alt=json&start-index=1&max-results=${PAGE_SIZE}`;
     const firstRes = await fetch(firstUrl, {
-      headers,
+      headers: { Accept: 'application/json, application/atom+xml, */*' },
       signal: AbortSignal.timeout(timeoutMs)
     });
 
-    if (firstRes.status === 304 && syncStateCache.allPostsSorted.length > 0) {
-      syncStateCache.lastSyncTime = new Date().toISOString();
-      return syncStateCache.allPostsSorted;
-    }
-
     if (!firstRes.ok) {
-      console.warn(`[Blogger sync] HTTP ${firstRes.status} on initial page.`);
       return syncStateCache.allPostsSorted;
     }
-
-    syncStateCache.etag = firstRes.headers.get('etag') || syncStateCache.etag;
-    syncStateCache.lastModified = firstRes.headers.get('last-modified') || syncStateCache.lastModified;
 
     const firstData = await firstRes.json();
     const firstBatch = parseBloggerFeedPayload(firstData);
@@ -408,7 +386,8 @@ export async function fetchAllBloggerPosts(options = {}) {
       }
     }
 
-    for (const post of allPosts) {
+    const turkishOnly = allPosts.filter(isTurkishPost);
+    for (const post of turkishOnly) {
       if (post.id) syncStateCache.postsById.set(post.id, post);
     }
     syncStateCache.lastSyncTime = new Date().toISOString();
@@ -416,7 +395,7 @@ export async function fetchAllBloggerPosts(options = {}) {
       (a, b) => new Date(b.publishedAt) - new Date(a.publishedAt)
     );
 
-    return allPosts;
+    return syncStateCache.allPostsSorted;
   } catch (err) {
     console.error('[Blogger sync] Error fetching Blogger posts:', err);
     return syncStateCache.allPostsSorted;
@@ -439,104 +418,6 @@ export async function triggerManualBloggerSync() {
     return { success: false, error: err };
   }
 }
-
-export const SITE_UI_DICTIONARY = {
-  tr: {
-    searchPlaceholder: 'Makale, kavram veya teorem ara...',
-    allCategories: 'Tüm Kategoriler',
-    readMore: 'Makaleyi Oku',
-    syncNow: 'Blogla Hızlı Eşitle',
-    syncing: 'Eşitleniyor...',
-    synced: 'Blog ile Senkronize',
-    claim: 'İddia',
-    counterClaim: 'Sokratik Karşı Tez',
-    notProof: 'Neyin Kanıtı Değildir?',
-    sectorDefinition: 'Sektör Tanımı',
-    sectorEvaluation: 'Sektör Değerlendirmesi',
-    socraticLab: 'Sokratik Diyalog Laboratuvarı',
-    epistemicFilter: 'Epistemik Süzgeç',
-    copyMatrix: 'Matrisi Panoya Kopyala',
-    copied: 'Analiz matrisi panoya kopyalandı!',
-    queryBtn: 'Sorgula',
-    liveAnalytics: 'Canlı Analitik'
-  },
-  en: {
-    searchPlaceholder: 'Search articles, concepts, or theorems...',
-    allCategories: 'All Categories',
-    readMore: 'Read Article',
-    syncNow: 'Fast Sync Blog',
-    syncing: 'Syncing...',
-    synced: 'Synchronized with Blog',
-    claim: 'Claim',
-    counterClaim: 'Socratic Counter-Thesis',
-    notProof: 'What Is It Not Proof Of?',
-    sectorDefinition: 'Sector Definition',
-    sectorEvaluation: 'Sector Evaluation',
-    socraticLab: 'Socratic Dialogue Laboratory',
-    epistemicFilter: 'Epistemic Filter',
-    copyMatrix: 'Copy Matrix to Clipboard',
-    copied: 'Analysis matrix copied to clipboard!',
-    queryBtn: 'Inquire',
-    liveAnalytics: 'Live Analytics'
-  },
-  de: {
-    searchPlaceholder: 'Artikel, Konzepte oder Theoreme suchen...',
-    allCategories: 'Alle Kategorien',
-    readMore: 'Artikel lesen',
-    syncNow: 'Blog schnell synchronisieren',
-    syncing: 'Synchronisiere...',
-    synced: 'Mit Blog synchronisiert',
-    claim: 'Behauptung',
-    counterClaim: 'Sokratische Gegenthese',
-    notProof: 'Wofür ist es kein Beweis?',
-    sectorDefinition: 'Sektordefinition',
-    sectorEvaluation: 'Sektorbewertung',
-    socraticLab: 'Sokratisches Dialoglabor',
-    epistemicFilter: 'Epistemischer Filter',
-    copyMatrix: 'Matrix in Zwischenablage kopieren',
-    copied: 'Analysematrix in die Zwischenablage kopiert!',
-    queryBtn: 'Hinterfragen',
-    liveAnalytics: 'Live-Analytik'
-  },
-  fr: {
-    searchPlaceholder: 'Rechercher des articles, concepts ou théorèmes...',
-    allCategories: 'Toutes les catégories',
-    readMore: "Lire l'article",
-    syncNow: 'Synchronisation rapide',
-    syncing: 'Synchronisation...',
-    synced: 'Synchronisé avec le blog',
-    claim: 'Affirmation',
-    counterClaim: 'Contre-thèse socratique',
-    notProof: "De quoi n'est-ce pas la preuve ?",
-    sectorDefinition: 'Définition du secteur',
-    sectorEvaluation: 'Évaluation du secteur',
-    socraticLab: 'Laboratoire de dialogue socratique',
-    epistemicFilter: 'Filtre épistémique',
-    copyMatrix: 'Copier la matrice',
-    copied: 'Matrice copiée dans le presse-papiers !',
-    queryBtn: 'Interroger',
-    liveAnalytics: 'Analytique en direct'
-  },
-  es: {
-    searchPlaceholder: 'Buscar artículos, conceptos o teoremas...',
-    allCategories: 'Todas las categorías',
-    readMore: 'Leer artículo',
-    syncNow: 'Sincronización rápida',
-    syncing: 'Sincronizando...',
-    synced: 'Sincronizado con el blog',
-    claim: 'Afirmación',
-    counterClaim: 'Contratesis socrática',
-    notProof: '¿De qué no es prueba?',
-    sectorDefinition: 'Definición del sector',
-    sectorEvaluation: 'Evaluación del sector',
-    socraticLab: 'Laboratorio de diálogo socrático',
-    epistemicFilter: 'Filtro epistémico',
-    copyMatrix: 'Copiar matriz al portapapeles',
-    copied: '¡Matriz copiada al portapapeles!',
-    queryBtn: 'Cuestionar',
-    liveAnalytics: 'Analítica en vivo'
-  }
-};
 
 function hashText(str) {
   let h = 2166136261;
@@ -565,10 +446,12 @@ export function unmaskFormulasAndCode(text, tokens) {
   return String(text || '').replace(/__\s*MATH_TOKEN_(\d+)\s*__/g, (_, idx) => tokens[Number(idx)] ?? '');
 }
 
-export async function translateNaturalText(text, targetLang, sourceLang = 'auto') {
+export async function translateNaturalText(text, targetLang, sourceLang = 'tr') {
   if (!text || !String(text).trim() || !targetLang) return text;
   const cleanTarget = String(targetLang).toLowerCase().slice(0, 2);
-  const cacheKey = `tr_${cleanTarget}_${hashText(text)}`;
+  if (cleanTarget === 'tr' && sourceLang === 'tr') return text;
+
+  const cacheKey = `tr2_${cleanTarget}_${hashText(text)}`;
 
   if (translationMemoryCache.has(cacheKey)) {
     return translationMemoryCache.get(cacheKey);
@@ -613,7 +496,7 @@ export async function translateNaturalText(text, targetLang, sourceLang = 'auto'
 export async function translateArticleSimultaneously(article, targetLang) {
   if (!article || !targetLang) return article;
   const cleanTarget = String(targetLang).toLowerCase().slice(0, 2);
-  if (article.language === cleanTarget) return article;
+  if (cleanTarget === 'tr') return article;
 
   const [
     title,
@@ -622,15 +505,17 @@ export async function translateArticleSimultaneously(article, targetLang) {
     content,
     claim,
     counterClaim,
-    notProof
+    notProof,
+    translatedCats
   ] = await Promise.all([
-    translateNaturalText(article.title || '', cleanTarget),
-    translateNaturalText(article.excerpt || '', cleanTarget),
-    translateNaturalText(article.summary || '', cleanTarget),
-    translateNaturalText(article.content || '', cleanTarget),
-    translateNaturalText(article.claim || article.dialecticalTriad?.claim || '', cleanTarget),
-    translateNaturalText(article.counterClaim || article.dialecticalTriad?.counterClaim || '', cleanTarget),
-    translateNaturalText(article.notProof || article.dialecticalTriad?.whatIsNotEvidence || '', cleanTarget)
+    translateNaturalText(article.title || '', cleanTarget, 'tr'),
+    translateNaturalText(article.excerpt || article.summary || '', cleanTarget, 'tr'),
+    translateNaturalText(article.summary || article.excerpt || '', cleanTarget, 'tr'),
+    translateNaturalText(article.content || '', cleanTarget, 'tr'),
+    translateNaturalText(article.claim || article.dialecticalTriad?.claim || article.title || '', cleanTarget, 'tr'),
+    translateNaturalText(article.counterClaim || article.dialecticalTriad?.counterClaim || '', cleanTarget, 'tr'),
+    translateNaturalText(article.notProof || article.dialecticalTriad?.whatIsNotEvidence || '', cleanTarget, 'tr'),
+    Promise.all((article.categories || ['Bilim & Felsefe']).map((c) => translateNaturalText(c, cleanTarget, 'tr')))
   ]);
 
   return {
@@ -642,15 +527,14 @@ export async function translateArticleSimultaneously(article, targetLang) {
     claim,
     counterClaim,
     notProof,
+    categories: translatedCats,
     translatedTo: cleanTarget,
-    dialecticalTriad: article.dialecticalTriad
-      ? {
-          ...article.dialecticalTriad,
-          claim,
-          counterClaim,
-          whatIsNotEvidence: notProof
-        }
-      : undefined
+    dialecticalTriad: {
+      ...(article.dialecticalTriad || {}),
+      claim,
+      counterClaim,
+      whatIsNotEvidence: notProof
+    }
   };
 }
 
@@ -658,62 +542,32 @@ export async function switchEntireSiteLanguage(targetLang) {
   if (typeof document === 'undefined') return;
   const cleanTarget = String(targetLang || 'tr').toLowerCase().slice(0, 2);
   document.documentElement.lang = cleanTarget;
-  document.body.classList.add('sciphil-translating');
 
-  const dict = SITE_UI_DICTIONARY[cleanTarget] || SITE_UI_DICTIONARY.en;
+  try {
+    localStorage.setItem('sciphil_lang', cleanTarget);
+  } catch {}
 
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (dict[key]) {
-      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-        el.setAttribute('placeholder', dict[key]);
-      } else {
-        el.textContent = dict[key];
+  window.dispatchEvent(new CustomEvent('sciphil:language-change', { detail: { lang: cleanTarget } }));
+
+  const staticNodes = Array.from(
+    document.querySelectorAll('[data-translatable="true"]')
+  ).filter(el => !el.closest('#root'));
+
+  await Promise.all(
+    staticNodes.map(async (el) => {
+      if (!el.dataset.origHtml) {
+        el.dataset.origHtml = el.innerHTML;
       }
-    }
-  });
-
-  const selector = [
-    '[data-translatable="true"]',
-    'article h1, article h2, article h3, article p, article li, article blockquote',
-    'main h1, main h2, main h3, main p',
-    '.article-title, .article-excerpt, .article-summary, .article-content, .debate-matrix-box'
-  ].join(', ');
-
-  const elements = Array.from(document.querySelectorAll(selector)).filter(
-    el => !el.closest('.katex, code, pre, script, style, [translate="no"]')
+      if (cleanTarget === 'tr') {
+        el.innerHTML = el.dataset.origHtml;
+      } else {
+        const tr = await translateNaturalText(el.dataset.origHtml, cleanTarget, 'tr');
+        if (tr) el.innerHTML = tr;
+      }
+    })
   );
-
-  elements.forEach(el => {
-    if (!el.dataset.origHtml) {
-      el.dataset.origHtml = el.innerHTML;
-    }
-  });
-
-  const tasks = elements.map(async el => {
-    const orig = el.dataset.origHtml || el.innerHTML;
-    const translated = await translateNaturalText(orig, cleanTarget);
-    return { el, translated };
-  });
-
-  const results = await Promise.all(tasks);
-
-  requestAnimationFrame(() => {
-    results.forEach(({ el, translated }) => {
-      el.innerHTML = translated;
-    });
-    document.body.classList.remove('sciphil-translating');
-    try {
-      localStorage.setItem('sciphil_lang', cleanTarget);
-    } catch {}
-    window.dispatchEvent(new CustomEvent('sciphil:language-change', { detail: { lang: cleanTarget } }));
-  });
 }
 
-/**
- * Sitenin arka planına Bilim, Kozmoloji ve Felsefe temasına uygun
- * Kozmik Uzay-Zaman ve Kuantum Ağı (Cosmic Spacetime & Neural Mesh) arka plan resmini uygular.
- */
 export function injectCosmicPhilosophyBackground() {
   if (typeof document === 'undefined' || document.getElementById('sciphil-cosmic-bg-style')) return;
 
@@ -732,14 +586,8 @@ export function injectCosmicPhilosophyBackground() {
       background-attachment: fixed !important;
     }
 
-    html:not(.dark) body.light,
     body.light-theme {
       background-image: var(--sciphil-cosmic-light) !important;
-    }
-
-    body.sciphil-translating [data-translatable="true"] {
-      opacity: 0.55;
-      transition: opacity 0.15s ease-in-out;
     }
   `;
   document.head.appendChild(style);
@@ -761,22 +609,6 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     injectCosmicPhilosophyBackground();
   }
 
-  document.addEventListener('click', (e) => {
-    const langBtn = e.target.closest('[data-lang], [data-language], .lang-btn, .language-option');
-    if (langBtn) {
-      const lang = langBtn.getAttribute('data-lang') || langBtn.getAttribute('data-language') || langBtn.textContent?.trim()?.toLowerCase();
-      if (lang && /^(tr|en|de|fr|es)$/i.test(lang)) {
-        switchEntireSiteLanguage(lang.toLowerCase());
-      }
-    }
-
-    const syncBtn = e.target.closest('[data-sync-blog], #sync-blog-btn, .sync-blog-btn');
-    if (syncBtn) {
-      triggerManualBloggerSync();
-    }
-  });
-
-  // Hiçbir kullanıcı tıklaması gelmese bile maksimum 10 dakikada bir otomatik eşitle
   setInterval(() => {
     triggerManualBloggerSync();
   }, AUTO_SYNC_INTERVAL_MS);

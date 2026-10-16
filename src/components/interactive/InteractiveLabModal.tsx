@@ -3,8 +3,9 @@ import { ChineseRoomSimulator } from './ChineseRoomSimulator';
 import { BlockUniverseSimulator } from './BlockUniverseSimulator';
 import { FallacyInspector } from './FallacyInspector';
 import { KnowledgeGraphView } from './KnowledgeGraphView';
+import { SocraticPartner } from './SocraticPartner';
 import { SocraticDialogueArena } from './SocraticDialogueArena';
-import { X, Sparkles, Cpu, Clock, AlertTriangle, Network, MessageSquare } from 'lucide-react';
+import { X, Sparkles, Cpu, Clock, AlertTriangle, Network, MessageSquare, Brain } from 'lucide-react';
 
 interface InteractiveLabModalProps {
   isOpen: boolean;
@@ -12,23 +13,24 @@ interface InteractiveLabModalProps {
   onFilterByQuery?: (query: string) => void;
 }
 
-export type LabTab = 'chinese-room' | 'time' | 'fallacy' | 'graph' | 'socrates';
+export type LabTab = 'chinese-room' | 'time' | 'fallacy' | 'graph' | 'socrates' | 'socratic-partner';
 
 export const InteractiveLabModal: React.FC<InteractiveLabModalProps> = ({
   isOpen,
   onClose,
   onFilterByQuery,
 }) => {
-  const [activeLabTab, setActiveLabTab] = useState<LabTab>('chinese-room');
+  const [activeLabTab, setActiveLabTab] = useState<LabTab>('socratic-partner');
 
   if (!isOpen) return null;
 
   const tabs = [
+    { id: 'socratic-partner', label: 'Sokratik Partner (Epistemik Matris)', icon: Brain },
     { id: 'chinese-room', label: 'Çin Odası & Qualia', icon: Cpu },
     { id: 'time', label: 'Zaman & Blok Evren', icon: Clock },
     { id: 'fallacy', label: 'Safsata Denetleyicisi', icon: AlertTriangle },
     { id: 'graph', label: 'Kavramsal Zihin Haritası', icon: Network },
-    { id: 'socrates', label: 'Sokratik Diyalog', icon: MessageSquare },
+    { id: 'socrates', label: 'Düşünür Arenası', icon: MessageSquare },
   ];
 
   return (
@@ -103,6 +105,7 @@ export const InteractiveLabModal: React.FC<InteractiveLabModalProps> = ({
               }}
             />
           )}
+          {activeLabTab === 'socratic-partner' && <SocraticPartner />}
           {activeLabTab === 'socrates' && <SocraticDialogueArena />}
         </div>
 

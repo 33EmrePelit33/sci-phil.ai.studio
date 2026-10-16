@@ -18,6 +18,16 @@ export interface UiTranslations {
   syncBlogger: string;
   syncing: string;
 
+  // Navigation Links (Consistent Across All Languages)
+  navHome: string;
+  navCatalog: string;
+  navClusters: string;
+  navAuthor: string;
+  navBlog: string;
+  share: string;
+  socraticPartner: string;
+  mathFormulations: string;
+
   // Hero Section
   heroPill: string;
   heroTitle: string;
@@ -80,6 +90,14 @@ export interface UiTranslations {
 
 export const UI_TRANSLATIONS: Record<SupportedLanguage, UiTranslations> = {
   tr: {
+    navHome: 'Ana Sayfa',
+    navCatalog: 'Katalog',
+    navClusters: 'Konu Kümeleri',
+    navAuthor: 'Yazar',
+    navBlog: 'Blog',
+    share: 'Paylaş',
+    socraticPartner: 'Sokratik Partner',
+    mathFormulations: 'Matematiksel Formülasyonlar',
     brandTitle: 'SCIENCE & PHILOSOPHY',
     brandSubtitle: 'Emre Pelit • Bilimsel & Felsefi Düşünce Portalı',
     searchPlaceholder: 'Makale, konu veya felsefi kavram ara...',
@@ -147,6 +165,14 @@ export const UI_TRANSLATIONS: Record<SupportedLanguage, UiTranslations> = {
   },
 
   en: {
+    navHome: 'Home',
+    navCatalog: 'Catalog',
+    navClusters: 'Topic Clusters',
+    navAuthor: 'Author',
+    navBlog: 'Blog',
+    share: 'Share',
+    socraticPartner: 'Socratic Partner',
+    mathFormulations: 'Mathematical Formulations',
     brandTitle: 'SCIENCE & PHILOSOPHY',
     brandSubtitle: 'Emre Pelit • Scientific & Philosophical Research Portal',
     searchPlaceholder: 'Search articles, topics or philosophical concepts...',
@@ -214,6 +240,14 @@ export const UI_TRANSLATIONS: Record<SupportedLanguage, UiTranslations> = {
   },
 
   de: {
+    navHome: 'Startseite',
+    navCatalog: 'Katalog',
+    navClusters: 'Themencluster',
+    navAuthor: 'Autor',
+    navBlog: 'Blog',
+    share: 'Teilen',
+    socraticPartner: 'Sokratischer Partner',
+    mathFormulations: 'Mathematische Formulierungen',
     brandTitle: 'SCIENCE & PHILOSOPHY',
     brandSubtitle: 'Emre Pelit • Wissenschaftliches & Philosophisches Portal',
     searchPlaceholder: 'Artikel, Themen oder Begriffe suchen...',
@@ -281,6 +315,14 @@ export const UI_TRANSLATIONS: Record<SupportedLanguage, UiTranslations> = {
   },
 
   fr: {
+    navHome: 'Accueil',
+    navCatalog: 'Catalogue',
+    navClusters: 'Grappes de sujets',
+    navAuthor: 'Auteur',
+    navBlog: 'Blog',
+    share: 'Partager',
+    socraticPartner: 'Partenaire socratique',
+    mathFormulations: 'Formulations mathématiques',
     brandTitle: 'SCIENCE & PHILOSOPHY',
     brandSubtitle: 'Emre Pelit • Portail de Pensée Scientifique et Philosophique',
     searchPlaceholder: 'Rechercher des articles, concepts...',
@@ -348,6 +390,14 @@ export const UI_TRANSLATIONS: Record<SupportedLanguage, UiTranslations> = {
   },
 
   es: {
+    navHome: 'Inicio',
+    navCatalog: 'Catálogo',
+    navClusters: 'Grupos de temas',
+    navAuthor: 'Autor',
+    navBlog: 'Blog',
+    share: 'Compartir',
+    socraticPartner: 'Compañero socrático',
+    mathFormulations: 'Formulaciones matemáticas',
     brandTitle: 'SCIENCE & PHILOSOPHY',
     brandSubtitle: 'Emre Pelit • Portal de Pensamiento Científico y Filosófico',
     searchPlaceholder: 'Buscar artículos, temas o conceptos...',
@@ -415,6 +465,14 @@ export const UI_TRANSLATIONS: Record<SupportedLanguage, UiTranslations> = {
   },
 
   it: {
+    navHome: 'Home',
+    navCatalog: 'Catalogo',
+    navClusters: 'Cluster di argomenti',
+    navAuthor: 'Autore',
+    navBlog: 'Blog',
+    share: 'Condividi',
+    socraticPartner: 'Partner socratico',
+    mathFormulations: 'Formulazioni matematiche',
     brandTitle: 'SCIENCE & PHILOSOPHY',
     brandSubtitle: 'Emre Pelit • Portale di Pensiero Scientifico e Filosofico',
     searchPlaceholder: 'Cerca articoli, argomenti o concetti...',
@@ -482,6 +540,14 @@ export const UI_TRANSLATIONS: Record<SupportedLanguage, UiTranslations> = {
   },
 
   ru: {
+    navHome: 'Главная',
+    navCatalog: 'Каталог',
+    navClusters: 'Тематические кластеры',
+    navAuthor: 'Автор',
+    navBlog: 'Блог',
+    share: 'Поделиться',
+    socraticPartner: 'Сократический партнёр',
+    mathFormulations: 'Математические формулировки',
     brandTitle: 'SCIENCE & PHILOSOPHY',
     brandSubtitle: 'Эмре Пелит • Портал научной и философской мысли',
     searchPlaceholder: 'Поиск статей, тем или концепций...',
@@ -549,6 +615,14 @@ export const UI_TRANSLATIONS: Record<SupportedLanguage, UiTranslations> = {
   },
 
   ar: {
+    navHome: 'الرئيسية',
+    navCatalog: 'الكتالوج',
+    navClusters: 'مجموعات المواضيع',
+    navAuthor: 'المؤلف',
+    navBlog: 'المدونة',
+    share: 'مشاركة',
+    socraticPartner: 'الشريك السقراطي',
+    mathFormulations: 'الصياغات الرياضية',
     brandTitle: 'SCIENCE & PHILOSOPHY',
     brandSubtitle: 'إمري بيليت • بوابة الفكر العلمي والفلسفي',
     searchPlaceholder: 'ابحث عن المقالات أو المفاهيم الفلسفية...',
@@ -616,6 +690,14 @@ export const UI_TRANSLATIONS: Record<SupportedLanguage, UiTranslations> = {
   },
 
   ja: {
+    navHome: 'ホーム',
+    navCatalog: 'カタログ',
+    navClusters: 'トピッククラスター',
+    navAuthor: '著者',
+    navBlog: 'ブログ',
+    share: '共有',
+    socraticPartner: 'ソクラテス的パートナー',
+    mathFormulations: '数学的定式化',
     brandTitle: 'SCIENCE & PHILOSOPHY',
     brandSubtitle: 'エムレ・ペリット • 科学と心の哲学研究ポータル',
     searchPlaceholder: '論文、テーマ、哲学的概念を検索...',
@@ -683,6 +765,14 @@ export const UI_TRANSLATIONS: Record<SupportedLanguage, UiTranslations> = {
   },
 
   zh: {
+    navHome: '首页',
+    navCatalog: '目录',
+    navClusters: '主题集群',
+    navAuthor: '作者',
+    navBlog: '博客',
+    share: '分享',
+    socraticPartner: '苏格拉底式伙伴',
+    mathFormulations: '数学公式',
     brandTitle: 'SCIENCE & PHILOSOPHY',
     brandSubtitle: '埃姆雷·佩利特 • 科学与心灵哲学研究门户',
     searchPlaceholder: '搜索文章、主题或哲学概念...',

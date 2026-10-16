@@ -41,17 +41,17 @@ test('server-only summary endpoint requests visitor totals and country dimension
   assert.match(server, /app\.get\('\/api\/analytics\/summary'/);
   assert.match(server, /ANALYTICS_START_AT/);
   assert.match(server, /\/stats\?/);
-  assert.match(server, /fields: 'country'/);
+  assert.match(server, /type=country/);
   assert.match(server, /buildRealAnalyticsPayload/);
   assert.doesNotMatch(server, /liveCountryTelemetry|Math\.random\(\) < 0\.45/);
   assert.match(server, /Authorization: `Bearer \$\{UMAMI_API_KEY\}`/);
   assert.match(server, /Europe\/Istanbul/);
-  assert.match(server, /30000/);
+  assert.match(server, /AbortSignal\.timeout\(8000\)/);
 });
 
 test('dashboard visibly renders unique visitors, pageviews, visits, and country counts', () => {
   for (const id of ['live-visitors', 'live-pageviews', 'live-visits', 'live-country-rows']) assert.ok(dashboard.includes(`id="${id}"`));
-  assert.match(dashboard, /24 Nisan 2026/);
+  assert.match(dashboard, /12 Ekim 2026/);
   assert.match(liveDashboardJs, /countries/);
   assert.match(liveDashboardJs, /const LIVE_AUTO_REFRESH_MS = 60 \* 1000/);
   assert.match(liveDashboardJs, /window\.setInterval\(load, LIVE_AUTO_REFRESH_MS\)/);
@@ -71,8 +71,11 @@ test('the combined dashboard supports configured sites without inventing metrics
   assert.match(server, /app\.get\('\/api\/analytics\/sites-summary'/);
   assert.match(server, /UMAMI_BLOGGER_WEBSITE_ID/);
   assert.match(server, /UMAMI_GROKME_WEBSITE_ID/);
-  assert.match(server, /status: site\.websiteId \? 'not_loaded' : 'not_configured'/);
-  assert.match(server, /visitors: null as number \| null/);
+  assert.match(server, /status: 'not_configured'/);
+  assert.match(server, /status: 'api_key_missing'/);
+  assert.match(server, /visitors: null/);
+  assert.match(server, /pageviews: null/);
+  assert.match(server, /visits: null/);
   assert.match(dashboard, /id="multi-site-analytics"/);
   assert.match(dashboard, /id="site-summary-rows"/);
   assert.match(liveDashboardJs, /fetch\('\/api\/analytics\/sites-summary'/);

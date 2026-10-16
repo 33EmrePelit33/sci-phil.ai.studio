@@ -259,7 +259,7 @@ export function injectSearchableArticleIndex(html, catalog) {
   const section = `    <section class="seo-article-index" aria-label="Makale arşivi">\n` +
     `      <details open>\n        <summary style="cursor:pointer;user-select:none;font-weight:700;font-size:1.05rem;padding:0.4rem 0;color:#fbbf24">Makale Arşivi — ${posts.length} makale</summary>\n` +
     `        <p>Bilim, felsefe, kozmoloji, zihin, yapay zekâ bilinci ve epistemoloji alanlarındaki yazılara doğrudan erişin.</p>\n` +
-    `        <p style="color:#7dd3fc;font-size:0.85rem;margin:.5rem 0"><strong>İç Linkleme &amp; Otorite Ağı:</strong> science-philosophy.ai.studio arşivi kalıcı olarak <a href="https://sci-phil.ai.studio/" style="color:#fde047">sci-phil.ai.studio</a> üzerinde birleştirilmiştir.</p>\n` +
+    `        <p style="color:#7dd3fc;font-size:0.85rem;margin:.5rem 0"><strong>Arşivin kanonik kaynağı:</strong> İçerikler <a href="https://sci-phil.ai.studio/" style="color:#fde047">Sci-Phi ana alan adında</a> yayımlanır.</p>\n` +
     `        <ul>\n${items}\n        </ul>\n      </details>\n    </section>`;
   const sectionPattern = /<section\b(?=[^>]*\bclass=["'][^"']*\bseo-article-index\b[^"']*["'])[^>]*>[\s\S]*?<\/section>/i;
   if (sectionPattern.test(html)) return html.replace(sectionPattern, section);
@@ -421,12 +421,34 @@ function renderArticlePage(post, posts, baseUrl = SITE_URL) {
 <meta name="author" content="Emre Pelit">
 <meta property="og:type" content="article"><meta property="og:site_name" content="Science &amp; Philosophy | Emre Pelit"><meta property="og:title" content="${escapeHtml(originalTitle)}"><meta property="og:description" content="${description}"><meta property="og:url" content="${escapeHtml(canonical)}"><meta property="og:image" content="${baseUrl}/author.jpg"><meta property="og:locale" content="${lang === 'tr' ? 'tr_TR' : lang}">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${escapeHtml(originalTitle)}"><meta name="twitter:description" content="${description}">
+<script defer src="/analytics-tracker.js"></script>
 <script type="application/ld+json">${jsonLd}</script>
 <style>
 :root{color-scheme:dark;--bg:#0b1120;--panel:#131c31;--line:#263550;--text:#f1f5f9;--muted:#aab8d0;--blue:#38bdf8;--gold:#d4af37}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:17px/1.8 system-ui,-apple-system,"Segoe UI",sans-serif}.wrap{width:min(900px,calc(100% - 32px));margin:auto}.top{padding:20px 0;border-bottom:1px solid var(--line)}.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:14px}.brand{color:var(--gold);font-weight:800;text-decoration:none}.analytics-nav{display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border:1px solid #365070;border-radius:10px;background:#13243d;color:var(--blue);text-decoration:none;font-weight:800;font-size:.82rem;white-space:nowrap}.analytics-nav:hover{background:#1a2b48}.crumbs{color:var(--muted);font-size:.9rem;margin:24px 0}.crumbs a,.nav a{color:var(--blue)}h1{font-size:clamp(2rem,5vw,3.2rem);line-height:1.2;margin:0 0 18px}h2{line-height:1.3}a{overflow-wrap:anywhere}.meta{color:var(--muted);font-size:.94rem;margin:14px 0 26px}.reader-tools{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:16px;margin:26px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center}.reader-tools button,.reader-tools select{background:#1b2a44;color:var(--text);border:1px solid #385174;border-radius:8px;padding:10px 12px;font:inherit}.status{flex-basis:100%;color:var(--muted);font-size:.9rem}.epistemology{margin:18px 0;padding:16px;border:1px solid #365070;border-radius:12px;background:#101a2d}.epistemology h2{font-size:1.05rem;margin:0 0 6px;color:var(--gold)}.sector-analysis{margin:28px 0;padding:20px;border:1px solid #3b4f70;border-radius:16px;background:linear-gradient(145deg,#131c31,#0f1729)}.sector-analysis h2{margin:18px 0 8px;font-size:1.35rem;color:var(--gold)}.sector-analysis h2:first-of-type{margin-top:8px}.sector-analysis h3{margin:16px 0 5px;font-size:1rem;color:var(--blue)}.sector-analysis p,.sector-analysis li{font-size:.9rem;line-height:1.7}.sector-kicker{display:inline-block;border:1px solid #45618a;border-radius:999px;padding:3px 9px;font-size:.8rem;color:#c7d8f5;font-weight:700;margin:0}.sector-thesis{padding:14px;background:#0b1324;border:1px solid #263550;border-radius:12px;margin:16px 0}.sector-thesis p{margin:6px 0 0}.sector-analysis ul{padding-left:22px}.sector-note{color:var(--muted);border-top:1px solid var(--line);padding-top:12px;margin-top:18px;font-size:.8rem!important}.sector-card-definition,.sector-card-assessment{font-size:.83rem;line-height:1.55;color:var(--muted);margin:10px 0}.sector-card-definition strong,.sector-card-assessment strong{color:var(--blue)}.article-body{overflow-wrap:anywhere}.article-body img,.article-body video{max-width:100%;height:auto}.article-body pre{max-width:100%;overflow:auto;background:#111b2e;padding:12px;border-radius:8px}.article-body table{display:block;max-width:100%;overflow:auto;border-collapse:collapse}.article-body td,.article-body th{padding:6px;border:1px solid var(--line)}.article-body blockquote{border-left:3px solid var(--blue);padding-left:16px;color:var(--muted)}.nav{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:30px 0}.nav a{max-width:48%}footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--muted);font-size:.9rem}
 .topic-cluster-box{margin:24px 0;padding:18px;border:1px solid #38bdf8;border-radius:14px;background:linear-gradient(145deg,#0c1d36,#10223d)}.cluster-badge{display:inline-block;padding:4px 10px;border-radius:8px;background:#0284c7;color:#fff;font-weight:750;font-size:0.82rem;margin-bottom:8px}.cluster-desc{font-size:0.92rem;color:#cbd5e1;margin:6px 0}.cluster-focus{font-size:0.88rem;color:#93c5fd;margin:4px 0}.cluster-links{margin-top:10px;font-size:0.88rem}.cluster-links ul{margin:6px 0 0;padding-left:20px}.cluster-links li{margin-bottom:4px}.deepening-section{margin:30px 0;padding:22px;border:1px solid #f59e0b;border-radius:16px;background:linear-gradient(145deg,#1c1917,#141210)}.deepening-section h2{color:#f59e0b;font-size:1.25rem;margin:0 0 10px}.deepening-questions{margin:10px 0;padding-left:20px;font-size:0.9rem;color:#d6d3d1;line-height:1.7}.author-eeat-card{display:flex;gap:14px;align-items:flex-start;padding:14px;border-radius:12px;background:#09090b;border:1px solid #27272a;margin-top:16px}@media(prefers-color-scheme:light){:root{color-scheme:light;--bg:#f8fafc;--panel:#fff;--line:#dce4ef;--text:#0f172a;--muted:#526174}}
-</style><script defer src="/web-vitals-reporter.js"></script><script defer src="/analytics-tracker.js"></script></head><body>
-<header class="top"><div class="wrap"><a class="brand" href="/">Science &amp; Philosophy · Emre Pelit</a><a class="analytics-nav" href="/analytics.html" aria-label="Canlı Analytics panelini aç">▥ Live Analytics ↗</a></div></header>
+</style>
+<header class="top"><div class="wrap" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <a href="/" style="display:inline-block;padding:2px;border-radius:12px;border:2px solid #f59e0b;cursor:pointer;" title="Yazar Profili: Emre Pelit">
+      <img src="/author.jpg" alt="Emre Pelit" style="width:40px;height:40px;border-radius:10px;object-fit:cover;display:block;" />
+    </a>
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <a class="brand" href="/" style="font-weight:800;font-size:1.1rem;letter-spacing:0.04em;">SCIENCE &amp; PHILOSOPHY</a>
+        <span style="font-size:10px;font-family:monospace;padding:2px 8px;border-radius:999px;background:#451a03;color:#fcd34d;border:1px solid #78350f;">sci-phil.ai.studio</span>
+      </div>
+      <small style="color:#94a3b8;font-size:11px;display:block;">Emre Pelit • Bilimsel &amp; Felsefi Düşünce Portalı</small>
+    </div>
+  </div>
+  <nav aria-label="Ana Gezinti" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+    <a href="/" style="padding:6px 12px;border-radius:8px;background:#1e293b;color:#f8fafc;font-size:12px;font-weight:600;text-decoration:none;border:1px solid #334155;">Ana Portal</a>
+    <a href="/#kulliyat" style="padding:6px 12px;border-radius:8px;background:#1e293b;color:#cbd5e1;font-size:12px;font-weight:600;text-decoration:none;border:1px solid #334155;">Makale Külliyatı</a>
+    <a href="/#kumeler" style="padding:6px 12px;border-radius:8px;background:#1e293b;color:#cbd5e1;font-size:12px;font-weight:600;text-decoration:none;border:1px solid #334155;">Konu Kümeleri</a>
+    <a href="https://emrepelit7337.blogspot.com/" target="_blank" rel="noopener" style="padding:6px 12px;border-radius:8px;background:#78350f33;color:#fbbf24;font-size:12px;font-weight:600;text-decoration:none;border:1px solid #f59e0b55;">Blog Ana Sayfa ↗</a>
+    <a class="analytics-nav" href="/analytics.html" aria-label="Canlı Analytics panelini aç">▥ Live Analytics ↗</a>
+  </nav>
+</div></header>
+</div></header>
 <main class="wrap"><nav class="crumbs" aria-label="Ekmek kırıntısı"><a href="/">Ana sayfa</a> / <a href="/#kulliyat">Bilim ve Felsefe Makaleleri</a></nav>
 <article><header><h1 id="article-title">${escapeHtml(originalTitle)}</h1><div class="meta">Yazar: Emre Pelit · Dil: ${escapeHtml(post.languageName || lang)} · Yayın: ${escapeHtml(String(post.published || '').slice(0, 10) || 'Tarih belirtilmemiş')} · Okuma süresi: ${escapeHtml(post.readingTime || '3 dk')}</div></header>
 ${epistemology}<div class="reader-tools" role="group" aria-label="Makale çeviri ve sesli okuma araçları"><label for="translate-language">Dil:</label><select id="translate-language"><option value="tr">Türkçe</option><option value="en">English</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option><option value="it">Italiano</option><option value="ru">Русский</option><option value="ar">العربية</option><option value="ja">日本語</option><option value="zh">中文</option><option value="pt">Português</option></select><button id="translate-article" type="button">🌐 Dile çevir</button><button id="speak-article" type="button">🔊 Sesli oku</button><button id="pause-article" type="button">⏸ Duraklat / sürdür</button><button id="stop-article" type="button">⏹ Durdur</button><p id="reader-status" class="status" role="status" aria-live="polite">Sesli okuma tarayıcı/işletim sistemi seslerine bağlıdır. Çeviri için sunucuda GEMINI_API_KEY ayarlanmalıdır.</p></div>
@@ -446,41 +468,11 @@ export function registerSeoRoutes(app, options = {}) {
   const includeHome = options.includeHome !== false;
   app.get('/robots.txt', (req, res) => {
     const baseUrl = getBaseUrl(req);
-    const robotsTxt = `User-agent: *
+    const robotsTxt = `# Sci-Phi primary domain: ${baseUrl}/
+User-agent: *
 Allow: /
 Disallow: /api/
 
-User-agent: Googlebot
-Allow: /
-
-User-agent: Googlebot-Image
-Allow: /
-
-User-agent: Googlebot-Mobile
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Yandex
-Allow: /
-
-User-agent: YandexBot
-Allow: /
-
-User-agent: Applebot
-Allow: /
-
-User-agent: DuckDuckBot
-Allow: /
-
-User-agent: Baiduspider
-Allow: /
-
-User-agent: Slurp
-Allow: /
-
-Host: ${baseUrl}
 Sitemap: ${baseUrl}/sitemap.xml
 `;
     res.type('text/plain; charset=utf-8').set('Cache-Control', 'public, max-age=600').send(robotsTxt);
